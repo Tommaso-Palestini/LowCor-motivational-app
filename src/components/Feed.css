@@ -1,0 +1,145 @@
+.feed-shell {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.feed-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.feed-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feed-counter {
+  color: var(--mist);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.feed {
+  position: relative;
+  height: min(640px, 74vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  background: var(--dusk);
+}
+
+.feed::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-card {
+  --glow: var(--lilac);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: 100%;
+  padding: 1.75rem;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.feed-card + .feed-card {
+  border-top: 1px solid var(--line);
+}
+
+.feed-card::before {
+  content: "";
+  position: absolute;
+  inset: -30% -30% auto auto;
+  z-index: -1;
+  width: 90%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--glow), transparent);
+  opacity: 0.28;
+  transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+}
+
+.feed-card--focus {
+  --glow: var(--peach);
+}
+
+.feed-card--answered::before {
+  opacity: 0.1;
+  transform: scale(0.8);
+}
+
+.feed-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(240, 237, 255, 0.09);
+  font-size: 0.8125rem;
+}
+
+.chip--quiet {
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--mist);
+}
+
+.feed-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.3;
+  text-wrap: balance;
+  transition: opacity 500ms ease;
+}
+
+.feed-card--answered .feed-text {
+  opacity: 0.55;
+}
+
+.feed-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.feed-actions .button {
+  flex: 1;
+}
+
+.feed-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  color: var(--mint);
+  font-weight: 500;
+  animation: unfold 350ms var(--ease);
+}
+
+.feed-result--skipped {
+  color: var(--mist);
+}
+
+.feed-empty {
+  display: grid;
+  place-content: center;
+  height: 100%;
+  padding: 2rem;
+  color: var(--mist);
+  text-align: center;
+}

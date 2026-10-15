@@ -1,0 +1,157 @@
+.activity-group + .activity-group {
+  margin-top: 1.5rem;
+}
+
+.activity-group-title {
+  margin-bottom: 0.5rem;
+  color: var(--mist);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.activity-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem;
+  border-radius: 22px;
+  transition: background-color 300ms ease;
+}
+
+.activity--focus {
+  background: rgba(255, 178, 138, 0.08);
+}
+
+.activity-name {
+  font-weight: 600;
+}
+
+.activity-meta {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.activity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  grid-column: 2;
+}
+
+.activity-note {
+  grid-column: 2 / -1;
+  padding: 0.5rem 0.875rem;
+  border-radius: 14px;
+  background: var(--wash);
+  font-size: 0.875rem;
+}
+
+.park-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  grid-column: 1 / -1;
+  animation: unfold 300ms var(--ease);
+}
+
+.park-form-input {
+  flex: 1 1 12rem;
+}
+
+@container (min-width: 460px) {
+  .activity {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+  }
+
+  .activity-actions {
+    grid-column: 3;
+    justify-content: flex-end;
+  }
+}
+
+/* Anello di progresso */
+
+.orbit {
+  width: 52px;
+  height: 52px;
+}
+
+.orbit-track {
+  fill: none;
+  stroke: var(--haze);
+  stroke-width: 5;
+}
+
+.orbit-fill {
+  fill: none;
+  stroke: var(--lilac);
+  stroke-width: 5;
+  transition:
+    stroke-dashoffset 800ms var(--ease),
+    stroke 450ms var(--ease);
+}
+
+.orbit--focus .orbit-fill {
+  stroke: var(--peach);
+}
+
+.orbit--done .orbit-fill {
+  stroke: var(--mint);
+}
+
+.orbit--parked .orbit-track {
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.orbit-text {
+  fill: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Nuova attività */
+
+.activity-add {
+  margin-top: 1.25rem;
+}
+
+.activity-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  animation: unfold 300ms var(--ease);
+}
+
+.activity-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activity-form-word {
+  color: var(--mist);
+}
+
+.activity-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

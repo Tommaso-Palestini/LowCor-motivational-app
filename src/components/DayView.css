@@ -1,0 +1,239 @@
+.day {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 760px) {
+  .day {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* Anello */
+
+.ring {
+  position: relative;
+  width: 340px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ring-track {
+  fill: none;
+  stroke: #3a3375;
+  stroke-width: 22;
+}
+
+.ring-elapsed {
+  fill: none;
+  stroke: #231f48;
+  stroke-width: 22;
+  stroke-linecap: butt;
+}
+
+.ring-hour {
+  fill: var(--mist);
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.ring-arc {
+  fill: none;
+  stroke-width: 22;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation: ring-draw 1000ms var(--ease) forwards;
+  animation-delay: calc(300ms + var(--i) * 120ms);
+  transition: stroke 450ms var(--ease);
+}
+
+.ring-arc--planned {
+  stroke: var(--lilac);
+}
+
+.ring-arc--focus {
+  stroke: var(--peach);
+}
+
+.ring-arc--done {
+  stroke: var(--mint);
+}
+
+@keyframes ring-draw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.ring-now-dot {
+  fill: var(--ink);
+}
+
+.ring-now-halo {
+  fill: rgba(240, 237, 255, 0.16);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: halo 2800ms ease-in-out infinite;
+}
+
+@keyframes halo {
+  0%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+}
+
+.ring-center {
+  position: absolute;
+  inset: 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+  animation: unfold 700ms var(--ease) 200ms both;
+}
+
+.ring-label,
+.ring-sub {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.ring-sub {
+  font-variant-numeric: tabular-nums;
+}
+
+.ring-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3.4vw, 1.6rem);
+  font-weight: 500;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+/* Lista dei blocchi */
+
+.day-panel {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.day-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0.375rem 0.375rem 0.5rem;
+  border-radius: var(--radius-row);
+  transition: background-color 250ms ease;
+}
+
+.day-item:hover {
+  background: var(--wash);
+}
+
+.day-item--now {
+  background: rgba(157, 140, 255, 0.12);
+}
+
+.day-swatch {
+  align-self: stretch;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--lilac);
+  transition: background-color 450ms var(--ease);
+}
+
+.day-item--focus .day-swatch {
+  background: var(--peach);
+}
+
+.day-item--done .day-swatch {
+  background: var(--mint);
+}
+
+.day-label {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.875rem;
+  min-width: 0;
+  padding: 0.375rem 0;
+  cursor: pointer;
+}
+
+.day-time {
+  min-width: 7.5rem;
+  color: var(--mist);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-name {
+  font-weight: 500;
+  transition: color 300ms ease;
+}
+
+.day-item--done .day-name {
+  color: var(--mist);
+  text-decoration: line-through;
+  text-decoration-color: rgba(121, 242, 203, 0.7);
+}
+
+.day-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-form-activity {
+  flex: 1 1 11rem;
+}
+
+.day-form-times {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.day-form-dash {
+  color: var(--mist);
+}

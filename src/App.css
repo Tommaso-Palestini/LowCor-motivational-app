@@ -1,0 +1,71 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem) 4rem;
+}
+
+/* Su telefono le due colonne si sciolgono e l'ordine lo decide "order" */
+.app-column {
+  display: contents;
+}
+
+.slot {
+  min-width: 0;
+}
+
+.slot--header {
+  order: 1;
+}
+
+.slot--day {
+  order: 2;
+}
+
+.slot--feed {
+  order: 3;
+}
+
+.slot--reminders {
+  order: 4;
+}
+
+.slot--activities {
+  order: 5;
+}
+
+.app-greeting {
+  margin-bottom: 0.25rem;
+  color: var(--mist);
+  animation: unfold 600ms var(--ease) both;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  animation: unfold 700ms var(--ease) 80ms both;
+}
+
+@media (min-width: 1100px) {
+  .app {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    gap: 3rem;
+  }
+
+  .app-column {
+    display: grid;
+    gap: 2.5rem;
+    min-width: 0;
+  }
+
+  .app-column--side {
+    gap: 1.5rem;
+  }
+}

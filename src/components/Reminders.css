@@ -1,0 +1,49 @@
+.reminders-empty {
+  margin-bottom: 1rem;
+  color: var(--mist);
+}
+
+.reminder-list {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.reminder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reminder-label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.reminder-text {
+  overflow-wrap: anywhere;
+  transition: color 300ms ease;
+}
+
+.reminder--done .reminder-text {
+  color: var(--mist);
+  text-decoration: line-through;
+  text-decoration-color: rgba(121, 242, 203, 0.7);
+}
+
+.reminder-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.reminder-form .field {
+  flex: 1;
+  min-width: 0;
+}
