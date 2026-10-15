@@ -139,8 +139,61 @@
 .feed-empty {
   display: grid;
   place-content: center;
+  justify-items: center;
+  gap: 1.25rem;
   height: 100%;
   padding: 2rem;
   color: var(--mist);
   text-align: center;
 }
+
+.chip--ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-color: color-mix(in oklch, var(--focus) 50%, transparent);
+  color: var(--focus);
+}
+
+.chip--ai svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Bottone "genera" che gira mentre l'AI lavora */
+.feed-generate--busy svg {
+  color: var(--focus);
+  animation: spin-slow 1.6s linear infinite;
+}
+
+/* Carta di attesa mentre arrivano quelle nuove */
+.feed-card--loading {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  --glow: var(--focus);
+}
+
+.feed-card--loading .feed-text {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+.feed-loading-orb {
+  width: 96px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in oklch, var(--ink) 70%, transparent), transparent 45%),
+    conic-gradient(from 0deg, var(--planned), var(--focus), var(--done), var(--planned));
+  filter: blur(1px);
+  box-shadow: 0 0 48px color-mix(in oklch, var(--focus) 55%, transparent);
+  animation: spin-slow 3s linear infinite, breathe 2.4s ease-in-out infinite;
+}
+
+.feed-loading-note {
+  max-width: 28ch;
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+

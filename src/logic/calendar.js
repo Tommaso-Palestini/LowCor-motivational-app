@@ -85,3 +85,22 @@ export function copyPreviousWeek(blocks, weekStart) {
 export function defaultWeekdays(dateString) {
   return [weekdayIndex(dateString)];
 }
+
+// I buchi liberi di un giorno tra "from" e "to" (in minuti), lunghi almeno minLength.
+export function freeWindows(dayBlocks, from, to, minLength = 30) {
+  const busy = dayBlocks
+    .map((block) => [timeToMinutes(block.start), timeToMinutes(block.end)])
+    .sort((a, b) => a[0] - b[0]);
+  const windows = [];
+  let cursor = from;
+  busy.forEach(([start, end]) => {
+    if (start - cursor >= minLength) {
+      windows.push({ start: cursor, end: Math.min(start, to) });
+    }
+    cursor = Math.max(cursor, end);
+  });
+  if (to - cursor >= minLength) {
+    windows.push({ start: cursor, end: to });
+  }
+  return windows.filter((window) => window.end - window.start >= minLength);
+}

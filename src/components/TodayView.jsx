@@ -15,7 +15,7 @@ function getGreeting(hour) {
   return "Buonasera";
 }
 
-function TodayView({ data, now, today, actions }) {
+function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
   const formattedDate = now.toLocaleDateString("it-IT", {
     weekday: "long",
     day: "numeric",
@@ -58,12 +58,15 @@ function TodayView({ data, now, today, actions }) {
       <aside className="today-column today-column--side">
         <div className="slot slot--feed">
           <Feed
-            key={data.cards.length}
             cards={data.cards}
             activities={data.activities}
             onView={actions.viewCard}
             onComplete={actions.completeCard}
             onSkip={actions.skipCard}
+            aiReady={ai.isReady}
+            isGenerating={isGeneratingCards}
+            autoMore={data.settings.aiAutoCards}
+            onGenerate={actions.generateCards}
           />
         </div>
 

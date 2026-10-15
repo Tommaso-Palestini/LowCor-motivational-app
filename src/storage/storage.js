@@ -4,6 +4,7 @@ import {
   sampleCards,
 } from "../data/sampleData";
 import { defaultSettings } from "../logic/settings";
+import { createMandala } from "../logic/mandala";
 
 const STORAGE_KEY = "daily-app-data";
 
@@ -15,6 +16,8 @@ const defaultData = {
   settings: defaultSettings,
   aura: 0,
   focus: null,
+  mandala: createMandala(),
+  brainstorm: { fit: [], explore: [] },
 };
 
 export function loadData() {
@@ -28,6 +31,7 @@ export function loadData() {
       ...defaultData,
       ...saved,
       settings: { ...defaultSettings, ...(saved.settings || {}) },
+      brainstorm: { ...defaultData.brainstorm, ...(saved.brainstorm || {}) },
     };
   } catch (error) {
     console.error("Could not load data:", error);

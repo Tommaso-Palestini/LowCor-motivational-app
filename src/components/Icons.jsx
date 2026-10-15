@@ -162,3 +162,45 @@ export function IconSettings() {
     </svg>
   );
 }
+
+export function IconSend() {
+  return (
+    <svg {...baseProps}>
+      <path d="M2.5 8h9M8 3.5L12.5 8 8 12.5" />
+    </svg>
+  );
+}
+
+export function IconStop() {
+  return (
+    <svg {...baseProps}>
+      <rect x="4" y="4" width="8" height="8" rx="1.5" />
+    </svg>
+  );
+}
+
+export function IconGrid() {
+  return (
+    <svg {...baseProps}>
+      <rect x="2.5" y="2.5" width="11" height="11" rx="2" />
+      <path d="M6.2 2.5v11M9.8 2.5v11M2.5 6.2h11M2.5 9.8h11" />
+    </svg>
+  );
+}
+
+export function IconBulb() {
+  return (
+    <svg {...baseProps}>
+      <path d="M6 13.5h4M6.5 11.5h3M8 2.5a4 4 0 0 0-2.4 7.2c.5.4.9 1 .9 1.8h3c0-.8.4-1.4.9-1.8A4 4 0 0 0 8 2.5z" />
+    </svg>
+  );
+}
+
+export function IconCalendarPlus() {
+  return (
+    <svg {...baseProps}>
+      <rect x="2.5" y="3.5" width="11" height="10" rx="2" />
+      <path d="M2.5 6.5h11M5.5 2v2.5M10.5 2v2.5M8 8.5v3M6.5 10h3" />
+    </svg>
+  );
+}

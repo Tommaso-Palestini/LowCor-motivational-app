@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { loadData, saveData } from "./storage/storage";
 import {
   addActivity,
+  findActivityByName,
   setFocus,
   parkActivity,
   resumeActivity,
@@ -13,7 +14,7 @@ import {
   deleteSeries,
   updateBlock,
 } from "./logic/blocks";
-import { incrementCardStat } from "./logic/cards";
+import { addCards, incrementCardStat } from "./logic/cards";
 import { addReminder, toggleReminder, deleteReminder } from "./logic/reminders";
 import { toDateString } from "./logic/dates";
 import { minutesOfDay, timeToMinutes } from "./logic/time";
@@ -28,12 +29,23 @@ import {
   settleFocus,
   MIN_SAVED_MINUTES,
 } from "./logic/focus";
+import {
+  createMandala,
+  resolveActionToggle,
+  setActionText,
+  setPillarTitle,
+} from "./logic/mandala";
+import { requestCards } from "./logic/aiTasks";
 import { useNow } from "./hooks/useNow";
 import { useHueWave } from "./hooks/useHueWave";
+import { useOllama } from "./hooks/useOllama";
 import Background from "./components/Background";
 import TopBar from "./components/TopBar";
+import { VIEWS } from "./logic/views";
 import TodayView from "./components/TodayView";
 import CalendarView from "./components/calendar/CalendarView";
+import GoalsView from "./components/goals/GoalsView";
+import BrainstormView from "./components/brainstorm/BrainstormView";
 import FocusMode from "./components/FocusMode";
 import Announcer from "./components/Announcer";
 import Toast from "./components/Toast";
@@ -51,9 +63,11 @@ function App() {
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
   const [toast, setToast] = useState(null);
+  const [isGeneratingCards, setIsGeneratingCards] = useState(false);
   const historyRef = useRef([]);
   const now = useNow();
   const today = toDateString(now);
+  const ai = useOllama(data.settings.aiUrl, data.settings.aiModel);
 
   useHueWave(data.settings);
 
@@ -63,9 +77,13 @@ function App() {
 
   // ---- Storia per annullare (Ctrl+Z) ----
 
+  function snapshot() {
+    historyRef.current = [...historyRef.current.slice(-(HISTORY_LIMIT - 1)), data];
+  }
+
   function commit(update, { record = true } = {}) {
     if (record) {
-      historyRef.current = [...historyRef.current.slice(-(HISTORY_LIMIT - 1)), data];
+      snapshot();
     }
     setData(update);
   }
@@ -80,12 +98,13 @@ function App() {
       showToast("Niente da annullare");
       return;
     }
-    // Ripristina solo i contenuti: impostazioni, carte del feed e focus restano come sono.
+    // Ripristina solo i contenuti: impostazioni, carte del feed, chat e focus restano come sono.
     setData((current) => ({
       ...current,
       activities: previous.activities,
       blocks: previous.blocks,
       reminders: previous.reminders,
+      mandala: previous.mandala,
       aura: previous.aura,
     }));
     showToast("Modifica annullata");
@@ -102,7 +121,17 @@ function App() {
       return;
     }
     const stamped = list.map((item, index) => ({ ...item, id: `${Date.now()}-${index}` }));
-    setAnnouncements((current) => [...current, ...stamped]);
+    // Gli annunci piccoli in coda si sostituiscono a vicenda: se spunti tante cose di fila
+    // non resti a guardare dieci annunci uno dopo l'altro.
+    setAnnouncements((current) =>
+      stamped.reduce((queue, item) => {
+        const last = queue[queue.length - 1];
+        if (item.size === "small" && queue.length > 1 && last.size === "small") {
+          return [...queue.slice(0, -1), item];
+        }
+        return [...queue, item];
+      }, current)
+    );
   }
 
   function nextAnnouncement() {
@@ -173,6 +202,87 @@ function App() {
     }
     updateField("blocks", (blocks) => addBlocks(blocks, copies));
     showToast(`${copies.length} blocchi copiati dalla settimana prima`, true);
+  }
+
+  // ---- AI: carte del feed ----
+
+  async function generateCards({ silent = false } = {}) {
+    if (isGeneratingCards || !ai.isReady) {
+      return;
+    }
+    setIsGeneratingCards(true);
+    try {
+      const drafts = await requestCards({
+        ai,
+        activities: data.activities,
+        cards: data.cards,
+        mandala: data.mandala,
+      });
+      const { added } = addCards(data.cards, drafts);
+      commit((current) => ({ ...current, cards: addCards(current.cards, drafts).cards }), { record: false });
+      if (!silent) {
+        showToast(added > 0 ? `${added} carte nuove in fondo al feed` : "Nessuna carta nuova questa volta, riprova");
+      }
+    } catch (error) {
+      showToast(error.message);
+    }
+    setIsGeneratingCards(false);
+  }
+
+  // ---- AI: brainstorming ----
+
+  // Trova l'attività per nome o la crea, e restituisce attività aggiornate e id.
+  function ensureActivity(activities, name, goal) {
+    const existing = findActivityByName(activities, name);
+    if (existing) {
+      return { activities, activityId: existing.id };
+    }
+    const activityId = crypto.randomUUID();
+    return {
+      activityId,
+      activities: addActivity(activities, { id: activityId, name, type: "passion", ...goal }),
+    };
+  }
+
+  function addProposals(proposals) {
+    commit((current) => {
+      let activities = current.activities;
+      const drafts = proposals.map((proposal) => {
+        const result = ensureActivity(activities, proposal.activityName, { amount: 1, period: "week" });
+        activities = result.activities;
+        return { date: proposal.date, start: proposal.start, end: proposal.end, activityId: result.activityId };
+      });
+      return { ...current, activities, blocks: addBlocks(current.blocks, drafts) };
+    });
+    showToast(proposals.length === 1 ? "Blocco aggiunto al calendario" : `${proposals.length} blocchi aggiunti`, true);
+  }
+
+  function adoptIdea(idea) {
+    commit((current) => {
+      const { activities, activityId } = ensureActivity(current.activities, idea.title, { amount: 3, period: "week" });
+      const { cards } = addCards(current.cards, [
+        { activityId, type: "micro-task", text: idea.firstStep, source: "ai" },
+      ]);
+      return { ...current, activities, cards };
+    });
+    showToast(`${idea.title} è tra le tue attività, il primo passo è nel feed`, true);
+  }
+
+  // ---- Schema 9×9 ----
+
+  function toggleMandalaAction(pillarIndex, actionIndex) {
+    const result = resolveActionToggle(data.mandala, pillarIndex, actionIndex);
+    commit((current) => ({
+      ...current,
+      mandala: result.next,
+      aura: Math.max(current.aura + result.auraDelta, 0),
+    }));
+    announce(result.announcements);
+  }
+
+  function clearMandala() {
+    updateField("mandala", () => createMandala());
+    showToast("Schema svuotato", true);
   }
 
   // ---- Focus ----
@@ -247,15 +357,14 @@ function App() {
         undo();
         return;
       }
-      if (event.ctrlKey || event.metaKey || event.altKey || document.querySelector("dialog[open]")) {
+      if (event.ctrlKey || event.metaKey || event.altKey || document.querySelector("dialog[open]") || isFocusOpen) {
         return;
       }
-      if (event.key.toLowerCase() === "f" && !isFocusOpen) {
+      const viewIndex = Number(event.key) - 1;
+      if (event.key.toLowerCase() === "f") {
         setIsFocusOpen(true);
-      } else if (event.key === "1" && !isFocusOpen) {
-        setView("today");
-      } else if (event.key === "2" && !isFocusOpen) {
-        setView("calendar");
+      } else if (VIEWS[viewIndex]) {
+        setView(VIEWS[viewIndex].id);
       }
     }
     document.addEventListener("keydown", handleKey);
@@ -281,10 +390,43 @@ function App() {
     completeCard: (id) =>
       updateField("cards", (cards) => incrementCardStat(cards, id, "completed"), { record: false }),
     skipCard: (id) => updateField("cards", (cards) => incrementCardStat(cards, id, "skipped"), { record: false }),
+    generateCards,
     addReminder: (text) => updateField("reminders", (reminders) => addReminder(reminders, text)),
     toggleReminder: (id) => updateField("reminders", (reminders) => toggleReminder(reminders, id)),
     deleteReminder: (id) => updateField("reminders", (reminders) => deleteReminder(reminders, id)),
+    setBrainstorm: (mode, messages) =>
+      commit((current) => ({ ...current, brainstorm: { ...current.brainstorm, [mode]: messages } }), {
+        record: false,
+      }),
+    addProposal: (proposal) => addProposals([proposal]),
+    addProposals,
+    adoptIdea,
+    setMandala: (update) => updateField("mandala", update),
+    setPillarTitle: (index, title) => updateField("mandala", (mandala) => setPillarTitle(mandala, index, title)),
+    setActionText: (pillarIndex, actionIndex, text) =>
+      updateField("mandala", (mandala) => setActionText(mandala, pillarIndex, actionIndex, text)),
+    toggleAction: toggleMandalaAction,
+    applyMandala: (update) => updateField("mandala", update, { record: false }),
+    snapshot,
+    clearMandala,
+    notify: (message) => showToast(message),
   };
+
+  let page = null;
+  if (view === "today") {
+    page = (
+      <TodayView
+        data={data}
+        now={now}
+        today={today}
+        actions={actions}
+        ai={ai}
+        isGeneratingCards={isGeneratingCards}
+      />
+    );
+  } else if (view === "calendar") {
+    page = <CalendarView data={data} now={now} actions={actions} />;
+  }
 
   return (
     <>
@@ -299,14 +441,19 @@ function App() {
           onOpenFocus={() => setIsFocusOpen(true)}
           settings={data.settings}
           onSettingsChange={(settings) => commit((current) => ({ ...current, settings }), { record: false })}
+          ai={ai}
         />
 
         <main className="app-main">
-          {view === "today" ? (
-            <TodayView data={data} now={now} today={today} actions={actions} />
-          ) : (
-            <CalendarView data={data} now={now} actions={actions} />
+          {page && (
+            <div key={view} className="app-page">
+              {page}
+            </div>
           )}
+          {/* Obiettivi e Idee restano montati anche quando sono nascosti:
+              se l'AI sta lavorando puoi cambiare sezione e la risposta arriva lo stesso. */}
+          <GoalsView mandala={data.mandala} ai={ai} actions={actions} hidden={view !== "goals"} />
+          <BrainstormView data={data} now={now} ai={ai} actions={actions} hidden={view !== "ideas"} />
         </main>
       </div>
 

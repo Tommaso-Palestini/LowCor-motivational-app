@@ -214,7 +214,7 @@ function FocusMode({
   }, [focus, remainingMs, onFinish]);
 
   useEffect(() => {
-    document.title = focus ? `${formatClock(remainingMs / 1000)} – ${activityName}` : "Daily";
+    document.title = focus ? `${formatClock(remainingMs / 1000)} – ${activityName}` : "LowCor";
   }, [focus, remainingMs, activityName]);
 
   useEffect(() => {

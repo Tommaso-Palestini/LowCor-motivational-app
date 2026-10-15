@@ -62,7 +62,8 @@ p {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -352,6 +353,25 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+    scale: 0.96;
+  }
+}
+
+@keyframes status-blink {
+  to {
+    opacity: 0.3;
   }
 }
 

@@ -1,6 +1,6 @@
-export function addActivity(activities, { name, type, amount, period }) {
+export function addActivity(activities, { id = crypto.randomUUID(), name, type, amount, period }) {
   const newActivity = {
-    id: crypto.randomUUID(),
+    id,
     name,
     type,
     status: "active",
@@ -8,6 +8,11 @@ export function addActivity(activities, { name, type, amount, period }) {
     resumeNote: "",
   };
   return [...activities, newActivity];
+}
+
+export function findActivityByName(activities, name) {
+  const wanted = name.trim().toLowerCase();
+  return activities.find((activity) => activity.name.trim().toLowerCase() === wanted) || null;
 }
 
 export function setFocus(activities, activityId) {

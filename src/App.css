@@ -8,6 +8,11 @@
 
 .app-main {
   min-width: 0;
+}
+
+.app-page,
+.goals-view:not([hidden]),
+.brainstorm:not([hidden]) {
   animation: view-in 450ms var(--ease);
 }
 
@@ -64,4 +69,14 @@
 
 .toast:not(:has(button)) {
   padding-right: 1.25rem;
+}
+
+@media (max-width: 760px) {
+  .app {
+    padding-bottom: 7rem;
+  }
+
+  .toast {
+    bottom: 5.25rem;
+  }
 }

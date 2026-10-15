@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { IconCheck } from "./Icons";
+import { IconCheck, IconSparkle } from "./Icons";
 
 const ADVANCE_DELAY = 450;
 
@@ -74,6 +74,12 @@ function FeedCard({
       <div className="feed-chips">
         <span className="chip">{activityName}</span>
         <span className="chip chip--quiet">{isFact ? "Curiosità" : "Micro-task"}</span>
+        {card.source === "ai" && (
+          <span className="chip chip--quiet chip--ai" title="Generata dall'AI locale">
+            <IconSparkle />
+            AI
+          </span>
+        )}
       </div>
 
       <p className="feed-text">{card.text}</p>
