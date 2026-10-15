@@ -1,0 +1,128 @@
+.lava {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--night);
+  pointer-events: none;
+}
+
+.lava::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 50%, transparent 40%, rgba(15, 12, 32, 0.65) 100%);
+}
+
+.lava-blob {
+  --offset: 0;
+  position: absolute;
+  width: 62vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    oklch(0.62 0.15 calc(var(--hue) + var(--offset))) 0%,
+    oklch(0.55 0.13 calc(var(--hue) + var(--offset)) / 0.45) 45%,
+    transparent 100%
+  );
+  opacity: 0.42;
+  mix-blend-mode: screen;
+  will-change: transform;
+  animation: var(--drift) var(--duration) ease-in-out infinite alternate;
+}
+
+.lava-blob--0 {
+  --offset: 0;
+  --drift: drift-a;
+  --duration: 70s;
+  top: -25vmax;
+  left: -20vmax;
+}
+
+.lava-blob--1 {
+  --offset: 55;
+  --drift: drift-b;
+  --duration: 95s;
+  top: 10vmax;
+  right: -30vmax;
+}
+
+.lava-blob--2 {
+  --offset: 120;
+  --drift: drift-c;
+  --duration: 82s;
+  bottom: -35vmax;
+  left: 5vmax;
+}
+
+.lava-blob--3 {
+  --offset: 190;
+  --drift: drift-a;
+  --duration: 110s;
+  bottom: -20vmax;
+  right: -10vmax;
+  width: 48vmax;
+  animation-direction: alternate-reverse;
+}
+
+.lava-blob--4 {
+  --offset: 250;
+  --drift: drift-c;
+  --duration: 125s;
+  top: 30vmax;
+  left: -25vmax;
+  width: 44vmax;
+  opacity: 0.32;
+}
+
+.lava-blob--5 {
+  --offset: 310;
+  --drift: drift-b;
+  --duration: 140s;
+  top: -15vmax;
+  left: 35vmax;
+  width: 40vmax;
+  opacity: 0.3;
+  animation-direction: alternate-reverse;
+}
+
+.lava--still .lava-blob {
+  animation-play-state: paused;
+}
+
+@keyframes drift-a {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(18vmax, 12vmax) scale(1.18);
+  }
+  100% {
+    transform: translate(6vmax, 28vmax) scale(0.92);
+  }
+}
+
+@keyframes drift-b {
+  0% {
+    transform: translate(0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate(-22vmax, 10vmax) scale(0.88);
+  }
+  100% {
+    transform: translate(-10vmax, -14vmax) scale(1.15);
+  }
+}
+
+@keyframes drift-c {
+  0% {
+    transform: translate(0, 0) scale(0.95);
+  }
+  50% {
+    transform: translate(14vmax, -18vmax) scale(1.2);
+  }
+  100% {
+    transform: translate(26vmax, -4vmax) scale(1);
+  }
+}

@@ -2,19 +2,10 @@ import { useState } from "react";
 import DayRing from "./DayRing";
 import { IconClose, IconPlus } from "./Icons";
 import { getCurrentAndNext, minutesOfDay } from "../logic/time";
+import { getBlockTone } from "../logic/tone";
 import "./DayView.css";
 
-function getTone(block, activity) {
-  if (block.done) {
-    return "done";
-  }
-  if (activity && activity.status === "focus") {
-    return "focus";
-  }
-  return "planned";
-}
-
-function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete }) {
+function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onFocusBlock }) {
   const [activityId, setActivityId] = useState("");
   const [start, setStart] = useState("09:00");
   const [end, setEnd] = useState("10:00");
@@ -32,7 +23,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete }) {
     return {
       ...block,
       name: activity ? activity.name : "Attività eliminata",
-      tone: getTone(block, activity),
+      tone: getBlockTone(block, activity, now),
     };
   });
 
@@ -64,6 +55,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete }) {
         nowMinutes={nowMinutes}
         current={current}
         next={next}
+        onFocusBlock={onFocusBlock}
       />
 
       <div className="day-panel">

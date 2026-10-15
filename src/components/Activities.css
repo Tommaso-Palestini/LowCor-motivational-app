@@ -28,7 +28,7 @@
 }
 
 .activity--focus {
-  background: rgba(255, 178, 138, 0.08);
+  background: color-mix(in oklch, var(--focus) 10%, transparent);
 }
 
 .activity-name {
@@ -93,7 +93,7 @@
 
 .orbit-fill {
   fill: none;
-  stroke: var(--lilac);
+  stroke: var(--planned);
   stroke-width: 5;
   transition:
     stroke-dashoffset 800ms var(--ease),
@@ -101,11 +101,11 @@
 }
 
 .orbit--focus .orbit-fill {
-  stroke: var(--peach);
+  stroke: var(--focus);
 }
 
 .orbit--done .orbit-fill {
-  stroke: var(--mint);
+  stroke: var(--done);
 }
 
 .orbit--parked .orbit-track {

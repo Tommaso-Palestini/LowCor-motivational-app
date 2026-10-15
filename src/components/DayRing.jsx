@@ -64,7 +64,7 @@ function getCenterText(blocks, current, next, nowMinutes) {
   };
 }
 
-function DayRing({ blocks, nowMinutes, current, next }) {
+function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
   const nowAngle = toAngle(nowMinutes);
   const showNow = nowMinutes >= RING_START;
   const nowPoint = polar(nowAngle, RADIUS);
@@ -110,6 +110,11 @@ function DayRing({ blocks, nowMinutes, current, next }) {
         <p className="ring-label">{center.label}</p>
         <p className="ring-title">{center.title}</p>
         <p className="ring-sub">{center.sub}</p>
+        {current && !current.done && (
+          <button type="button" className="ring-focus" onClick={() => onFocusBlock(current)}>
+            Entra in focus
+          </button>
+        )}
       </div>
     </div>
   );

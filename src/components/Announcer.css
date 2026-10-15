@@ -1,0 +1,177 @@
+.announcer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+
+/* Annuncio grande: entra di colpo come in un gioco, resta un attimo, poi sale e sparisce */
+.announce--big {
+  --accent: var(--planned);
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  animation: slam 2800ms var(--ease) forwards;
+}
+
+.announce--done {
+  --accent: var(--done);
+}
+
+.announce--focus {
+  --accent: var(--focus);
+}
+
+.announce--big::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 140vw;
+  height: 9rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--accent) 30%, transparent) 30%,
+    color-mix(in oklch, var(--accent) 45%, transparent) 50%,
+    color-mix(in oklch, var(--accent) 30%, transparent) 70%,
+    transparent
+  );
+  filter: blur(18px);
+  transform: translate(-50%, -50%) scaleX(0);
+  animation: sweep 2800ms var(--ease) forwards;
+}
+
+.announce--big .announce-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 9vw, 6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(100deg, var(--ink) 20%, var(--accent) 50%, var(--ink) 80%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px color-mix(in oklch, var(--accent) 70%, transparent));
+  animation: shine 2800ms linear forwards;
+}
+
+.announce-sub {
+  color: var(--ink);
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
+  font-weight: 500;
+}
+
+.announce-aura {
+  padding: 0.25rem 0.875rem;
+  border: 1px solid color-mix(in oklch, var(--focus) 60%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--focus) 16%, transparent);
+  color: var(--focus);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes slam {
+  0% {
+    opacity: 0;
+    transform: scale(1.7);
+    filter: blur(14px);
+  }
+  14% {
+    opacity: 1;
+    transform: scale(0.96);
+    filter: blur(0);
+  }
+  20% {
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.98);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translate(-50%, -50%) scaleX(0);
+    opacity: 0;
+  }
+  18% {
+    transform: translate(-50%, -50%) scaleX(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scaleX(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* Annuncio piccolo: una pillola in basso */
+.announce--small {
+  --accent: var(--done);
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 5.5rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border: 1px solid color-mix(in oklch, var(--accent) 50%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--dusk) 90%, transparent);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 30px color-mix(in oklch, var(--accent) 30%, transparent);
+  animation: pop-up 1800ms var(--ease) forwards;
+}
+
+.announce--small .announce-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.announce--small .announce-sub {
+  color: var(--mist);
+  font-size: 0.9375rem;
+}
+
+@keyframes pop-up {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}

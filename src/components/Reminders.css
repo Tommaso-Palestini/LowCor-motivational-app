@@ -35,7 +35,7 @@
 .reminder--done .reminder-text {
   color: var(--mist);
   text-decoration: line-through;
-  text-decoration-color: rgba(121, 242, 203, 0.7);
+  text-decoration-color: color-mix(in oklch, var(--done) 70%, transparent);
 }
 
 .reminder-form {

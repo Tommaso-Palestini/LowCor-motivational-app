@@ -44,3 +44,121 @@ export function IconShuffle() {
     </svg>
   );
 }
+
+export function IconSparkle() {
+  return (
+    <svg {...baseProps}>
+      <path d="M8 1.8l1.3 3.6c.2.5.6.9 1.1 1.1L14 7.8l-3.6 1.3c-.5.2-.9.6-1.1 1.1L8 13.8l-1.3-3.6c-.2-.5-.6-.9-1.1-1.1L2 7.8l3.6-1.3c.5-.2.9-.6 1.1-1.1z" />
+    </svg>
+  );
+}
+
+export function IconBolt() {
+  return (
+    <svg {...baseProps}>
+      <path d="M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z" />
+    </svg>
+  );
+}
+
+export function IconRepeat() {
+  return (
+    <svg {...baseProps} width={12} height={12}>
+      <path d="M2.5 7V6a2.5 2.5 0 0 1 2.5-2.5h7.5M10.5 1.5l2 2-2 2" />
+      <path d="M13.5 9v1a2.5 2.5 0 0 1-2.5 2.5H3.5M5.5 14.5l-2-2 2-2" />
+    </svg>
+  );
+}
+
+export function IconChevronLeft() {
+  return (
+    <svg {...baseProps}>
+      <path d="M10 3.5L5.5 8l4.5 4.5" />
+    </svg>
+  );
+}
+
+export function IconChevronRight() {
+  return (
+    <svg {...baseProps}>
+      <path d="M6 3.5L10.5 8 6 12.5" />
+    </svg>
+  );
+}
+
+export function IconWand() {
+  return (
+    <svg {...baseProps}>
+      <path d="M2.5 13.5l7-7M9.5 6.5l1.5-1.5" />
+      <path d="M11.5 1.5v2M10.5 2.5h2M13.5 6v1.6M12.7 6.8h1.6M6 1.8v1.4M5.3 2.5h1.4" />
+    </svg>
+  );
+}
+
+export function IconCopy() {
+  return (
+    <svg {...baseProps}>
+      <rect x="5.5" y="5.5" width="8" height="8" rx="2" />
+      <path d="M10.5 5.5V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" />
+    </svg>
+  );
+}
+
+export function IconDownload() {
+  return (
+    <svg {...baseProps}>
+      <path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10" />
+    </svg>
+  );
+}
+
+export function IconPlay() {
+  return (
+    <svg {...baseProps}>
+      <path d="M5 3.2v9.6c0 .5.5.8.9.5l7-4.8c.4-.3.4-.8 0-1L5.9 2.7c-.4-.3-.9 0-.9.5z" />
+    </svg>
+  );
+}
+
+export function IconPause() {
+  return (
+    <svg {...baseProps}>
+      <path d="M5.5 3v10M10.5 3v10" />
+    </svg>
+  );
+}
+
+export function IconExpand() {
+  return (
+    <svg {...baseProps}>
+      <path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" />
+    </svg>
+  );
+}
+
+export function IconTarget() {
+  return (
+    <svg {...baseProps}>
+      <circle cx="8" cy="8" r="5.5" />
+      <circle cx="8" cy="8" r="2" />
+    </svg>
+  );
+}
+
+export function IconMinimize() {
+  return (
+    <svg {...baseProps}>
+      <path d="M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5" />
+    </svg>
+  );
+}
+
+export function IconSettings() {
+  return (
+    <svg {...baseProps}>
+      <path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6" />
+      <circle cx="10" cy="4.5" r="1.5" />
+      <circle cx="6" cy="11.5" r="1.5" />
+    </svg>
+  );
+}

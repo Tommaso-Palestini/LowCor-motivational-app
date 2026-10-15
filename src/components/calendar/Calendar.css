@@ -1,0 +1,727 @@
+.calendar {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.calendar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
+.calendar-title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.calendar-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.6vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  animation: unfold 500ms var(--ease) both;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.calendar-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.segmented {
+  display: flex;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+}
+
+.segmented button {
+  min-height: 36px;
+  padding: 0.375rem 1rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--mist);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 250ms var(--ease), color 200ms ease;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: color-mix(in oklch, var(--ink) 14%, transparent);
+  color: var(--ink);
+}
+
+.calendar-week-layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .calendar-week-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+.calendar-hint {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+/* Settimana */
+
+.week {
+  position: relative;
+  max-height: min(72vh, 900px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(1.2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.week-head,
+.week-body {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  min-width: 640px;
+}
+
+.week-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  grid-template-columns: 3.5rem repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: var(--dusk);
+}
+
+.week-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 0.375rem;
+  padding: 0.625rem 0.25rem;
+  text-align: center;
+}
+
+.week-day-name {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.week-day-number {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.week-day-count {
+  flex-basis: 100%;
+  color: var(--mist);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.week-day--today .week-day-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--night);
+}
+
+.week-body {
+  position: relative;
+}
+
+.week-gutter {
+  position: relative;
+}
+
+.week-hour {
+  position: absolute;
+  right: 0.5rem;
+  color: var(--mist);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+}
+
+.week-hour:first-child {
+  display: none;
+}
+
+.week-columns {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background-image: linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 100% var(--hour);
+  cursor: crosshair;
+  touch-action: pan-x pan-y;
+  user-select: none;
+}
+
+.week-columns--dragging {
+  cursor: grabbing;
+}
+
+.week-column {
+  position: relative;
+  border-left: 1px solid var(--line);
+}
+
+.week-column--today {
+  background: color-mix(in oklch, var(--planned) 6%, transparent);
+}
+
+.week-now {
+  position: absolute;
+  left: -1px;
+  right: 0;
+  z-index: 2;
+  height: 2px;
+  background: var(--focus);
+  box-shadow: 0 0 10px var(--focus);
+  pointer-events: none;
+}
+
+.week-now::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--focus);
+}
+
+/* Blocchi nel calendario */
+
+.cal-block {
+  --tone: var(--planned);
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  overflow: hidden;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid color-mix(in oklch, var(--tone) 55%, transparent);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--tone) 24%, var(--dusk));
+  text-align: left;
+  cursor: grab;
+  transition:
+    box-shadow 200ms ease,
+    transform 160ms var(--ease),
+    background-color 450ms var(--ease),
+    border-color 450ms var(--ease);
+}
+
+.cal-block::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--tone);
+}
+
+.cal-block:hover {
+  z-index: 2;
+  box-shadow: 0 0 0 1px var(--tone), 0 8px 24px color-mix(in oklch, var(--night) 60%, transparent);
+}
+
+.cal-block--focus {
+  --tone: var(--focus);
+}
+
+.cal-block--done {
+  --tone: var(--done);
+}
+
+.cal-block--missed {
+  --tone: var(--missed);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      color-mix(in oklch, var(--missed) 14%, transparent) 6px 12px
+    ),
+    color-mix(in oklch, var(--missed) 12%, var(--dusk));
+}
+
+.cal-block--dragging {
+  z-index: 4;
+  box-shadow: 0 0 0 2px var(--tone), 0 18px 40px color-mix(in oklch, var(--night) 70%, transparent);
+  transform: scale(1.02);
+  cursor: grabbing;
+  opacity: 0.95;
+}
+
+.cal-block-name {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cal-block-name svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.cal-block-repeat {
+  display: inline-flex;
+  color: var(--mist);
+}
+
+.cal-block-time {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--mist);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cal-block--compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.375rem;
+  padding-block: 0;
+}
+
+.cal-block--compact .cal-block-time {
+  display: none;
+}
+
+.cal-block-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.cal-block-resize::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--tone);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 200ms ease;
+}
+
+.cal-block:hover .cal-block-resize::after {
+  opacity: 0.8;
+}
+
+.cal-ghost {
+  position: absolute;
+  right: 2px;
+  left: 2px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed var(--planned);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--planned) 18%, transparent);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* Obiettivi della settimana */
+
+.goals {
+  display: grid;
+  gap: 1rem;
+}
+
+.goals > .section-title {
+  margin-bottom: 0;
+}
+
+.goals-total {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.goals-list {
+  display: grid;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goal-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.goal-name {
+  font-weight: 600;
+}
+
+.goal-count {
+  color: var(--mist);
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-bar {
+  --tone: var(--planned);
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--haze);
+}
+
+.goal-bar--focus {
+  --tone: var(--focus);
+}
+
+.goal-done {
+  background: var(--done);
+  transition: width 700ms var(--ease);
+}
+
+.goal-planned {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--tone) 0 4px,
+    color-mix(in oklch, var(--tone) 45%, transparent) 4px 8px
+  );
+  transition: width 700ms var(--ease);
+}
+
+.goal-hint {
+  margin-top: 0.25rem;
+  color: var(--mist);
+  font-size: 0.75rem;
+}
+
+.goals-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.goals-note {
+  color: var(--mist);
+  font-size: 0.75rem;
+}
+
+/* Mese */
+
+.month {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.month-head,
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.month-head {
+  color: var(--mist);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.month-day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-height: 7.5rem;
+  padding: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      color-mix(in oklch, var(--done) calc(var(--heat) * 26%), transparent),
+      color-mix(in oklch, var(--done) calc(var(--heat) * 26%), transparent)
+    ),
+    var(--glass);
+  backdrop-filter: blur(18px);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 200ms ease, transform 160ms var(--ease);
+}
+
+.month-day:hover {
+  border-color: var(--line-strong);
+}
+
+.month-day:active {
+  transform: scale(0.98);
+}
+
+.month-day--other {
+  opacity: 0.45;
+}
+
+.month-day-number {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.month-day--today .month-day-number {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--night);
+}
+
+.month-day-blocks {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.month-chip {
+  --tone: var(--planned);
+  overflow: hidden;
+  padding: 0.125rem 0.5rem;
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--tone) 22%, transparent);
+  border-left: 3px solid var(--tone);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.month-chip--focus {
+  --tone: var(--focus);
+}
+
+.month-chip--done {
+  --tone: var(--done);
+}
+
+.month-chip--missed {
+  --tone: var(--missed);
+}
+
+.month-more {
+  color: var(--mist);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .month-day {
+    min-height: 4.5rem;
+    padding: 0.375rem;
+    border-radius: 12px;
+  }
+
+  .month-chip {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--tone);
+    font-size: 0;
+  }
+
+  .month-day-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+}
+
+/* Editor del blocco */
+
+.editor {
+  width: min(520px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: color-mix(in oklch, var(--dusk) 94%, transparent);
+  color: var(--ink);
+  box-shadow: 0 30px 80px color-mix(in oklch, var(--night) 75%, transparent);
+  animation: editor-in 320ms var(--ease);
+}
+
+.editor::backdrop {
+  background: color-mix(in oklch, var(--night) 55%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+@keyframes editor-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.editor-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.editor-field {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.editor-field > span {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.editor-row .field {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0.75rem;
+}
+
+.editor-warning {
+  padding: 0.625rem 0.875rem;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--focus) 12%, transparent);
+  color: var(--ink);
+  font-size: 0.8125rem;
+}
+
+.editor-repeat {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.editor-check {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+}
+
+.editor-repeat-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  animation: unfold 260ms var(--ease);
+}
+
+.editor-weekdays {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.editor-weekday {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.editor-weekday[aria-pressed="true"] {
+  border-color: var(--planned);
+  background: var(--planned);
+  color: var(--night);
+}
+
+.editor-weeks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mist);
+}
+
+.editor-actions,
+.editor-danger {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.editor-danger {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 480px) {
+  .editor-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editor-row .editor-field:first-child {
+    grid-column: 1 / -1;
+  }
+}

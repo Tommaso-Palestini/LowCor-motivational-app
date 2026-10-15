@@ -3,6 +3,7 @@ import {
   sampleBlocks,
   sampleCards,
 } from "../data/sampleData";
+import { defaultSettings } from "../logic/settings";
 
 const STORAGE_KEY = "daily-app-data";
 
@@ -11,6 +12,9 @@ const defaultData = {
   blocks: sampleBlocks,
   cards: sampleCards,
   reminders: [],
+  settings: defaultSettings,
+  aura: 0,
+  focus: null,
 };
 
 export function loadData() {
@@ -19,7 +23,12 @@ export function loadData() {
     if (raw === null) {
       return defaultData;
     }
-    return { ...defaultData, ...JSON.parse(raw) };
+    const saved = JSON.parse(raw);
+    return {
+      ...defaultData,
+      ...saved,
+      settings: { ...defaultSettings, ...(saved.settings || {}) },
+    };
   } catch (error) {
     console.error("Could not load data:", error);
     return defaultData;

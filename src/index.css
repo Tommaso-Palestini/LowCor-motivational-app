@@ -1,16 +1,29 @@
+/*
+  Tutta la palette dipende da una sola variabile: --hue.
+  L'onda di colori la fa girare da JavaScript (useHueWave).
+  I tre colori di stato stanno sempre a 120° di distanza sulla ruota dei colori,
+  così restano distinguibili qualunque sia la tinta del momento.
+*/
 :root {
-  --night: #17142e;
-  --dusk: #211d40;
-  --haze: #2f2a5a;
-  --ink: #f0edff;
-  --mist: #a9a3cf;
-  --lilac: #9d8cff;
-  --mint: #79f2cb;
-  --peach: #ffb28a;
+  --hue: 290;
 
-  --line: rgba(169, 163, 207, 0.16);
-  --line-strong: rgba(169, 163, 207, 0.34);
-  --wash: rgba(240, 237, 255, 0.05);
+  --night: oklch(0.19 0.045 var(--hue));
+  --dusk: oklch(0.245 0.06 var(--hue));
+  --haze: oklch(0.31 0.075 var(--hue));
+  --track: oklch(0.37 0.1 var(--hue));
+  --spent: oklch(0.255 0.06 var(--hue));
+  --ink: oklch(0.965 0.018 var(--hue));
+  --mist: oklch(0.79 0.05 var(--hue));
+
+  --planned: oklch(0.74 0.15 var(--hue));
+  --done: oklch(0.88 0.13 calc(var(--hue) - 120));
+  --focus: oklch(0.84 0.11 calc(var(--hue) + 120));
+  --missed: oklch(0.6 0.04 var(--hue));
+
+  --line: color-mix(in oklch, var(--mist) 18%, transparent);
+  --line-strong: color-mix(in oklch, var(--mist) 36%, transparent);
+  --wash: color-mix(in oklch, var(--ink) 6%, transparent);
+  --glass: color-mix(in oklch, var(--dusk) 62%, transparent);
 
   --font-display: "Unbounded Variable", system-ui, sans-serif;
   --font-body: "Onest Variable", system-ui, sans-serif;
@@ -32,10 +45,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(90% 60% at 0% 0%, #241f4d 0%, transparent 60%),
-    var(--night);
-  background-attachment: fixed;
+  background: var(--night);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -58,7 +68,7 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lilac);
+  outline: 2px solid var(--planned);
   outline-offset: 3px;
 }
 
@@ -86,8 +96,8 @@ select {
   padding: clamp(1.25rem, 3vw, 1.75rem);
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
-  background: rgba(33, 29, 64, 0.72);
-  backdrop-filter: blur(14px);
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(1.2);
 }
 
 .panel > .section-title {
@@ -101,7 +111,7 @@ select {
   padding: 0.625rem 1rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
-  background: var(--dusk);
+  background: color-mix(in oklch, var(--dusk) 85%, transparent);
   transition: border-color 200ms ease, background-color 200ms ease;
 }
 
@@ -115,23 +125,30 @@ select {
 }
 
 .field::placeholder {
-  color: rgba(169, 163, 207, 0.75);
+  color: color-mix(in oklch, var(--mist) 75%, transparent);
 }
 
 select.field {
   appearance: none;
   padding-right: 2.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23a9a3cf' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23b8b2d8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   cursor: pointer;
 }
 
-input[type="time"].field {
+select.field option {
+  background: #221d40;
+  color: #f2efff;
+}
+
+input[type="time"].field,
+input[type="date"].field {
   font-variant-numeric: tabular-nums;
 }
 
-input[type="time"].field::-webkit-calendar-picker-indicator {
+input[type="time"].field::-webkit-calendar-picker-indicator,
+input[type="date"].field::-webkit-calendar-picker-indicator {
   filter: invert(0.75);
   cursor: pointer;
 }
@@ -143,7 +160,7 @@ input[type="time"].field::-webkit-calendar-picker-indicator {
 
 .form-error {
   flex-basis: 100%;
-  color: var(--peach);
+  color: var(--focus);
   font-size: 0.875rem;
 }
 
@@ -170,6 +187,11 @@ input[type="time"].field::-webkit-calendar-picker-indicator {
 
 .button:active {
   transform: scale(0.96);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .button--primary {
@@ -200,6 +222,16 @@ input[type="time"].field::-webkit-calendar-picker-indicator {
 .button--quiet:hover {
   background: var(--wash);
   color: var(--ink);
+}
+
+.button--danger {
+  background: transparent;
+  border-color: color-mix(in oklch, var(--focus) 45%, transparent);
+  color: var(--focus);
+}
+
+.button--danger:hover {
+  border-color: var(--focus);
 }
 
 .icon-button {
@@ -257,14 +289,58 @@ input[type="time"].field::-webkit-calendar-picker-indicator {
 }
 
 .check:hover {
-  border-color: var(--mint);
+  border-color: var(--done);
 }
 
 .check:checked {
-  border-color: var(--mint);
-  background-color: var(--mint);
+  border-color: var(--done);
+  background-color: var(--done);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2317142e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5l2.5 2.5 4.5-5.5'/%3E%3C/svg%3E");
   animation: check-pop 380ms var(--ease);
+}
+
+/* Interruttore on/off */
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  cursor: pointer;
+  transition: background-color 250ms var(--ease);
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--mist);
+  transition: transform 300ms var(--ease), background-color 250ms ease;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--planned);
+}
+
+.switch[aria-checked="true"]::after {
+  transform: translateX(18px);
+  background: var(--night);
+}
+
+/* Cursore */
+
+.range {
+  width: 100%;
+  accent-color: var(--planned);
+  cursor: pointer;
 }
 
 @keyframes check-pop {
