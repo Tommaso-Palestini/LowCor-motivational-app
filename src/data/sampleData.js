@@ -2,6 +2,7 @@ export const sampleActivities = [
   {
     id: "a1",
     name: "Palestra",
+    energy: "high",
     type: "fixed",
     status: "active",
     goal: { amount: 5, period: "week" },
@@ -10,6 +11,7 @@ export const sampleActivities = [
   {
     id: "a2",
     name: "Dieta",
+    energy: "low",
     type: "fixed",
     status: "active",
     goal: { amount: 1, period: "day" },
@@ -18,6 +20,7 @@ export const sampleActivities = [
   {
     id: "a3",
     name: "Inglese",
+    energy: "medium",
     type: "passion",
     status: "focus",
     goal: { amount: 4, period: "week" },
@@ -26,6 +29,7 @@ export const sampleActivities = [
   {
     id: "a4",
     name: "Blender",
+    energy: "medium",
     type: "passion",
     status: "parked",
     goal: { amount: 3, period: "week" },

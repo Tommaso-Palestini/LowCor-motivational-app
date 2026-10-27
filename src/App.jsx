@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { loadData, saveData } from "./storage/storage";
 import {
   addActivity,
+  setActivityEnergy,
   findActivityByName,
   setFocus,
   parkActivity,
@@ -385,6 +386,8 @@ function App() {
     addActivity: (activity) => updateField("activities", (activities) => addActivity(activities, activity)),
     parkActivity: (id, note) => updateField("activities", (activities) => parkActivity(activities, id, note)),
     resumeActivity: (id) => updateField("activities", (activities) => resumeActivity(activities, id)),
+    setActivityEnergy: (id, energy) =>
+      updateField("activities", (activities) => setActivityEnergy(activities, id, energy)),
     setFocusActivity: (id) => updateField("activities", (activities) => setFocus(activities, id)),
     viewCard: (id) => updateField("cards", (cards) => incrementCardStat(cards, id, "views"), { record: false }),
     completeCard: (id) =>

@@ -1,10 +1,120 @@
 import { getWeekSummary } from "../../logic/planner";
 import { formatDuration } from "../../logic/time";
-import { weekDates } from "../../logic/dates";
+import { formatDate, weekDates } from "../../logic/dates";
+import { ENERGY, activityEnergy, nextEnergy } from "../../logic/energy";
 import { downloadIcs } from "../../logic/ics";
-import { IconCopy, IconDownload, IconWand } from "../Icons";
+import { IconBatteryLow, IconCopy, IconDownload, IconWand } from "../Icons";
 
-function WeekGoals({ activities, blocks, weekStart, now, canPlan, onPlan, onCopy }) {
+function EnergyChip({ activity, onChange }) {
+  const level = activityEnergy(activity);
+  const { label } = ENERGY[level];
+  return (
+    <button
+      type="button"
+      className={`energy-chip energy-chip--${level}`}
+      onClick={() => onChange(activity.id, nextEnergy(level))}
+      aria-label={`Energia di ${activity.name}: ${label.toLowerCase()}. Tocca per cambiarla`}
+      title="Energia richiesta: tocca per cambiarla"
+    >
+      <span className="energy-pips" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </span>
+      {label}
+    </button>
+  );
+}
+
+function shortDay(date) {
+  return formatDate(date, { weekday: "short", day: "numeric" });
+}
+
+function WeekEnergy({ energy, limits, rebalance, onMoveBlock }) {
+  const scale = Math.max(limits.maxLoad, ...energy.map((day) => day.load), 1);
+  const overloaded = energy.filter((day) => day.overloaded);
+
+  return (
+    <div className="energy">
+      <div className="energy-head">
+        <h3 className="energy-title">Energia della settimana</h3>
+        <span className="energy-legend">soglia {limits.maxLoad} punti</span>
+      </div>
+
+      <ol className="energy-bars" style={{ "--limit": `${(limits.maxLoad / scale) * 100}%` }}>
+        {energy.map((day) => (
+          <li
+            key={day.date}
+            className={`energy-day ${day.overloaded ? "energy-day--over" : ""}`}
+            title={`${shortDay(day.date)}: ${day.load} punti, ${day.high} blocchi intensi`}
+          >
+            <span className="energy-bar">
+              <span style={{ height: `${(day.load / scale) * 100}%` }} />
+            </span>
+            <span className="energy-load">{day.load}</span>
+            <span className="energy-day-name">{formatDate(day.date, { weekday: "narrow" })}</span>
+          </li>
+        ))}
+      </ol>
+
+      {overloaded.length === 0 ? (
+        <p className="goal-hint">Nessun giorno oltre la soglia: il carico è distribuito bene.</p>
+      ) : (
+        <div className="energy-warnings">
+          {overloaded.map((day) => {
+            const moves = rebalance.filter((move) => move.block.date === day.date);
+            return (
+              <div key={day.date} className="energy-warning">
+                <p className="energy-warning-title">
+                  <IconBatteryLow />
+                  {shortDay(day.date)}: rischio overload
+                </p>
+                <p className="goal-hint">
+                  {day.load} punti e {day.high} {day.high === 1 ? "blocco intenso" : "blocchi intensi"}
+                  {moves.length > 0 ? ". Prova a spostare:" : ". Nessun giorno libero dove spostare i blocchi: accorciane o togline uno."}
+                </p>
+                {moves.length > 0 && (
+                  <ul className="energy-moves">
+                    {moves.map(({ block, activity, to }) => (
+                      <li key={block.id} className="energy-move">
+                        <span>
+                          <strong>{activity ? activity.name : "Blocco"}</strong> {block.start} a {shortDay(to.date)}{" "}
+                          {to.start}
+                        </span>
+                        <button
+                          type="button"
+                          className="button button--quiet energy-move-button"
+                          onClick={() => onMoveBlock(block.id, to)}
+                        >
+                          Sposta
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WeekGoals({
+  activities,
+  blocks,
+  weekStart,
+  now,
+  canPlan,
+  energy,
+  limits,
+  rebalance,
+  onMoveBlock,
+  onSetEnergy,
+  onPlan,
+  onCopy,
+}) {
   const summary = getWeekSummary(activities, blocks, weekStart, now);
   const totalMissing = summary.reduce((sum, row) => sum + row.missing, 0);
   const minutesDone = summary.reduce((sum, row) => sum + row.minutesDone, 0);
@@ -35,6 +145,7 @@ function WeekGoals({ activities, blocks, weekStart, now, canPlan, onPlan, onCopy
             <li key={activity.id} className="goal">
               <div className="goal-line">
                 <span className="goal-name">{activity.name}</span>
+                <EnergyChip activity={activity} onChange={onSetEnergy} />
                 <span className="goal-count">
                   {done}/{target}
                 </span>
@@ -58,6 +169,8 @@ function WeekGoals({ activities, blocks, weekStart, now, canPlan, onPlan, onCopy
           );
         })}
       </ul>
+
+      <WeekEnergy energy={energy} limits={limits} rebalance={rebalance} onMoveBlock={onMoveBlock} />
 
       <div className="goals-actions">
         <button

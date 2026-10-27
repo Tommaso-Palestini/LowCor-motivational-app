@@ -1,8 +1,9 @@
-export function addActivity(activities, { id = crypto.randomUUID(), name, type, amount, period }) {
+export function addActivity(activities, { id = crypto.randomUUID(), name, type, amount, period, energy = "medium" }) {
   const newActivity = {
     id,
     name,
     type,
+    energy,
     status: "active",
     goal: { amount, period },
     resumeNote: "",
@@ -33,6 +34,10 @@ export function parkActivity(activities, activityId, resumeNote) {
       ? { ...activity, status: "parked", resumeNote }
       : activity
   );
+}
+
+export function setActivityEnergy(activities, activityId, energy) {
+  return activities.map((activity) => (activity.id === activityId ? { ...activity, energy } : activity));
 }
 
 export function resumeActivity(activities, activityId) {

@@ -8,7 +8,7 @@ import {
   minutesToTime,
   timeToMinutes,
 } from "../../logic/time";
-import { IconCheck, IconRepeat } from "../Icons";
+import { IconBatteryLow, IconCheck, IconRepeat } from "../Icons";
 
 const HOUR_HEIGHT = 52;
 const SNAP = 15;
@@ -27,7 +27,12 @@ function minutesToPixels(minutes) {
   return (minutes / 60) * HOUR_HEIGHT;
 }
 
-function WeekGrid({ dates, blocks, activities, now, onCreateDraft, onOpenBlock, onMoveBlock }) {
+function overloadReason(day, limits) {
+  const parts = [`${day.load} punti di energia (soglia ${limits.maxLoad})`, `${day.high} blocchi intensi (max ${limits.maxHigh})`];
+  return `Rischio overload: ${parts.join(", ")}. Sposta qualche blocco in un giorno più leggero.`;
+}
+
+function WeekGrid({ dates, blocks, activities, energy, limits, now, onCreateDraft, onOpenBlock, onMoveBlock }) {
   const scrollRef = useRef(null);
   const columnsRef = useRef(null);
   const dragRef = useRef(null);
@@ -177,19 +182,26 @@ function WeekGrid({ dates, blocks, activities, now, onCreateDraft, onOpenBlock, 
     <div className="week" ref={scrollRef}>
       <div className="week-head">
         <span className="week-corner" aria-hidden="true" />
-        {dates.map((date) => {
+        {dates.map((date, index) => {
           const dayBlocks = blocks.filter((block) => block.date === date);
           const doneCount = dayBlocks.filter((block) => block.done).length;
+          const day = energy[index];
           return (
             <div
               key={date}
-              className={`week-day ${date === today ? "week-day--today" : ""}`}
+              className={`week-day ${date === today ? "week-day--today" : ""} ${day.overloaded ? "week-day--overload" : ""}`}
             >
               <span className="week-day-name">{formatDate(date, { weekday: "short" })}</span>
               <span className="week-day-number">{formatDate(date, { day: "numeric" })}</span>
               {dayBlocks.length > 0 && (
                 <span className="week-day-count">
                   {doneCount}/{dayBlocks.length}
+                </span>
+              )}
+              {day.overloaded && (
+                <span className="energy-badge" role="img" aria-label={overloadReason(day, limits)} title={overloadReason(day, limits)}>
+                  <IconBatteryLow />
+                  <span className="energy-badge-text">Overload</span>
                 </span>
               )}
             </div>

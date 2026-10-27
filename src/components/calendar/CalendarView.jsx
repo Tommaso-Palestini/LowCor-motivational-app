@@ -12,6 +12,7 @@ import {
   weekDates,
 } from "../../logic/dates";
 import { minutesOfDay, minutesToTime } from "../../logic/time";
+import { energyLimits, suggestRebalance, weekEnergy } from "../../logic/energy";
 import { IconChevronLeft, IconChevronRight, IconPlus } from "../Icons";
 import "./Calendar.css";
 
@@ -37,6 +38,10 @@ function CalendarView({ data, now, actions }) {
   const dates = mode === "week" ? weekDates(anchor) : monthDates(anchor);
   const weekStart = weekDates(anchor)[0];
   const canPlan = weekDates(anchor)[6] >= today;
+  const limits = energyLimits(data.settings);
+  const energy = mode === "week" ? weekEnergy(dates, data.blocks, data.activities, limits) : [];
+  const rebalance =
+    mode === "week" ? suggestRebalance(dates, data.blocks, data.activities, limits, today) : [];
 
   function move(direction) {
     if (mode === "week") {
@@ -128,6 +133,8 @@ function CalendarView({ data, now, actions }) {
             dates={dates}
             blocks={data.blocks}
             activities={data.activities}
+            energy={energy}
+            limits={limits}
             now={now}
             onCreateDraft={openNewBlock}
             onOpenBlock={(blockId) => setEditor({ mode: "edit", blockId })}
@@ -139,6 +146,11 @@ function CalendarView({ data, now, actions }) {
             weekStart={weekStart}
             now={now}
             canPlan={canPlan}
+            energy={energy}
+            limits={limits}
+            rebalance={rebalance}
+            onMoveBlock={actions.moveBlock}
+            onSetEnergy={actions.setActivityEnergy}
             onPlan={() => actions.planWeek(weekStart)}
             onCopy={() => actions.copyWeek(weekStart)}
           />

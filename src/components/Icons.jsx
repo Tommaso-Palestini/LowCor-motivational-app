@@ -205,6 +205,15 @@ export function IconCalendarPlus() {
   );
 }
 
+export function IconBatteryLow() {
+  return (
+    <svg {...baseProps}>
+      <rect x="1.5" y="4.5" width="11" height="7" rx="1.5" />
+      <path d="M14.5 7v2M3.75 6.75v2.5" />
+    </svg>
+  );
+}
+
 export function IconSpinner({ className = "" }) {
   return (
     <svg {...baseProps} className={`spin ${className}`}>

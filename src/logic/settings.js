@@ -9,6 +9,9 @@ export const defaultSettings = {
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",
   aiAutoCards: true,
+  // Oltre queste soglie un giorno è in "Rischio overload"
+  energyMaxHigh: 3,
+  energyMaxLoad: 10,
 };
 
 export const WAVE_START_HUE = 25;

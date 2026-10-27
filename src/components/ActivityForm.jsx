@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ENERGY } from "../logic/energy";
 import { IconPlus } from "./Icons";
 
 function ActivityForm({ onAdd }) {
@@ -7,6 +8,7 @@ function ActivityForm({ onAdd }) {
   const [type, setType] = useState("passion");
   const [amount, setAmount] = useState(3);
   const [period, setPeriod] = useState("week");
+  const [energy, setEnergy] = useState("medium");
   const [error, setError] = useState("");
 
   function close() {
@@ -27,7 +29,7 @@ function ActivityForm({ onAdd }) {
       setError("L'obiettivo deve essere almeno 1.");
       return;
     }
-    onAdd({ name: trimmedName, type, amount: goalAmount, period });
+    onAdd({ name: trimmedName, type, amount: goalAmount, period, energy });
     close();
   }
 
@@ -77,6 +79,18 @@ function ActivityForm({ onAdd }) {
         >
           <option value="week">a settimana</option>
           <option value="day">al giorno</option>
+        </select>
+        <select
+          className="field"
+          value={energy}
+          onChange={(event) => setEnergy(event.target.value)}
+          aria-label="Energia richiesta"
+        >
+          {Object.entries(ENERGY).map(([level, { label }]) => (
+            <option key={level} value={level}>
+              Energia {label.toLowerCase()}
+            </option>
+          ))}
         </select>
       </div>
       {error && (

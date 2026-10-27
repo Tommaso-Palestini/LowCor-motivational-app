@@ -163,6 +163,35 @@ function SettingsPanel({ settings, onChange, ai }) {
         <Switch checked={settings.fullGas} onChange={(value) => set("fullGas", value)} label="Full gas" />
       </div>
 
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">Rischio overload</p>
+          <p className="settings-hint">Quando un giorno del calendario va segnalato come troppo pieno</p>
+        </div>
+      </div>
+      <label className="settings-slider">
+        <span className="settings-hint">Più di {settings.energyMaxHigh} blocchi a energia alta</span>
+        <input
+          type="range"
+          className="range"
+          min="1"
+          max="8"
+          value={settings.energyMaxHigh}
+          onChange={(event) => set("energyMaxHigh", Number(event.target.value))}
+        />
+      </label>
+      <label className="settings-slider">
+        <span className="settings-hint">Oppure più di {settings.energyMaxLoad} punti di energia (alta 3, media 2, bassa 1)</span>
+        <input
+          type="range"
+          className="range"
+          min="4"
+          max="24"
+          value={settings.energyMaxLoad}
+          onChange={(event) => set("energyMaxLoad", Number(event.target.value))}
+        />
+      </label>
+
       <AiSection ai={ai} settings={settings} set={set} />
 
       <div className="settings-shortcuts">
