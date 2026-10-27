@@ -13,6 +13,8 @@ const defaultData = {
   blocks: sampleBlocks,
   cards: sampleCards,
   reminders: [],
+  // Pensieri catturati al volo, da smistare: { id, text, createdAt }
+  inbox: [],
   settings: defaultSettings,
   aura: 0,
   focus: null,

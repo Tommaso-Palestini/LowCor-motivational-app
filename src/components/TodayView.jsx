@@ -3,6 +3,7 @@ import ActivityList from "./ActivityList";
 import Reminders from "./Reminders";
 import Feed from "./Feed";
 import FlexPlan from "./FlexPlan";
+import Inbox from "./inbox/Inbox";
 import { shouldPromptReview } from "../logic/review";
 import { IconSparkle } from "./Icons";
 import { getBlocksForDate } from "../logic/blocks";
@@ -61,6 +62,18 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
             onFocusBlock={actions.focusBlock}
           />
         </div>
+
+        {data.inbox?.length > 0 && (
+          <div className="slot slot--inbox">
+            <Inbox
+              inbox={data.inbox}
+              onToReminder={actions.thoughtToReminder}
+              onToActivity={actions.thoughtToActivity}
+              onDelete={actions.deleteThought}
+              onCapture={actions.openCapture}
+            />
+          </div>
+        )}
 
         <div className="slot slot--flex">
           <FlexPlan data={data} now={now} actions={actions} />

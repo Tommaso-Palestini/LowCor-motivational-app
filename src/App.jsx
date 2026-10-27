@@ -32,6 +32,8 @@ import {
 } from "./logic/blocks";
 import { addCards, incrementCardStat } from "./logic/cards";
 import { addReminder, toggleReminder, deleteReminder } from "./logic/reminders";
+import { addThought, removeThought, thoughtToActivityName } from "./logic/inbox";
+import QuickCapture from "./components/inbox/QuickCapture";
 import { toDateString, weekDates } from "./logic/dates";
 import { minutesOfDay, timeToMinutes } from "./logic/time";
 import { calculateProgress } from "./logic/progress";
@@ -100,6 +102,7 @@ function App() {
   }, []);
   const [view, setView] = useState("today");
   const [isFocusOpen, setIsFocusOpen] = useState(false);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
   const [toast, setToast] = useState(null);
   const [isGeneratingCards, setIsGeneratingCards] = useState(false);
@@ -544,6 +547,32 @@ function App() {
     showToast(`${idea.title} è tra le tue attività, il primo passo è nel feed`, true);
   }
 
+  // ---- Pensieri da smistare ----
+
+  function captureThought(text) {
+    updateField("inbox", (inbox) => addThought(inbox, text));
+    showToast("Messo da parte in “Da smistare”", true);
+  }
+
+  function thoughtToReminder(thought) {
+    commit((current) => ({
+      ...current,
+      inbox: removeThought(current.inbox, thought.id),
+      reminders: addReminder(current.reminders, thought.text),
+    }));
+    showToast("Ora è un promemoria", true);
+  }
+
+  function thoughtToActivity(thought) {
+    const name = thoughtToActivityName(thought.text);
+    commit((current) => ({
+      ...current,
+      inbox: removeThought(current.inbox, thought.id),
+      activities: ensureActivity(current.activities, name, { amount: 1, period: "week" }).activities,
+    }));
+    showToast(`${name} è tra le tue attività`, true);
+  }
+
   // ---- Schema 9×9 ----
 
   function toggleMandalaAction(pillarIndex, actionIndex) {
@@ -639,6 +668,9 @@ function App() {
       const viewIndex = Number(event.key) - 1;
       if (event.key.toLowerCase() === "f") {
         setIsFocusOpen(true);
+      } else if (event.key.toLowerCase() === "q") {
+        event.preventDefault();
+        setIsCaptureOpen(true);
       } else if (VIEWS[viewIndex]) {
         setView(VIEWS[viewIndex].id);
       }
@@ -658,6 +690,10 @@ function App() {
     planWeek: handlePlanWeek,
     copyWeek: handleCopyWeek,
     focusBlock,
+    openCapture: () => setIsCaptureOpen(true),
+    thoughtToReminder,
+    thoughtToActivity,
+    deleteThought: (thought) => updateField("inbox", (inbox) => removeThought(inbox, thought.id)),
     addActivity: (activity) => updateField("activities", (activities) => addActivity(activities, activity)),
     parkActivity: (id, note) => updateField("activities", (activities) => parkActivity(activities, id, note)),
     resumeActivity: (id) => updateField("activities", (activities) => resumeActivity(activities, id)),
@@ -779,6 +815,7 @@ function App() {
           onRestoreBackup={restoreBackup}
           consent={data.consent}
           onDeleteAll={deleteAllData}
+          onCapture={() => setIsCaptureOpen(true)}
         />
 
         <main className="app-main">
@@ -837,6 +874,7 @@ function App() {
         <ConsentDialog onAccept={() => commit((current) => ({ ...current, consent: consentRecord() }), { record: false })} />
       )}
       <LegalViewer />
+      {isCaptureOpen && <QuickCapture onSave={captureThought} onClose={() => setIsCaptureOpen(false)} />}
 
       {reviewWeek && (
         <Suspense fallback={null}>

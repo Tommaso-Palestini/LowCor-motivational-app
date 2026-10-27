@@ -25,6 +25,10 @@
   order: 2;
 }
 
+.slot--inbox {
+  order: 2;
+}
+
 .slot--flex {
   order: 3;
 }

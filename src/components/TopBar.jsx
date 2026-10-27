@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
 import { VIEWS } from "../logic/views";
-import { IconSettings, IconSparkle, IconTarget } from "./Icons";
+import { IconPlus, IconSettings, IconSparkle, IconTarget } from "./Icons";
 import "./TopBar.css";
 import { locale, t } from "../i18n";
 
@@ -39,6 +39,7 @@ function TopBar({
   onRestoreBackup,
   consent,
   onDeleteAll,
+  onCapture,
 }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -79,6 +80,16 @@ function TopBar({
             </span>
             <span className="sr-only">{t("punti aura")}</span>
           </p>
+
+          <button
+            type="button"
+            className="icon-button topbar-capture"
+            onClick={onCapture}
+            aria-label={t("Butta lì un pensiero")}
+            title={t("Butta lì un pensiero (Q)")}
+          >
+            <IconPlus />
+          </button>
 
           <button
             type="button"

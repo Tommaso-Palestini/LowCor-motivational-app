@@ -3,7 +3,7 @@
   inset: 0;
   z-index: 50;
   display: grid;
-  place-items: center;
+  justify-items: center;
   padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
   overflow-y: auto;
   background: color-mix(in oklch, var(--night) 82%, transparent);
@@ -20,8 +20,16 @@
 
 .focus-corner {
   position: absolute;
-  top: 1.25rem;
+  top: max(1.25rem, env(safe-area-inset-top));
   right: 1.25rem;
+  z-index: 2;
+}
+
+/* Centrati con margin auto: se il contenuto è più alto dello schermo parte dall'alto e scorre,
+   invece di uscire sopra il bordo come con place-items: center */
+.focus-setup,
+.focus-running {
+  margin-block: auto;
 }
 
 /* Preparazione */
@@ -109,6 +117,18 @@
   place-items: center;
   width: min(360px, 82vw);
   aspect-ratio: 1;
+}
+
+/* Telefoni bassi: timer e spazi più compatti, così controlli e suoni stanno nello schermo */
+@media (max-height: 760px) {
+  .focus-running {
+    gap: 1.25rem;
+    padding-top: 2.5rem;
+  }
+
+  .focus-stage {
+    width: min(300px, 76vw, 46vh);
+  }
 }
 
 /*

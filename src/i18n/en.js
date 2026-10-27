@@ -352,4 +352,22 @@ export default {
   "Suono di fine focus": "End-of-focus sound",
   "Due note morbide quando il timer arriva a zero. Il rumore di sottofondo si sceglie dentro il focus.":
     "Two soft notes when the timer hits zero. Pick the background noise inside focus.",
+
+  // Pensieri da smistare
+  "Butta lì un pensiero": "Jot down a thought",
+  "Butta lì un pensiero (Q)": "Jot down a thought (Q)",
+  "Cosa ti passa per la testa?": "What's on your mind?",
+  "Scrivilo e torna a quello che facevi": "Write it down and get back to what you were doing",
+  Pensiero: "Thought",
+  "Finisce in “Da smistare” nella home: lo sistemi quando hai tempo.": "It lands in “To sort” on the home screen: deal with it when you have time.",
+  "Metti da parte": "Set aside",
+  "Da smistare": "To sort",
+  pensiero: "thought",
+  pensieri: "thoughts",
+  "Come promemoria": "As reminder",
+  "Come attività": "As activity",
+  "Un altro pensiero": "Another thought",
+  "Elimina {name}": "Delete {name}",
+  "Messo da parte in “Da smistare”": "Set aside in “To sort”",
+  "Ora è un promemoria": "Now it's a reminder",
 };

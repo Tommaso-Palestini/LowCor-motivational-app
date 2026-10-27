@@ -194,6 +194,27 @@ test("privacy: chi usava già l'app accetta i termini, e può cancellare tutto",
   expect(errors).toEqual([]);
 });
 
+test("pensieri al volo: li catturo e li smisto", async ({ page }) => {
+  const errors = watchErrors(page);
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Butta lì un pensiero" }).click();
+  await page.getByRole("textbox", { name: "Pensiero" }).fill("Chiamare il dentista");
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Un altro pensiero" }).click();
+  await page.getByRole("textbox", { name: "Pensiero" }).fill("Imparare la chitarra");
+  await page.getByRole("button", { name: "Metti da parte" }).click();
+
+  const inbox = page.getByRole("region", { name: "Da smistare" });
+  await expect(inbox.getByText("2 pensieri")).toBeVisible();
+  await inbox.getByRole("listitem").filter({ hasText: "Chiamare il dentista" }).getByRole("button", { name: "Come promemoria" }).click();
+  await inbox.getByRole("listitem").filter({ hasText: "Imparare la chitarra" }).getByRole("button", { name: "Come attività" }).click();
+  await expect(inbox).toHaveCount(0);
+  await expect(page.getByText("Chiamare il dentista")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  expect(errors).toEqual([]);
+});
+
 // Fluidità: misura i fotogrammi mentre la home scorre e l'anello ondeggia.
 // In un browser headless i numeri sono indicativi, ma un rallentamento serio si vede.
 test("fluidità della home", async ({ page }, testInfo) => {
