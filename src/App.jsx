@@ -51,6 +51,8 @@ import TodayView from "./components/TodayView";
 import GoalsView from "./components/goals/GoalsView";
 import BrainstormView from "./components/brainstorm/BrainstormView";
 import FocusMode from "./components/FocusMode";
+import Nudges from "./components/Nudges";
+import { useBlockAlerts } from "./hooks/useBlockAlerts";
 
 // Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
 // Appena il browser è libero li precarichiamo, così il primo cambio di sezione è istantaneo.
@@ -71,6 +73,7 @@ function isTypingTarget(target) {
 function App() {
   const [data, setData] = useState(loadData);
   const [backgroundImage, setBackgroundImage] = useState(loadBackgroundImage);
+  const [nudges, setNudges] = useState([]);
 
   useEffect(() => {
     const idle = window.requestIdleCallback || ((callback) => setTimeout(callback, 1500));
@@ -248,6 +251,25 @@ function App() {
       showToast(error.message);
     }
     setIsGeneratingCards(false);
+  }
+
+  // ---- Promemoria dei blocchi ----
+
+  useBlockAlerts({
+    blocks: data.blocks,
+    activities: data.activities,
+    enabled: data.settings.blockAlerts,
+    minutesBefore: data.settings.alertMinutes,
+    // Un avviso nuovo dello stesso blocco sostituisce il vecchio; al massimo tre in vista
+    onAlerts: (alerts) =>
+      setNudges((current) => {
+        const fresh = new Set(alerts.map((alert) => alert.block.id));
+        return [...current.filter((nudge) => !fresh.has(nudge.block.id)), ...alerts].slice(-3);
+      }),
+  });
+
+  function dismissNudge(key) {
+    setNudges((current) => current.filter((nudge) => nudge.key !== key));
   }
 
   // ---- Sfondo personalizzato ----
@@ -565,6 +587,21 @@ function App() {
       />
 
       <Announcer announcement={announcements[0] || null} onDone={nextAnnouncement} />
+      <Nudges
+        nudges={nudges}
+        onDismiss={dismissNudge}
+        onFocus={(nudge) => {
+          dismissNudge(nudge.key);
+          focusBlock(nudge.block);
+        }}
+        onDone={(nudge) => {
+          dismissNudge(nudge.key);
+          const block = data.blocks.find((item) => item.id === nudge.block.id);
+          if (block && !block.done) {
+            setBlockDoneWithRewards(block.id, true);
+          }
+        }}
+      />
       <Toast
         toast={toast}
         onUndo={undo}

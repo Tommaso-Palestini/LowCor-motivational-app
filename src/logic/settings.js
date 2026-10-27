@@ -12,6 +12,9 @@ export const defaultSettings = {
   userName: "",
   // Cosa mostra "Mentre aspetti": "all", "micro-task" o "fact"
   feedFilter: "all",
+  // Promemoria dei blocchi: prima dell'inizio, all'inizio e alla fine
+  blockAlerts: true,
+  alertMinutes: 5,
   fullGas: true,
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
 
 function Switch({ checked, onChange, label }) {
@@ -182,6 +182,53 @@ function BackgroundSection({ settings, set, image, onPick, onRemove }) {
   );
 }
 
+function AlertsSection({ settings, set }) {
+  const supported = typeof window !== "undefined" && "Notification" in window;
+  const [permission, setPermission] = useState(supported ? Notification.permission : "denied");
+
+  async function askPermission() {
+    setPermission(await Notification.requestPermission());
+  }
+
+  return (
+    <div className="settings-bg">
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">Promemoria dei blocchi</p>
+          <p className="settings-hint">Un avviso prima di iniziare, all'inizio e alla fine, per non perdere la cognizione del tempo</p>
+        </div>
+        <Switch checked={settings.blockAlerts} onChange={(value) => set("blockAlerts", value)} label="Promemoria dei blocchi" />
+      </div>
+      {settings.blockAlerts && (
+        <>
+          <label className="settings-slider">
+            <span className="settings-hint">Avvisami {settings.alertMinutes} minuti prima</span>
+            <input
+              type="range"
+              className="range"
+              min="1"
+              max="15"
+              value={settings.alertMinutes}
+              onChange={(event) => set("alertMinutes", Number(event.target.value))}
+            />
+          </label>
+          {supported && permission === "default" && (
+            <button type="button" className="button button--ghost" onClick={askPermission}>
+              Avvisami anche quando l'app è in background
+            </button>
+          )}
+          {supported && permission === "granted" && (
+            <p className="settings-hint">Notifiche di sistema attive quando l'app è aperta in background.</p>
+          )}
+          {supported && permission === "denied" && (
+            <p className="settings-hint">Notifiche bloccate dal browser: gli avvisi compaiono solo dentro l'app.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackground, onRemoveBackground }) {
   function set(key, value) {
     onChange({ ...settings, [key]: value });
@@ -270,6 +317,8 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
           onChange={(event) => set("energyMaxLoad", Number(event.target.value))}
         />
       </label>
+
+      <AlertsSection settings={settings} set={set} />
 
       <AiSection ai={ai} settings={settings} set={set} />
 
