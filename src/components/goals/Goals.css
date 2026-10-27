@@ -106,7 +106,6 @@
   border: 1px solid var(--line);
   border-radius: 20px;
   background: color-mix(in oklch, var(--dusk) 55%, transparent);
-  backdrop-filter: blur(18px);
   transition: border-color 400ms ease, box-shadow 600ms var(--ease);
 }
 
@@ -605,7 +604,6 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-row);
   background: color-mix(in oklch, var(--dusk) 85%, transparent);
-  backdrop-filter: blur(12px);
   transition: border-color 200ms ease;
 }
 

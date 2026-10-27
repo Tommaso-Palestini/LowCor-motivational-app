@@ -1,8 +1,13 @@
+/* Prestazioni: la lava è isolata dal resto della pagina (contain) e i blob si sommano
+   senza fusione "screen", che costringeva a ricomporre tutto lo sfondo a ogni fotogramma.
+   L'opacità più alta compensa la luce che dava la fusione. */
 .lava {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  contain: strict;
+  isolation: isolate;
   background: var(--night);
   pointer-events: none;
 }
@@ -26,8 +31,7 @@
     oklch(0.55 0.13 calc(var(--hue) + var(--offset)) / 0.45) 45%,
     transparent 100%
   );
-  opacity: 0.42;
-  mix-blend-mode: screen;
+  opacity: 0.5;
   will-change: transform;
   animation: var(--drift) var(--duration) ease-in-out infinite alternate;
 }

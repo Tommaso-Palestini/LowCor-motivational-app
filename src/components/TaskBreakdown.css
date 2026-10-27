@@ -92,7 +92,6 @@
   border: 1px solid color-mix(in oklch, var(--focus) 40%, transparent);
   border-radius: var(--radius-row);
   background: color-mix(in oklch, var(--dusk) 88%, transparent);
-  backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px -4px color-mix(in oklch, var(--focus) 20%, transparent);
   animation: breakdown-enter 260ms var(--ease) both;
 }
@@ -200,7 +199,6 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-row);
   background: color-mix(in oklch, var(--dusk) 92%, transparent);
-  backdrop-filter: blur(14px);
   box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.4);
   animation: breakdown-enter 260ms var(--ease) both;
 }

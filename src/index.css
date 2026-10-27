@@ -26,6 +26,10 @@
   --line-strong: color-mix(in oklch, var(--mist) 36%, transparent);
   --wash: color-mix(in oklch, var(--ink) 6%, transparent);
   --glass: color-mix(in oklch, var(--dusk) 62%, transparent);
+  /* Prestazioni: il vetro sfocato (backdrop-filter) resta solo su ciò che sta sopra il contenuto
+     (barre, finestre, avvisi). I pannelli che scorrono sono semitrasparenti senza sfocatura:
+     sopra la lava, che è già un gradiente morbido, la differenza non si vede ma i telefoni
+     non devono più ricalcolare la sfocatura a ogni fotogramma. */
 
   /* Stile del testo: "morbido" di base, gli altri si scelgono in Impostazioni > Aspetto */
   --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
@@ -161,7 +165,6 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
   background: var(--glass);
-  backdrop-filter: blur(22px) saturate(1.2);
 }
 
 .panel > .section-title {
@@ -504,7 +507,6 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: var(--glass);
-  backdrop-filter: blur(18px);
 }
 
 .segmented button {
@@ -686,4 +688,9 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   .review-step-label {
     display: inline;
   }
+}
+
+/* Con una foto come sfondo i pannelli coprono di più, così restano leggibili senza sfocatura */
+:root:has(.custom-bg) {
+  --glass: color-mix(in oklch, var(--dusk) 84%, transparent);
 }
