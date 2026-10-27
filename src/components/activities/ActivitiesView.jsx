@@ -1,7 +1,8 @@
 import { useState } from "react";
 import ActivityCard from "./ActivityCard";
 import ActivityEditor from "./ActivityEditor";
-import { IconPlus } from "../Icons";
+import ShareDialog from "../share/ShareDialog";
+import { IconPlus, IconSend } from "../Icons";
 import "./Activities.css";
 
 const GROUPS = [
@@ -27,6 +28,7 @@ const GROUPS = [
 
 function ActivitiesView({ data, now, actions }) {
   const [isCreating, setIsCreating] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const { activities, blocks } = data;
 
   return (
@@ -44,6 +46,15 @@ function ActivitiesView({ data, now, actions }) {
           <button type="button" className="button button--primary" onClick={() => setIsCreating(true)} disabled={isCreating}>
             <IconPlus />
             Nuova attività
+          </button>
+          <button
+            type="button"
+            className="button button--ghost"
+            onClick={() => setIsSharing(true)}
+            disabled={activities.length === 0}
+          >
+            <IconSend />
+            Condividi in PDF
           </button>
         </div>
       </header>
@@ -86,6 +97,16 @@ function ActivitiesView({ data, now, actions }) {
           </section>
         );
       })}
+      {isSharing && (
+        <ShareDialog
+          data={data}
+          now={now}
+          userName={data.settings.userName}
+          onUserNameChange={(name) => actions.setSetting("userName", name)}
+          onClose={() => setIsSharing(false)}
+          onError={actions.notify}
+        />
+      )}
     </div>
   );
 }

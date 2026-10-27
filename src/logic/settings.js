@@ -8,6 +8,8 @@ export const defaultSettings = {
   // "lava" o "image" (la foto scelta dall'utente); backgroundDim è quanto la scuriamo, in %
   background: "lava",
   backgroundDim: 55,
+  // Nome per la copertina e la firma del PDF da condividere
+  userName: "",
   fullGas: true,
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",

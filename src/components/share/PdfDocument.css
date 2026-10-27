@@ -1,0 +1,438 @@
+/* Il PDF da condividere. Pagine A4 a 96 dpi, catturate come immagini.
+   La palette usa --h, la tinta dell'app nel momento in cui crei il PDF. */
+
+.pdf-doc {
+  --pdf-night: oklch(0.17 0.045 var(--h));
+  --pdf-deep: oklch(0.13 0.04 var(--h));
+  --pdf-glow: oklch(0.42 0.14 var(--h));
+  --pdf-ink: oklch(0.97 0.015 var(--h));
+  --pdf-mist: oklch(0.78 0.05 var(--h));
+  --pdf-line: oklch(0.78 0.05 var(--h) / 0.2);
+  --pdf-accent: oklch(0.78 0.15 var(--h));
+  --pdf-done: oklch(0.88 0.13 calc(var(--h) - 120));
+  display: grid;
+  gap: 40px;
+  width: 794px;
+  color: var(--pdf-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.pdf-page {
+  position: relative;
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 60% at 100% 0%, oklch(0.3 0.1 var(--h) / 0.55), transparent 70%),
+    linear-gradient(180deg, var(--pdf-night), var(--pdf-deep));
+}
+
+/* Piè di pagina */
+
+.pdf-footer {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  bottom: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--pdf-line);
+  color: var(--pdf-mist);
+  font-size: 12px;
+}
+
+.pdf-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pdf-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.pdf-footer-brand svg {
+  color: var(--pdf-accent);
+}
+
+/* Copertina: l'anello enorme della settimana, il titolo che ci passa sopra */
+
+.pdf-cover-glow {
+  position: absolute;
+  top: 60px;
+  right: -180px;
+  width: 760px;
+  height: 760px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--pdf-glow), transparent);
+  opacity: 0.55;
+}
+
+.pdf-cover-ring {
+  position: absolute;
+  top: 70px;
+  right: -110px;
+}
+
+.pdf-ring-track {
+  fill: none;
+  stroke: oklch(0.78 0.05 var(--h) / 0.12);
+}
+
+.pdf-ring-fill {
+  fill: none;
+  stroke: url(#pdf-ring-gradient);
+}
+
+.pdf-ring-stop-a {
+  stop-color: var(--pdf-accent);
+}
+
+.pdf-ring-stop-b {
+  stop-color: var(--pdf-done);
+}
+
+.pdf-cover-ring-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding-right: 40px;
+  color: var(--pdf-mist);
+  font-size: 15px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.pdf-cover-percent {
+  color: var(--pdf-ink);
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pdf-cover-text {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  top: 560px;
+  display: grid;
+  gap: 18px;
+}
+
+.pdf-cover-week {
+  color: var(--pdf-accent);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pdf-cover-title {
+  max-width: 640px;
+  font-family: var(--font-display);
+  font-size: 76px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.pdf-cover-lead {
+  max-width: 460px;
+  color: var(--pdf-mist);
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+.pdf-cover-stats {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  bottom: 120px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  border-top: 1px solid var(--pdf-line);
+}
+
+.pdf-cover-stats > div {
+  display: grid;
+  gap: 6px;
+  padding: 22px 0 0;
+}
+
+.pdf-cover-stats > div + div {
+  padding-left: 24px;
+  border-left: 1px solid var(--pdf-line);
+}
+
+.pdf-cover-stats dt {
+  color: var(--pdf-mist);
+  font-size: 13px;
+}
+
+.pdf-cover-stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.pdf-cover-stats dd span {
+  color: var(--pdf-mist);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Pagine interne */
+
+.pdf-flow {
+  display: grid;
+  gap: 28px;
+  padding: 96px 72px 0;
+}
+
+.pdf-section {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.pdf-section-title {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.pdf-section-lead {
+  color: var(--pdf-mist);
+  font-size: 16px;
+}
+
+/* Non negoziabili: articoli del patto */
+
+.pdf-article {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 8px;
+  padding: 26px 28px 26px 18px;
+  border: 1px solid oklch(0.97 0.015 var(--h) / 0.3);
+  border-radius: 28px;
+  background: oklch(0.22 0.06 var(--h) / 0.65);
+  box-shadow:
+    inset 0 0 0 5px oklch(0.13 0.04 var(--h) / 0.6),
+    inset 0 0 0 6px oklch(0.97 0.015 var(--h) / 0.1);
+}
+
+.pdf-article-number {
+  color: transparent;
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 0.9;
+  text-align: center;
+  -webkit-text-stroke: 1.5px var(--pdf-accent);
+}
+
+.pdf-article-body {
+  display: grid;
+  gap: 10px;
+}
+
+.pdf-article-label {
+  color: var(--pdf-accent);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pdf-article-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.pdf-article-why {
+  max-width: 52ch;
+  color: oklch(0.97 0.015 var(--h) / 0.88);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.pdf-article-facts {
+  display: flex;
+  gap: 8px;
+}
+
+.pdf-article-facts p {
+  padding: 4px 12px;
+  border: 1px solid var(--pdf-line);
+  border-radius: 999px;
+  color: var(--pdf-mist);
+  font-size: 13px;
+}
+
+.pdf-article-track {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.pdf-weeks {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 34px;
+}
+
+.pdf-week {
+  display: flex;
+  align-items: flex-end;
+  width: 12px;
+  height: 100%;
+  border-radius: 4px;
+  background: oklch(0.78 0.05 var(--h) / 0.14);
+  overflow: hidden;
+}
+
+.pdf-week span {
+  width: 100%;
+  border-radius: inherit;
+  background: oklch(0.78 0.15 var(--h) / 0.75);
+}
+
+.pdf-week--met span {
+  background: var(--pdf-done);
+}
+
+.pdf-streak {
+  color: var(--pdf-mist);
+  font-size: 14px;
+}
+
+.pdf-streak strong {
+  color: var(--pdf-done);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Passioni: due per riga */
+
+.pdf-passion-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.pdf-passion {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--pdf-line);
+  border-radius: 24px;
+  background: oklch(0.22 0.06 var(--h) / 0.45);
+}
+
+.pdf-passion-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.pdf-passion-why {
+  color: oklch(0.97 0.015 var(--h) / 0.85);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.pdf-passion-goal {
+  color: var(--pdf-mist);
+  font-size: 13px;
+}
+
+/* Parcheggiate */
+
+.pdf-parked {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pdf-parked li {
+  display: grid;
+  gap: 2px;
+  padding: 14px 20px;
+  border: 1px dashed var(--pdf-line);
+  border-radius: 18px;
+}
+
+.pdf-parked-name {
+  font-weight: 600;
+}
+
+.pdf-parked-note {
+  color: var(--pdf-mist);
+  font-size: 14px;
+}
+
+/* Chiusura con firma */
+
+.pdf-closing {
+  display: grid;
+  gap: 40px;
+  padding: 36px 0 0;
+}
+
+.pdf-closing-quote {
+  max-width: 560px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.pdf-signature {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.pdf-signature-name {
+  color: var(--pdf-accent);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.pdf-signature-line {
+  height: 1px;
+  margin-bottom: 8px;
+  background: var(--pdf-line);
+}
+
+.pdf-signature-date {
+  color: var(--pdf-mist);
+  font-size: 14px;
+}

@@ -447,6 +447,7 @@ function App() {
     updateActivity: (id, changes) =>
       updateField("activities", (activities) => updateActivity(activities, id, changes)),
     setActivityType: changeActivityType,
+    setSetting,
     deleteActivity: removeActivity,
     setActivityEnergy: (id, energy) =>
       updateField("activities", (activities) => setActivityEnergy(activities, id, energy)),

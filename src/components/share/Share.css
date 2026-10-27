@@ -1,0 +1,69 @@
+/* Finestra "Condividi in PDF" */
+
+.share-form,
+.share-ready {
+  display: grid;
+  gap: 1rem;
+}
+
+.share-lead {
+  color: var(--mist);
+  font-size: 0.9375rem;
+}
+
+.share-check {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.share-preview {
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+  margin: 0;
+}
+
+.share-preview img {
+  width: min(260px, 70%);
+  aspect-ratio: 794 / 1123;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  box-shadow: 0 24px 60px color-mix(in oklch, var(--night) 80%, transparent);
+  animation: share-reveal 600ms var(--ease) both;
+}
+
+.share-preview figcaption {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@keyframes share-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(-2deg) scale(0.96);
+  }
+}
+
+/* Le pagine del PDF si impaginano fuori dallo schermo, poi vengono catturate */
+.pdf-stage {
+  position: fixed;
+  top: 0;
+  left: -12000px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-preview img {
+    animation: none;
+  }
+}
