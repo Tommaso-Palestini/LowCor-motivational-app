@@ -323,6 +323,21 @@ export default {
     "This backup comes from a newer version of the app: update it and try again",
   "Il backup è incompleto": "The backup is incomplete",
   Privacy: "Privacy",
+  "Termini d'uso": "Terms of use",
+  "Informativa privacy": "Privacy policy",
+  "Ho letto e accetto": "I have read and accept",
+  "l'informativa privacy": "the privacy policy",
+  e: "and",
+  "i termini d'uso": "the terms of use",
+  "Privacy e termini d'uso": "Privacy and terms of use",
+  "LowCor non raccoglie dati: tutto resta su questo dispositivo. Prima di continuare, dai un'occhiata a come funziona.":
+    "LowCor collects no data: everything stays on this device. Before you go on, have a look at how it works.",
+  Continua: "Continue",
+  "accettati il {date}": "accepted on {date}",
+  "Cancella tutti i dati": "Delete all data",
+  "Cancella tutto": "Delete everything",
+  "Cancello attività, calendario, obiettivi, idee, impostazioni e sfondo da questo dispositivo. Non si può annullare: se vuoi, salva prima un backup.":
+    "This deletes activities, calendar, goals, ideas, settings and background from this device. It can't be undone: save a backup first if you like.",
   "Solo sul computer": "Computer only",
   "L'AI gira con Ollama sul tuo computer, niente cloud. Usa LowCor dal browser del computer per carte generate, brainstorming e schema 9x9.":
     "The AI runs with Ollama on your computer, no cloud. Use LowCor in your computer's browser for generated cards, brainstorming and the 9x9 grid.",

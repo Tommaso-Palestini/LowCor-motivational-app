@@ -37,6 +37,8 @@ function TopBar({
   onRemoveBackground,
   onExportBackup,
   onRestoreBackup,
+  consent,
+  onDeleteAll,
 }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -107,6 +109,8 @@ function TopBar({
                 onRemoveBackground={onRemoveBackground}
                 onExportBackup={onExportBackup}
                 onRestoreBackup={onRestoreBackup}
+                consent={consent}
+                onDeleteAll={onDeleteAll}
               />
             )}
           </div>

@@ -82,6 +82,12 @@ export function saveBackgroundImage(dataUrl) {
   }
 }
 
+// Diritto alla cancellazione: via tutto quello che l'app ha salvato su questo dispositivo
+export function clearAllData() {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(BACKGROUND_KEY);
+}
+
 export function saveData(data) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));

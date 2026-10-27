@@ -1,5 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
+import { clearAllData, loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
+import { consentRecord, hasConsent } from "./logic/consent";
+import { ConsentDialog, LegalLink, LegalViewer } from "./components/legal/Legal";
 import { backupFilename, createBackup } from "./logic/backup";
 import { shareFile } from "./logic/pdfExport";
 import { compressImage } from "./logic/backgroundImage";
@@ -314,7 +316,7 @@ function App() {
   function finishOnboarding({ mode, templates, name, settings, planFirstWeek }) {
     commit(
       (current) => {
-        let next = { ...current, onboarded: true, settings: { ...current.settings, ...settings, userName: name } };
+        let next = { ...current, onboarded: true, consent: consentRecord(), settings: { ...current.settings, ...settings, userName: name } };
         if (mode !== "sample") {
           const built = mode === "templates" ? buildFromTemplates(templates, current.settings.language) : null;
           next = { ...next, activities: built ? built.activities : [], cards: built ? built.cards : [], blocks: [] };
@@ -469,6 +471,12 @@ function App() {
       setBackgroundImage(backup.backgroundImage);
     }
     showToast("Backup ripristinato", true);
+  }
+
+  async function deleteAllData() {
+    await scheduleBlockNotifications({ blocks: [], activities: [], enabled: false }).catch(() => {});
+    clearAllData();
+    window.location.reload();
   }
 
   // ---- Attività ----
@@ -769,6 +777,8 @@ function App() {
           onRemoveBackground={removeBackground}
           onExportBackup={exportBackup}
           onRestoreBackup={restoreBackup}
+          consent={data.consent}
+          onDeleteAll={deleteAllData}
         />
 
         <main className="app-main">
@@ -787,9 +797,7 @@ function App() {
           <p>{t("© {year} LowCor. Tutti i diritti riservati.", { year: now.getFullYear() })}</p>
           <p className="app-footer-note">
             {t("I tuoi dati restano su questo dispositivo.")}{" "}
-            <a href="privacy.html" target="_blank" rel="noopener">
-              {t("Privacy")}
-            </a>
+            <LegalLink page="privacy" /> · <LegalLink page="terms" />
           </p>
         </footer>
       </div>
@@ -822,6 +830,11 @@ function App() {
           />
         </Suspense>
       )}
+
+      {data.onboarded && !hasConsent(data) && (
+        <ConsentDialog onAccept={() => commit((current) => ({ ...current, consent: consentRecord() }), { record: false })} />
+      )}
+      <LegalViewer />
 
       {reviewWeek && (
         <Suspense fallback={null}>

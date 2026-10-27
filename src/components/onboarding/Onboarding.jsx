@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { TEMPLATES } from "../../data/templates";
 import { LANGUAGES, getLanguage, t } from "../../i18n";
 import { IconCheck, IconChevronLeft, IconChevronRight } from "../Icons";
+import { ConsentCheck } from "../legal/Legal";
 import "./Onboarding.css";
 
 const STEPS = ["Benvenuto", "Cosa coltivare", "Come ti aiuto", "Pronti"];
@@ -35,6 +36,7 @@ function Onboarding({ settings, onLanguage, onFinish }) {
   const [readable, setReadable] = useState(false);
   const [calm, setCalm] = useState(false);
   const [planFirstWeek, setPlanFirstWeek] = useState(true);
+  const [accepted, setAccepted] = useState(false);
   const headingRef = useRef(null);
   const language = getLanguage();
 
@@ -108,6 +110,7 @@ function Onboarding({ settings, onLanguage, onFinish }) {
                 autoComplete="given-name"
               />
             </label>
+            <ConsentCheck checked={accepted} onChange={setAccepted} />
           </section>
         )}
 
@@ -232,7 +235,7 @@ function Onboarding({ settings, onLanguage, onFinish }) {
             type="button"
             className="button button--primary"
             onClick={() => setStep((current) => current + 1)}
-            disabled={step === 1 && picked.length === 0}
+            disabled={(step === 0 && !accepted) || (step === 1 && picked.length === 0)}
           >
             {step === 0 ? t("Cominciamo") : t("Avanti")}
             <IconChevronRight />

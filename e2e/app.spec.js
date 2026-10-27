@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { LEGAL_VERSION } from "../src/logic/consent.js";
 
 // Dati di partenza: l'esempio dell'app, onboarding già fatto, nessun annuncio a schermo intero in mezzo.
 async function seed(page, extra = {}) {
@@ -7,7 +8,7 @@ async function seed(page, extra = {}) {
       sessionStorage.setItem("seeded", "1");
       localStorage.setItem("daily-app-data", JSON.stringify(data));
     }
-  }, { onboarded: true, settings: { fullGas: false, blockAlerts: false }, ...extra });
+  }, { onboarded: true, consent: { version: LEGAL_VERSION, acceptedAt: "2026-10-27T09:00:00.000Z" }, settings: { fullGas: false, blockAlerts: false }, ...extra });
 }
 
 // Raccoglie gli errori della pagina: un test fallisce se ce ne sono
@@ -47,6 +48,11 @@ test("onboarding: modelli, prima settimana e ingresso nell'app", async ({ page }
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "La tua giornata, in un anello." })).toBeVisible();
   await page.getByPlaceholder("Il tuo nome").fill("Giulia");
+  await expect(page.getByRole("button", { name: "Cominciamo" })).toBeDisabled();
+  await page.getByRole("link", { name: "l'informativa privacy" }).click();
+  await expect(page.frameLocator(".legal-frame").getByRole("heading", { name: "Privacy" }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Chiudi" }).click();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Cominciamo" }).click();
   await page.getByRole("button", { name: /Leggere di più/ }).click();
   await page.getByRole("button", { name: "Avanti" }).click();
@@ -164,6 +170,24 @@ test("backup: salvo un file e lo ripristino", async ({ page }) => {
   await expect(page.getByText("Sostituisce tutto quello che c'è ora")).toBeVisible();
   await page.getByRole("button", { name: "Ripristina", exact: true }).click();
   await expect(page.getByText("Backup ripristinato")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("privacy: chi usava già l'app accetta i termini, e può cancellare tutto", async ({ page }) => {
+  const errors = watchErrors(page);
+  await seed(page, { consent: undefined });
+  await page.goto("/");
+  const consent = page.getByRole("dialog", { name: "Privacy e termini d'uso" });
+  await expect(consent).toBeVisible();
+  await expect(consent.getByRole("button", { name: "Continua" })).toBeDisabled();
+  await consent.getByRole("checkbox").check();
+  await consent.getByRole("button", { name: "Continua" }).click();
+  await expect(consent).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Impostazioni" }).click();
+  await page.getByRole("button", { name: "Cancella tutti i dati" }).click();
+  await page.getByRole("button", { name: "Cancella tutto" }).click();
+  await expect(page.getByRole("heading", { name: "La tua giornata, in un anello." })).toBeVisible();
   expect(errors).toEqual([]);
 });
 

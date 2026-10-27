@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
 import { backupSummary, parseBackup } from "../logic/backup";
+import { LegalLink } from "./legal/Legal";
 import { LANGUAGES, locale, t } from "../i18n";
 
 function Switch({ checked, onChange, label }) {
@@ -428,6 +429,48 @@ function BackupSection({ onExport, onRestore }) {
   );
 }
 
+function PrivacySection({ consent, onDeleteAll }) {
+  const [confirming, setConfirming] = useState(false);
+  const acceptedOn = consent?.acceptedAt
+    ? new Date(consent.acceptedAt).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <div className="settings-bg">
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">{t("Privacy")}</p>
+          <p className="settings-hint">
+            <LegalLink page="privacy">{t("Informativa privacy")}</LegalLink> · <LegalLink page="terms" />
+            {acceptedOn && <>{" · "}{t("accettati il {date}", { date: acceptedOn })}</>}
+          </p>
+        </div>
+      </div>
+      {confirming ? (
+        <div className="settings-backup-confirm" role="alert">
+          <p className="settings-hint">
+            {t("Cancello attività, calendario, obiettivi, idee, impostazioni e sfondo da questo dispositivo. Non si può annullare: se vuoi, salva prima un backup.")}
+          </p>
+          <div className="settings-bg-actions">
+            <button type="button" className="button button--primary" onClick={onDeleteAll}>
+              {t("Cancella tutto")}
+            </button>
+            <button type="button" className="button button--quiet" onClick={() => setConfirming(false)}>
+              {t("Lascia tutto com'è")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="settings-bg-actions">
+          <button type="button" className="button button--quiet" onClick={() => setConfirming(true)}>
+            {t("Cancella tutti i dati")}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SettingsPanel({
   settings,
   onChange,
@@ -437,6 +480,8 @@ function SettingsPanel({
   onRemoveBackground,
   onExportBackup,
   onRestoreBackup,
+  consent,
+  onDeleteAll,
 }) {
   function set(key, value) {
     onChange({ ...settings, [key]: value });
@@ -534,11 +579,7 @@ function SettingsPanel({
 
       <p className="settings-group">{t("I tuoi dati")}</p>
       <BackupSection onExport={onExportBackup} onRestore={onRestoreBackup} />
-      <p className="settings-hint">
-        <a href="privacy.html" target="_blank" rel="noopener">
-          {t("Privacy")}
-        </a>
-      </p>
+      <PrivacySection consent={consent} onDeleteAll={onDeleteAll} />
 
       <p className="settings-group">{t("AI e scorciatoie")}</p>
       <AiSection ai={ai} settings={settings} set={set} />
