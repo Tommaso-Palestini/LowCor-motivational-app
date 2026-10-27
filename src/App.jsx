@@ -6,7 +6,7 @@ import { energyLimits } from "./logic/energy";
 import { reviewWeekStart } from "./logic/review";
 import { externalBusy, normalizeCalendarUrl, parseIcs } from "./logic/icsImport";
 import { evaluateAchievements } from "./logic/achievements";
-import { setLanguage } from "./i18n";
+import { setLanguage, t } from "./i18n";
 import { buildFromTemplates } from "./data/templates";
 import {
   addActivity,
@@ -61,6 +61,7 @@ import FocusMode from "./components/FocusMode";
 import Nudges from "./components/Nudges";
 import { useBlockAlerts } from "./hooks/useBlockAlerts";
 import { useAppearance } from "./hooks/useAppearance";
+import { isNative, scheduleBlockNotifications } from "./native";
 
 // Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
 // Appena il browser è libero li precarichiamo, così il primo cambio di sezione è istantaneo.
@@ -272,6 +273,22 @@ function App() {
   }
 
   // ---- Promemoria dei blocchi ----
+
+  // Nell'app nativa i promemoria vengono programmati in anticipo e arrivano anche ad app chiusa
+  useEffect(() => {
+    if (!isNative) {
+      return undefined;
+    }
+    const timerId = setTimeout(() => {
+      scheduleBlockNotifications({
+        blocks: data.blocks,
+        activities: data.activities,
+        enabled: data.settings.blockAlerts,
+        minutesBefore: data.settings.alertMinutes,
+      }).catch((error) => console.warn("Promemoria nativi non programmati:", error));
+    }, 1500);
+    return () => clearTimeout(timerId);
+  }, [data.blocks, data.activities, data.settings.blockAlerts, data.settings.alertMinutes, data.settings.language]);
 
   useBlockAlerts({
     blocks: data.blocks,
@@ -740,6 +757,11 @@ function App() {
           <GoalsView mandala={data.mandala} ai={ai} actions={actions} hidden={view !== "goals"} />
           <BrainstormView data={data} now={now} ai={ai} actions={actions} hidden={view !== "ideas"} />
         </main>
+
+        <footer className="app-footer">
+          <p>{t("© {year} LowCor. Tutti i diritti riservati.", { year: now.getFullYear() })}</p>
+          <p className="app-footer-note">{t("I tuoi dati restano su questo dispositivo.")}</p>
+        </footer>
       </div>
 
       <FocusMode

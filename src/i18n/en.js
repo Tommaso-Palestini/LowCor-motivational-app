@@ -294,6 +294,10 @@ export default {
   Avanti: "Next",
   "Entra in LowCor": "Enter LowCor",
 
+  // Piè di pagina
+  "© {year} LowCor. Tutti i diritti riservati.": "© {year} LowCor. All rights reserved.",
+  "I tuoi dati restano su questo dispositivo.": "Your data stays on this device.",
+
   // Varie
   blocco: "block",
   blocchi: "blocks",

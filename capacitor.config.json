@@ -1,0 +1,18 @@
+{
+  "appId": "app.lowcor.routine",
+  "appName": "LowCor",
+  "webDir": "dist",
+  "backgroundColor": "#01190a",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_lowcor",
+      "iconColor": "#4bc680"
+    }
+  }
+}
