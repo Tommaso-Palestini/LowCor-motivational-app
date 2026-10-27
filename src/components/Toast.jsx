@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { t } from "../i18n";
 
 const TOAST_MS = 5000;
 
@@ -26,7 +27,7 @@ function Toast({ toast, onUndo, onClose }) {
       <span>{toast.message}</span>
       {toast.undo && (
         <button type="button" className="toast-undo" onClick={onUndo}>
-          Annulla
+          {t("Annulla")}
         </button>
       )}
     </div>

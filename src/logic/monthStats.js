@@ -1,3 +1,4 @@
+import { locale } from "../i18n";
 import { addDays, monthDates, parseDate, toDateString } from "./dates";
 import { blockDuration } from "./time";
 import { isBlockPast } from "./tone";
@@ -13,7 +14,7 @@ export function recentMonths(now, count = 12) {
     const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
     return {
       key: toDateString(date).slice(0, 7),
-      label: date.toLocaleDateString("it-IT", { month: "long", year: "numeric" }),
+      label: date.toLocaleDateString(locale(), { month: "long", year: "numeric" }),
     };
   });
 }
@@ -73,7 +74,7 @@ export function monthStats(key, activities, blocks, now) {
 
   return {
     key,
-    label: firstDate.toLocaleDateString("it-IT", { month: "long", year: "numeric" }),
+    label: firstDate.toLocaleDateString(locale(), { month: "long", year: "numeric" }),
     days,
     sessions: done.length,
     minutes: done.reduce((sum, block) => sum + blockDuration(block), 0),

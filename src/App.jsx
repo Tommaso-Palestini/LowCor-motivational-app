@@ -6,6 +6,8 @@ import { energyLimits } from "./logic/energy";
 import { reviewWeekStart } from "./logic/review";
 import { externalBusy, normalizeCalendarUrl, parseIcs } from "./logic/icsImport";
 import { evaluateAchievements } from "./logic/achievements";
+import { setLanguage } from "./i18n";
+import { buildFromTemplates } from "./data/templates";
 import {
   addActivity,
   setActivityEnergy,
@@ -26,7 +28,7 @@ import {
 } from "./logic/blocks";
 import { addCards, incrementCardStat } from "./logic/cards";
 import { addReminder, toggleReminder, deleteReminder } from "./logic/reminders";
-import { toDateString } from "./logic/dates";
+import { toDateString, weekDates } from "./logic/dates";
 import { minutesOfDay, timeToMinutes } from "./logic/time";
 import { calculateProgress } from "./logic/progress";
 import { AURA, resolveBlockDone } from "./logic/aura";
@@ -66,6 +68,7 @@ const loadCalendar = () => import("./components/calendar/CalendarView");
 const loadActivities = () => import("./components/activities/ActivitiesView");
 const CalendarView = lazy(loadCalendar);
 const WeeklyReview = lazy(() => import("./components/review/WeeklyReview"));
+const Onboarding = lazy(() => import("./components/onboarding/Onboarding"));
 const ActivitiesView = lazy(loadActivities);
 import Announcer from "./components/Announcer";
 import Toast from "./components/Toast";
@@ -100,6 +103,8 @@ function App() {
   const today = toDateString(now);
   const ai = useOllama(data.settings.aiUrl, data.settings.aiModel);
 
+  // La lingua va impostata prima che i figli disegnino i loro testi
+  setLanguage(data.settings.language);
   useAppearance(data.settings);
   useHueWave(data.settings);
 
@@ -283,6 +288,29 @@ function App() {
 
   function dismissNudge(key) {
     setNudges((current) => current.filter((nudge) => nudge.key !== key));
+  }
+
+  // ---- Onboarding ----
+
+  function finishOnboarding({ mode, templates, name, settings, planFirstWeek }) {
+    commit(
+      (current) => {
+        let next = { ...current, onboarded: true, settings: { ...current.settings, ...settings, userName: name } };
+        if (mode !== "sample") {
+          const built = mode === "templates" ? buildFromTemplates(templates, current.settings.language) : null;
+          next = { ...next, activities: built ? built.activities : [], cards: built ? built.cards : [], blocks: [] };
+        }
+        if (planFirstWeek) {
+          const now = new Date();
+          const { created } = planWeek(next.activities, next.blocks, weekDates(toDateString(now))[0], now, {
+            limits: energyLimits(next.settings),
+          });
+          next = { ...next, blocks: addBlocks(next.blocks, created) };
+        }
+        return next;
+      },
+      { record: false }
+    );
   }
 
   // ---- Traguardi ----
@@ -733,6 +761,16 @@ function App() {
       />
 
       <Announcer announcement={announcements[0] || null} onDone={nextAnnouncement} />
+      {!data.onboarded && (
+        <Suspense fallback={null}>
+          <Onboarding
+            settings={data.settings}
+            onLanguage={(language) => setSetting("language", language)}
+            onFinish={finishOnboarding}
+          />
+        </Suspense>
+      )}
+
       {reviewWeek && (
         <Suspense fallback={null}>
           <WeeklyReview

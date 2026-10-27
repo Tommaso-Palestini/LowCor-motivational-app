@@ -27,6 +27,8 @@ const defaultData = {
   // Traguardi sbloccati: { [id]: data ISO } e contatori che servono a sbloccarli
   achievements: {},
   counters: {},
+  // false solo al primissimo avvio: mostra l'onboarding
+  onboarded: false,
 };
 
 export function loadData() {
@@ -38,6 +40,8 @@ export function loadData() {
     const saved = JSON.parse(raw);
     return {
       ...defaultData,
+      // Chi aveva già dati prima dell'onboarding non deve rifarlo
+      onboarded: true,
       ...saved,
       settings: { ...defaultSettings, ...(saved.settings || {}) },
       brainstorm: { ...defaultData.brainstorm, ...(saved.brainstorm || {}) },

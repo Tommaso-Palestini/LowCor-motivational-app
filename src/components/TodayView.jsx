@@ -7,19 +7,20 @@ import { shouldPromptReview } from "../logic/review";
 import { IconSparkle } from "./Icons";
 import { getBlocksForDate } from "../logic/blocks";
 import "./TodayView.css";
+import { locale, t } from "../i18n";
 
 function getGreeting(hour) {
   if (hour < 13) {
-    return "Buongiorno";
+    return t("Buongiorno");
   }
   if (hour < 18) {
-    return "Buon pomeriggio";
+    return t("Buon pomeriggio");
   }
-  return "Buonasera";
+  return t("Buonasera");
 }
 
 function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
-  const formattedDate = now.toLocaleDateString("it-IT", {
+  const formattedDate = now.toLocaleDateString(locale(), {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -37,12 +38,12 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
           <div className="slot slot--review">
             <div className="review-prompt">
               <div>
-                <p className="review-prompt-title">Il rito della settimana</p>
-                <p className="review-prompt-text">Cinque minuti per chiudere questa settimana e preparare la prossima.</p>
+                <p className="review-prompt-title">{t("Il rito della settimana")}</p>
+                <p className="review-prompt-text">{t("Cinque minuti per chiudere questa settimana e preparare la prossima.")}</p>
               </div>
               <button type="button" className="button button--primary" onClick={() => actions.openReview()}>
                 <IconSparkle />
-                Inizia
+                {t("Inizia")}
               </button>
             </div>
           </div>
@@ -80,6 +81,7 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
       <aside className="today-column today-column--side">
         <div className="slot slot--feed">
           <Feed
+            key={data.onboarded ? "ready" : "setup"}
             cards={data.cards}
             activities={data.activities}
             onView={actions.viewCard}

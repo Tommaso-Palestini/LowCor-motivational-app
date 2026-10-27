@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { IconCheck, IconSparkle } from "./Icons";
 import { prefersReducedMotion } from "../logic/motion";
+import { t } from "../i18n";
 
 const ADVANCE_DELAY = 450;
 
@@ -72,9 +73,9 @@ function FeedCard({
     <article ref={elementRef} className={classes}>
       <div className="feed-chips">
         <span className="chip">{activityName}</span>
-        <span className="chip chip--quiet">{isFact ? "Curiosità" : "Micro-task"}</span>
+        <span className="chip chip--quiet">{isFact ? t("Curiosità") : t("Micro-task")}</span>
         {card.source === "ai" && (
-          <span className="chip chip--quiet chip--ai" title="Generata dall'AI locale">
+          <span className="chip chip--quiet chip--ai" title={t("Generata dall'AI locale")}>
             <IconSparkle />
             AI
           </span>
@@ -86,15 +87,15 @@ function FeedCard({
       {answer ? (
         <p className={`feed-result feed-result--${answer}`}>
           {answer === "completed" && <IconCheck />}
-          {answer === "completed" ? (isFact ? "Salvata tra le interessanti" : "Fatto") : "Saltata"}
+          {answer === "completed" ? (isFact ? t("Salvata tra le interessanti") : t("Fatto")) : t("Saltata")}
         </p>
       ) : (
         <div className="feed-actions">
           <button type="button" className="button button--ghost" onClick={handleSkip}>
-            Salta
+            {t("Salta")}
           </button>
           <button type="button" className="button button--primary" onClick={handleComplete}>
-            {isFact ? "Interessante" : "Fatto"}
+            {isFact ? t("Interessante") : t("Fatto")}
           </button>
         </div>
       )}

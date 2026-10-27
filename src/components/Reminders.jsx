@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IconClose, IconPlus } from "./Icons";
 import "./Reminders.css";
+import { t } from "../i18n";
 
 function Reminders({ reminders, onAdd, onToggle, onDelete }) {
   const [text, setText] = useState("");
@@ -18,11 +19,11 @@ function Reminders({ reminders, onAdd, onToggle, onDelete }) {
   return (
     <section className="panel reminders" aria-labelledby="reminders-title">
       <h2 id="reminders-title" className="section-title">
-        Reminder
+        {t("Reminder")}
       </h2>
 
       {reminders.length === 0 ? (
-        <p className="reminders-empty">Niente da ricordare. Scrivi qui le cose da non perdere.</p>
+        <p className="reminders-empty">{t("Niente da ricordare. Scrivi qui le cose da non perdere.")}</p>
       ) : (
         <ul className="reminder-list">
           {reminders.map((reminder) => (
@@ -43,7 +44,7 @@ function Reminders({ reminders, onAdd, onToggle, onDelete }) {
                 type="button"
                 className="icon-button"
                 onClick={() => onDelete(reminder.id)}
-                aria-label={`Elimina il reminder: ${reminder.text}`}
+                aria-label={t("Elimina il reminder: {text}", { text: reminder.text })}
               >
                 <IconClose />
               </button>
@@ -57,10 +58,10 @@ function Reminders({ reminders, onAdd, onToggle, onDelete }) {
           className="field"
           value={text}
           onChange={(event) => setText(event.target.value)}
-          placeholder="Nuovo reminder"
-          aria-label="Testo del nuovo reminder"
+          placeholder={t("Nuovo reminder")}
+          aria-label={t("Testo del nuovo reminder")}
         />
-        <button type="submit" className="icon-button icon-button--filled" aria-label="Aggiungi reminder">
+        <button type="submit" className="icon-button icon-button--filled" aria-label={t("Aggiungi reminder")}>
           <IconPlus />
         </button>
       </form>

@@ -1,5 +1,6 @@
 import { toDateString } from "./dates";
 import { minutesOfDay, timeToMinutes } from "./time";
+import { t } from "../i18n";
 
 // Finestre in cui un avviso ha ancora senso: se apri l'app 20 minuti dopo l'inizio,
 // "si comincia" non serve più.
@@ -42,12 +43,18 @@ export function alertText(alert) {
   const name = alert.activity.name;
   if (alert.kind === "soon") {
     return {
-      title: `Tra ${alert.minutes} ${alert.minutes === 1 ? "minuto" : "minuti"}: ${name}`,
-      body: `Alle ${alert.block.start}. Chiudi quello che stai facendo e preparati.`,
+      title: t(alert.minutes === 1 ? "Tra 1 minuto: {name}" : "Tra {n} minuti: {name}", { n: alert.minutes, name }),
+      body: t("Alle {time}. Chiudi quello che stai facendo e preparati.", { time: alert.block.start }),
     };
   }
   if (alert.kind === "start") {
-    return { title: `Si comincia: ${name}`, body: `Fino alle ${alert.block.end}. Un passo alla volta.` };
+    return {
+      title: t("Si comincia: {name}", { name }),
+      body: t("Fino alle {time}. Un passo alla volta.", { time: alert.block.end }),
+    };
   }
-  return { title: `Hai fatto ${name}?`, body: `Il blocco è finito alle ${alert.block.end}. Segnalo con un tocco.` };
+  return {
+    title: t("Hai fatto {name}?", { name }),
+    body: t("Il blocco è finito alle {time}. Segnalo con un tocco.", { time: alert.block.end }),
+  };
 }

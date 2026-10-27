@@ -3,11 +3,13 @@ import { sortFeed } from "../logic/feed";
 import FeedCard from "./FeedCard";
 import { IconShuffle, IconSparkle } from "./Icons";
 import "./Feed.css";
+import { t } from "../i18n";
 
 const FILTERS = [
   { id: "all", label: "Tutte", empty: "Nessuna carta da mostrare. Le carte arrivano dalle attività che non hai parcheggiato." },
   { id: "micro-task", label: "Micro-task", empty: "Nessun micro-task per ora: piccole cose da fare in pochi minuti." },
   { id: "fact", label: "Curiosità", empty: "Nessuna curiosità per ora: fatti sorprendenti sulle tue attività." },
+  // le etichette passano da t() al momento di disegnarle
 ];
 
 function Feed({
@@ -99,12 +101,12 @@ function Feed({
     <section className="feed-shell" aria-labelledby="feed-title">
       <div className="feed-head">
         <h2 id="feed-title" className="section-title">
-          Mentre aspetti
+          {t("Mentre aspetti")}
         </h2>
         <div className="feed-tools">
           {visibleCards.length > 0 && (
             <span className="feed-counter">
-              {activeIndex + 1} di {visibleCards.length}
+              {t("{n} di {total}", { n: activeIndex + 1, total: visibleCards.length })}
             </span>
           )}
           {aiReady && (
@@ -113,8 +115,8 @@ function Feed({
               className={`icon-button ${isGenerating ? "feed-generate--busy" : ""}`}
               onClick={() => onGenerate({ silent: false, only })}
               disabled={isGenerating}
-              aria-label="Genera nuove carte con l'AI"
-              title={only === "fact" ? "Genera nuove curiosità con l'AI" : only ? "Genera nuovi micro-task con l'AI" : "Genera nuove carte con l'AI"}
+              aria-label={t("Genera nuove carte con l'AI")}
+              title={only === "fact" ? t("Genera nuove curiosità con l'AI") : only ? t("Genera nuovi micro-task con l'AI") : t("Genera nuove carte con l'AI")}
             >
               <IconSparkle />
             </button>
@@ -123,15 +125,15 @@ function Feed({
             type="button"
             className="icon-button"
             onClick={reshuffle}
-            aria-label="Rimescola le carte"
-            title="Rimescola le carte"
+            aria-label={t("Rimescola le carte")}
+            title={t("Rimescola le carte")}
           >
             <IconShuffle />
           </button>
         </div>
       </div>
 
-      <div className="feed-filters" role="group" aria-label="Cosa vuoi vedere">
+      <div className="feed-filters" role="group" aria-label={t("Cosa vuoi vedere")}>
         {FILTERS.map((item) => (
           <button
             key={item.id}
@@ -140,7 +142,7 @@ function Feed({
             className={`feed-filter feed-filter--${item.id}`}
             onClick={() => changeFilter(item.id)}
           >
-            {item.label}
+            {t(item.label)}
             <span className="feed-filter-count">{counts[item.id]}</span>
           </button>
         ))}
@@ -150,21 +152,21 @@ function Feed({
         ref={feedRef}
         className="feed"
         tabIndex={0}
-        aria-label="Carte: scorri per passare alla successiva"
+        aria-label={t("Carte: scorri per passare alla successiva")}
         aria-busy={isGenerating}
       >
         {visibleCards.length === 0 && !isGenerating ? (
           <div className="feed-empty">
-            <p>{currentFilter.empty}</p>
+            <p>{t(currentFilter.empty)}</p>
             {aiReady && (
               <button type="button" className="button button--primary" onClick={() => onGenerate({ silent: false, only })}>
                 <IconSparkle />
-                {only === "fact" ? "Genera curiosità" : only ? "Genera micro-task" : "Genera le prime carte"}
+                {only === "fact" ? t("Genera curiosità") : only ? t("Genera micro-task") : t("Genera le prime carte")}
               </button>
             )}
             {!aiReady && filter !== "all" && (
               <button type="button" className="button button--ghost" onClick={() => changeFilter("all")}>
-                Mostra tutte le carte
+                {t("Mostra tutte le carte")}
               </button>
             )}
           </div>
@@ -191,8 +193,8 @@ function Feed({
         {isGenerating && (
           <div className="feed-card feed-card--loading" role="status">
             <div className="feed-loading-orb" aria-hidden="true" />
-            <p className="feed-text">Sto pescando nuove carte…</p>
-            <p className="feed-loading-note">L'AI gira sul tuo computer: può volerci qualche decina di secondi.</p>
+            <p className="feed-text">{t("Sto pescando nuove carte…")}</p>
+            <p className="feed-loading-note">{t("L'AI gira sul tuo computer: può volerci qualche decina di secondi.")}</p>
           </div>
         )}
       </div>

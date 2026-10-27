@@ -2,6 +2,7 @@ import ActivityItem from "./ActivityItem";
 import ActivityForm from "./ActivityForm";
 import { calculateProgress } from "../logic/progress";
 import "./Activities.css";
+import { t } from "../i18n";
 
 function ActivityList({ activities, blocks, onAdd, onPark, onResume, onFocus }) {
   const fixed = activities.filter(
@@ -13,15 +14,15 @@ function ActivityList({ activities, blocks, onAdd, onPark, onResume, onFocus }) 
   const parked = activities.filter((activity) => activity.status === "parked");
 
   const groups = [
-    { title: "Non negoziabili", items: fixed },
-    { title: "Passioni", items: passions },
-    { title: "Parcheggiate", items: parked },
+    { title: t("Non negoziabili"), items: fixed },
+    { title: t("Passioni"), items: passions },
+    { title: t("Parcheggiate"), items: parked },
   ].filter((group) => group.items.length > 0);
 
   return (
     <section className="panel activities" aria-labelledby="activities-title">
       <h2 id="activities-title" className="section-title">
-        Attività
+        {t("Attività")}
       </h2>
 
       {groups.map((group) => (

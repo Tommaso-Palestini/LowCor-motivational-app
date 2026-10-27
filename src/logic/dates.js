@@ -1,3 +1,5 @@
+import { locale } from "../i18n";
+
 export function toDateString(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -42,5 +44,5 @@ export function weekdayIndex(dateString) {
 }
 
 export function formatDate(dateString, options) {
-  return parseDate(dateString).toLocaleDateString("it-IT", options);
+  return parseDate(dateString).toLocaleDateString(locale(), options);
 }

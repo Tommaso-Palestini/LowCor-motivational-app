@@ -13,6 +13,7 @@ import {
 import { IconClose, IconMinimize, IconPause, IconPlay, IconTarget } from "./Icons";
 import { vibrate } from "../logic/haptics";
 import "./FocusMode.css";
+import { t } from "../i18n";
 
 const PRESETS = [25, 50, 90];
 const RING_RADIUS = 140;
@@ -57,12 +58,12 @@ function minuteTicks(totalMinutes) {
 
 function getStage(progress) {
   if (progress < 0.34) {
-    return "L'aura si accende";
+    return t("L'aura si accende");
   }
   if (progress < 0.67) {
-    return "Aura in carica";
+    return t("Aura in carica");
   }
-  return "Aura al massimo";
+  return t("Aura al massimo");
 }
 
 function FocusSetup({ activities, blocks, now, onStart, onClose }) {
@@ -93,21 +94,21 @@ function FocusSetup({ activities, blocks, now, onStart, onClose }) {
 
   return (
     <form className="focus-setup" onSubmit={handleSubmit}>
-      <button type="button" className="icon-button focus-corner" onClick={onClose} aria-label="Chiudi">
+      <button type="button" className="icon-button focus-corner" onClick={onClose} aria-label={t("Chiudi")}>
         <IconClose />
       </button>
 
-      <h2 className="focus-heading">Entra in focus</h2>
+      <h2 className="focus-heading">{t("Entra in focus")}</h2>
       <p className="focus-lead">
-        Il resto sparisce. Alla fine la sessione diventa un blocco fatto e ti fa guadagnare aura.
+        {t("Il resto sparisce. Alla fine la sessione diventa un blocco fatto e ti fa guadagnare aura.")}
       </p>
 
       {available.length === 0 ? (
-        <p className="focus-lead">Riprendi o crea un'attività per iniziare una sessione.</p>
+        <p className="focus-lead">{t("Riprendi o crea un'attività per iniziare una sessione.")}</p>
       ) : (
         <>
           <label className="focus-field">
-            <span>Su cosa</span>
+            <span>{t("Su cosa")}</span>
             <select
               className="field"
               value={activityId}
@@ -122,7 +123,7 @@ function FocusSetup({ activities, blocks, now, onStart, onClose }) {
           </label>
 
           <fieldset className="focus-field">
-            <legend>Per quanto</legend>
+            <legend>{t("Per quanto")}</legend>
             <div className="focus-presets">
               {options.map((value) => (
                 <button
@@ -132,7 +133,7 @@ function FocusSetup({ activities, blocks, now, onStart, onClose }) {
                   aria-pressed={minutes === value}
                   onClick={() => setMinutes(value)}
                 >
-                  {value === untilEnd ? `Fino alle ${current.end}` : `${value} min`}
+                  {value === untilEnd ? t("Fino alle {time}", { time: current.end }) : `${value} min`}
                 </button>
               ))}
             </div>
@@ -140,7 +141,7 @@ function FocusSetup({ activities, blocks, now, onStart, onClose }) {
 
           <button type="submit" className="button button--primary focus-start">
             <IconPlay />
-            Inizia {minutes} minuti
+            {t("Inizia {n} minuti", { n: minutes })}
           </button>
         </>
       )}
@@ -181,7 +182,7 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
 
   return (
     <div className="focus-running" style={{ "--progress": progress }}>
-      <button type="button" className="icon-button focus-corner" onClick={onMinimize} aria-label="Riduci a icona">
+      <button type="button" className="icon-button focus-corner" onClick={onMinimize} aria-label={t("Riduci a icona")}>
         <IconMinimize />
       </button>
 
@@ -217,11 +218,11 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
 
         <div className="focus-center">
           <p className="focus-activity">{activityName}</p>
-          <p className="focus-clock" role="timer" aria-label="Tempo rimanente">
+          <p className="focus-clock" role="timer" aria-label={t("Tempo rimanente")}>
             {formatClock(remainingMs / 1000)}
           </p>
           <p className="focus-aura-earned">
-            {isPaused ? "In pausa" : `${getStage(progress)}, +${elapsedMinutes * AURA.focusMinute}`}
+            {isPaused ? t("In pausa") : `${getStage(progress)}, +${elapsedMinutes * AURA.focusMinute}`}
           </p>
         </div>
       </div>
@@ -230,23 +231,23 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
         {isPaused ? (
           <button type="button" className="button button--primary" onClick={onResume}>
             <IconPlay />
-            Riprendi
+            {t("Riprendi")}
           </button>
         ) : (
           <button type="button" className="button button--ghost" onClick={onPause}>
             <IconPause />
-            Pausa
+            {t("Pausa")}
           </button>
         )}
         <button type="button" className="button button--ghost" onClick={() => onFinish(false)}>
-          Termina e salva
+          {t("Termina e salva")}
         </button>
         <button type="button" className="button button--quiet" onClick={onCancel}>
-          Annulla sessione
+          {t("Annulla sessione")}
         </button>
       </div>
       {elapsedMinutes < MIN_SAVED_MINUTES && (
-        <p className="focus-note">Sotto i {MIN_SAVED_MINUTES} minuti la sessione non viene salvata.</p>
+        <p className="focus-note">{t("Sotto i {n} minuti la sessione non viene salvata.", { n: MIN_SAVED_MINUTES })}</p>
       )}
     </div>
   );
@@ -324,7 +325,7 @@ function FocusMode({
         className="focus-pill"
         onClick={onOpen}
         style={{ "--progress": progress }}
-        aria-label={`Torna al focus su ${activityName}`}
+        aria-label={t("Torna al focus su {name}", { name: activityName })}
       >
         <IconTarget />
         <span className="focus-pill-time">{formatClock(remainingMs / 1000)}</span>
@@ -334,7 +335,7 @@ function FocusMode({
   }
 
   return (
-    <div ref={overlayRef} className="focus-overlay" role="dialog" aria-modal="true" aria-label="Focus">
+    <div ref={overlayRef} className="focus-overlay" role="dialog" aria-modal="true" aria-label={t("Focus")}>
       {focus ? (
         <FocusRunning
           focus={focus}

@@ -1,6 +1,7 @@
 import { alertText } from "../logic/alerts";
 import { IconBolt, IconCheck, IconClose, IconTarget } from "./Icons";
 import "./Nudges.css";
+import { t } from "../i18n";
 
 const ICONS = { soon: IconBolt, start: IconTarget, end: IconCheck };
 
@@ -10,7 +11,7 @@ function Nudges({ nudges, onDismiss, onFocus, onDone }) {
     return null;
   }
   return (
-    <div className="nudges" role="region" aria-label="Promemoria" aria-live="polite">
+    <div className="nudges" role="region" aria-label={t("Promemoria")} aria-live="polite">
       {nudges.map((nudge) => {
         const { title, body } = alertText(nudge);
         const Icon = ICONS[nudge.kind];
@@ -25,23 +26,23 @@ function Nudges({ nudges, onDismiss, onFocus, onDone }) {
               <div className="nudge-actions">
                 {nudge.kind === "start" && (
                   <button type="button" className="button button--primary" onClick={() => onFocus(nudge)}>
-                    Entra in focus
+                    {t("Entra in focus")}
                   </button>
                 )}
                 {nudge.kind === "end" && (
                   <>
                     <button type="button" className="button button--primary" onClick={() => onDone(nudge)}>
                       <IconCheck />
-                      Fatto
+                      {t("Fatto")}
                     </button>
                     <button type="button" className="button button--quiet" onClick={() => onDismiss(nudge.key)}>
-                      Non ancora
+                      {t("Non ancora")}
                     </button>
                   </>
                 )}
               </div>
             </div>
-            <button type="button" className="icon-button nudge-close" onClick={() => onDismiss(nudge.key)} aria-label="Chiudi">
+            <button type="button" className="icon-button nudge-close" onClick={() => onDismiss(nudge.key)} aria-label={t("Chiudi")}>
               <IconClose />
             </button>
           </div>

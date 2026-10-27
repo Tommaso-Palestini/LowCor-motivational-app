@@ -1,10 +1,11 @@
 import { useState } from "react";
 import ProgressOrbit from "./ProgressOrbit";
+import { t } from "../i18n";
 
 function formatGoal(goal) {
   return goal.period === "day"
-    ? `${goal.amount} al giorno`
-    : `${goal.amount} a settimana`;
+    ? t("{n} al giorno", { n: goal.amount })
+    : t("{n} a settimana", { n: goal.amount });
 }
 
 function getTone(activity, progress) {
@@ -22,15 +23,15 @@ function getTone(activity, progress) {
 
 function getMeta(activity, progress) {
   if (activity.status === "parked") {
-    return "In pausa";
+    return t("In pausa");
   }
   if (progress.completed) {
-    return "Obiettivo raggiunto";
+    return t("Obiettivo raggiunto");
   }
   if (activity.status === "focus") {
-    return `Fissa della settimana, obiettivo ${formatGoal(activity.goal)}`;
+    return t("Fissa della settimana, obiettivo {goal}", { goal: formatGoal(activity.goal) });
   }
-  return `Obiettivo ${formatGoal(activity.goal)}`;
+  return t("Obiettivo {goal}", { goal: formatGoal(activity.goal) });
 }
 
 function ActivityItem({ activity, progress, onPark, onResume, onFocus }) {
@@ -57,7 +58,7 @@ function ActivityItem({ activity, progress, onPark, onResume, onFocus }) {
         <p className="activity-meta">{getMeta(activity, progress)}</p>
         {!isParked && (
           <span className="sr-only">
-            {progress.done} su {progress.target} completati
+            {t("{done} su {total} completati", { done: progress.done, total: progress.target })}
           </span>
         )}
       </div>
@@ -66,24 +67,24 @@ function ActivityItem({ activity, progress, onPark, onResume, onFocus }) {
         <div className="activity-actions">
           {isPassion && activity.status === "active" && (
             <button type="button" className="button button--quiet" onClick={() => onFocus(activity.id)}>
-              Rendi fissa
+              {t("Rendi fissa")}
             </button>
           )}
           {isPassion && !isParked && (
             <button type="button" className="button button--quiet" onClick={() => setIsParking(true)}>
-              Parcheggia
+              {t("Parcheggia")}
             </button>
           )}
           {isParked && (
             <button type="button" className="button button--ghost" onClick={() => onResume(activity.id)}>
-              Riprendi
+              {t("Riprendi")}
             </button>
           )}
         </div>
       )}
 
       {isParked && activity.resumeNote && (
-        <p className="activity-note">Riparti da: {activity.resumeNote}</p>
+        <p className="activity-note">{t("Riparti da: {note}", { note: activity.resumeNote })}</p>
       )}
 
       {isParking && (
@@ -92,15 +93,15 @@ function ActivityItem({ activity, progress, onPark, onResume, onFocus }) {
             className="field park-form-input"
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Dove sei arrivato?"
-            aria-label={`Dove sei arrivato con ${activity.name}`}
+            placeholder={t("Dove sei arrivato?")}
+            aria-label={t("Dove sei arrivato con {name}", { name: activity.name })}
             autoFocus
           />
           <button type="submit" className="button button--primary">
-            Parcheggia
+            {t("Parcheggia")}
           </button>
           <button type="button" className="button button--quiet" onClick={() => setIsParking(false)}>
-            Annulla
+            {t("Annulla")}
           </button>
         </form>
       )}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { formatDuration, timeToMinutes } from "../logic/time";
 import { prefersReducedMotion } from "../logic/motion";
+import { t } from "../i18n";
 
 const RING_START = 6 * 60;
 const RING_SPAN = 18 * 60;
@@ -112,31 +113,31 @@ function RemainingBar({ block, nowMinutes }) {
       <span className="ring-remaining-bar" aria-hidden="true">
         <span style={{ width: `${fraction * 100}%` }} />
       </span>
-      <span className="ring-remaining-text">{left > 0 ? `ancora ${formatDuration(left)}` : "tempo scaduto"}</span>
+      <span className="ring-remaining-text">{left > 0 ? t("ancora {time}", { time: formatDuration(left) }) : t("tempo scaduto")}</span>
     </div>
   );
 }
 
 function getCenterText(blocks, current, next, nowMinutes) {
   if (current) {
-    return { label: "Adesso", title: current.name, sub: `fino alle ${current.end}` };
+    return { label: t("Adesso"), title: current.name, sub: t("fino alle {time}", { time: current.end }) };
   }
   if (next) {
     const wait = formatDuration(timeToMinutes(next.start) - nowMinutes);
-    return { label: "Prossimo", title: next.name, sub: `alle ${next.start}, tra ${wait}` };
+    return { label: t("Prossimo"), title: next.name, sub: t("alle {time}, tra {wait}", { time: next.start, wait }) };
   }
   if (blocks.length > 0) {
     const doneCount = blocks.filter((block) => block.done).length;
     return {
-      label: "Giornata chiusa",
-      title: `${doneCount} su ${blocks.length}`,
-      sub: "blocchi completati",
+      label: t("Giornata chiusa"),
+      title: t("{done} su {total}", { done: doneCount, total: blocks.length }),
+      sub: t("blocchi completati"),
     };
   }
   return {
-    label: "Giornata libera",
-    title: "Dalle una forma",
-    sub: "Aggiungi il primo blocco",
+    label: t("Giornata libera"),
+    title: t("Dalle una forma"),
+    sub: t("Aggiungi il primo blocco"),
   };
 }
 
@@ -151,7 +152,7 @@ function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         role="img"
-        aria-label={`Giornata dalle 6 alle 24 con ${blocks.length} blocchi`}
+        aria-label={t("Giornata dalle 6 alle 24 con {n} blocchi", { n: blocks.length })}
       >
         <RingWaves />
         <circle className="ring-track" cx={CENTER} cy={CENTER} r={RADIUS} />
@@ -190,7 +191,7 @@ function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
         {current && <RemainingBar block={current} nowMinutes={nowMinutes} />}
         {current && !current.done && (
           <button type="button" className="ring-focus" onClick={() => onFocusBlock(current)}>
-            Entra in focus
+            {t("Entra in focus")}
           </button>
         )}
       </div>

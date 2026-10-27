@@ -54,7 +54,7 @@ function typicalDuration(activity, blocks) {
     .map(blockDuration)
     .sort((a, b) => a - b);
   if (durations.length === 0) {
-    return DEFAULT_DURATION;
+    return activity.defaultMinutes || DEFAULT_DURATION;
   }
   return durations[Math.floor(durations.length / 2)];
 }
@@ -108,7 +108,9 @@ export function planWeek(activities, blocks, weekStart, now, { limits = null, sk
     const isDaily = activity.goal.period === "day";
     const maxPerDay = isDaily ? activity.goal.amount : 1;
     const duration = typicalDuration(activity, blocks);
-    const preferred = preferredStart(activity, blocks);
+    // Senza storico usa l'orario scelto nell'onboarding (o nel modello di partenza)
+    const preferred =
+      preferredStart(activity, blocks) ?? (activity.preferredStart ? timeToMinutes(activity.preferredStart) : null);
     let remaining = isDaily ? Infinity : missing;
 
     for (let round = 0; round < maxPerDay && remaining > 0; round += 1) {
@@ -130,6 +132,11 @@ export function planWeek(activities, blocks, weekStart, now, { limits = null, sk
           break;
         }
         const earliest = candidate.date === today ? minutesOfDay(now) : 0;
+        // Se oggi l'orario abituale è passato da più di due ore, meglio un altro giorno
+        // (la routine del mattino alle cinque del pomeriggio non serve a nessuno)
+        if (preferred !== null && earliest > preferred + 120) {
+          continue;
+        }
         const occupied = [...candidate.dayBlocks, ...busy.filter((event) => event.date === candidate.date)];
         const start = findFreeSlot(occupied, preferred, earliest, duration);
         if (start === null) {

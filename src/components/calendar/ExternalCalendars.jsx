@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { IconClose, IconDownload, IconRepeat, IconSpinner } from "../Icons";
+import { locale } from "../../i18n";
 
 function formatImported(iso) {
-  return new Date(iso).toLocaleString("it-IT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleString(locale(), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
 // Collega calendari esterni (.ics da file o da link): i loro impegni occupano tempo nel calendario e nel pianificatore.

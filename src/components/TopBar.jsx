@@ -3,10 +3,11 @@ import SettingsPanel from "./SettingsPanel";
 import { VIEWS } from "../logic/views";
 import { IconSettings, IconSparkle, IconTarget } from "./Icons";
 import "./TopBar.css";
+import { locale, t } from "../i18n";
 
 function ViewTabs({ className, view, onViewChange }) {
   return (
-    <nav className={className} aria-label="Sezioni">
+    <nav className={className} aria-label={t("Sezioni")}>
       {VIEWS.map((item) => (
         <button
           key={item.id}
@@ -15,7 +16,7 @@ function ViewTabs({ className, view, onViewChange }) {
           aria-current={view === item.id ? "page" : undefined}
           onClick={() => onViewChange(item.id)}
         >
-          {item.label}
+          {t(item.label)}
         </button>
       ))}
     </nav>
@@ -67,12 +68,12 @@ function TopBar({
         <ViewTabs className="topbar-tabs" view={view} onViewChange={onViewChange} />
 
         <div className="topbar-actions">
-          <p className="topbar-aura" title="Aura: la guadagni chiudendo blocchi, obiettivi e sessioni di focus">
+          <p className="topbar-aura" title={t("Aura: la guadagni chiudendo blocchi, obiettivi e sessioni di focus")}>
             <IconSparkle />
             <span key={aura} className="topbar-aura-value">
-              {aura.toLocaleString("it-IT")}
+              {aura.toLocaleString(locale())}
             </span>
-            <span className="sr-only">punti aura</span>
+            <span className="sr-only">{t("punti aura")}</span>
           </p>
 
           <button
@@ -81,14 +82,14 @@ function TopBar({
             onClick={onOpenFocus}
           >
             <IconTarget />
-            <span className="topbar-focus-label">{hasFocus ? "Focus attivo" : "Focus"}</span>
+            <span className="topbar-focus-label">{hasFocus ? t("Focus attivo") : t("Focus")}</span>
           </button>
 
           <div className="topbar-settings" ref={settingsRef}>
             <button
               type="button"
               className={`icon-button ${ai.isReady ? "topbar-settings-button--ai" : ""}`}
-              aria-label="Impostazioni"
+              aria-label={t("Impostazioni")}
               aria-expanded={isSettingsOpen}
               onClick={() => setIsSettingsOpen((open) => !open)}
             >

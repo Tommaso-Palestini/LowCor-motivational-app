@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ENERGY } from "../logic/energy";
 import { IconPlus } from "./Icons";
+import { t } from "../i18n";
 
 function ActivityForm({ onAdd }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,11 +23,11 @@ function ActivityForm({ onAdd }) {
     const trimmedName = name.trim();
     const goalAmount = Number(amount);
     if (trimmedName === "") {
-      setError("Dai un nome all'attività.");
+      setError(t("Dai un nome all'attività."));
       return;
     }
     if (!(goalAmount >= 1)) {
-      setError("L'obiettivo deve essere almeno 1.");
+      setError(t("L'obiettivo deve essere almeno 1."));
       return;
     }
     onAdd({ name: trimmedName, type, amount: goalAmount, period, energy });
@@ -37,7 +38,7 @@ function ActivityForm({ onAdd }) {
     return (
       <button type="button" className="button button--ghost activity-add" onClick={() => setIsOpen(true)}>
         <IconPlus />
-        Nuova attività
+        {t("Nuova attività")}
       </button>
     );
   }
@@ -48,8 +49,8 @@ function ActivityForm({ onAdd }) {
         className="field activity-form-name"
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="Nome, per esempio Chitarra"
-        aria-label="Nome dell'attività"
+        placeholder={t("Nome, per esempio Chitarra")}
+        aria-label={t("Nome dell'attività")}
         autoFocus
       />
       <div className="activity-form-row">
@@ -57,10 +58,10 @@ function ActivityForm({ onAdd }) {
           className="field"
           value={type}
           onChange={(event) => setType(event.target.value)}
-          aria-label="Tipo di attività"
+          aria-label={t("Tipo di attività")}
         >
-          <option value="passion">Passione</option>
-          <option value="fixed">Non negoziabile</option>
+          <option value="passion">{t("Passione")}</option>
+          <option value="fixed">{t("Non negoziabile")}</option>
         </select>
         <input
           type="number"
@@ -68,27 +69,27 @@ function ActivityForm({ onAdd }) {
           className="field field--narrow"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
-          aria-label="Quante volte"
+          aria-label={t("Quante volte")}
         />
-        <span className="activity-form-word">volte</span>
+        <span className="activity-form-word">{t("volte")}</span>
         <select
           className="field"
           value={period}
           onChange={(event) => setPeriod(event.target.value)}
-          aria-label="Ogni quanto"
+          aria-label={t("Ogni quanto")}
         >
-          <option value="week">a settimana</option>
-          <option value="day">al giorno</option>
+          <option value="week">{t("a settimana")}</option>
+          <option value="day">{t("al giorno")}</option>
         </select>
         <select
           className="field"
           value={energy}
           onChange={(event) => setEnergy(event.target.value)}
-          aria-label="Energia richiesta"
+          aria-label={t("Energia richiesta")}
         >
           {Object.entries(ENERGY).map(([level, { label }]) => (
             <option key={level} value={level}>
-              Energia {label.toLowerCase()}
+              {t("Energia {level}", { level: t(label).toLowerCase() })}
             </option>
           ))}
         </select>
@@ -100,10 +101,10 @@ function ActivityForm({ onAdd }) {
       )}
       <div className="activity-form-actions">
         <button type="submit" className="button button--primary">
-          Aggiungi attività
+          {t("Aggiungi attività")}
         </button>
         <button type="button" className="button button--quiet" onClick={close}>
-          Annulla
+          {t("Annulla")}
         </button>
       </div>
     </form>

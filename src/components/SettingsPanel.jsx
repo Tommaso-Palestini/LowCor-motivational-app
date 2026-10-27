@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
+import { LANGUAGES, t } from "../i18n";
 
 function Switch({ checked, onChange, label }) {
   return (
@@ -35,34 +36,34 @@ function AiSection({ ai, settings, set }) {
     <div className="settings-ai">
       <div className="settings-row">
         <div>
-          <p className="settings-name">AI locale</p>
+          <p className="settings-name">{t("AI locale")}</p>
           <p className={`settings-status settings-status--${ai.status}`}>
             <span aria-hidden="true" />
-            {AI_STATUS[ai.status]}
+            {t(AI_STATUS[ai.status])}
             {ai.isReady && `, ${ai.model}`}
           </p>
         </div>
         {!ai.isReady && (
           <button type="button" className="button button--quiet" onClick={ai.retry}>
-            Riprova
+            {t("Riprova")}
           </button>
         )}
       </div>
 
       {ai.status === "offline" && (
         <p className="settings-hint">
-          Avvia Ollama sul computer (<code>ollama serve</code>) oppure controlla l'indirizzo qui sotto.
+          {t("Avvia Ollama sul computer")} (<code>ollama serve</code>) {t("oppure controlla l'indirizzo qui sotto.")}
         </p>
       )}
       {ai.status === "no-model" && (
         <p className="settings-hint">
-          Scarica un modello dal terminale: <code>ollama pull llama3.2</code>
+          {t("Scarica un modello dal terminale:")} <code>ollama pull llama3.2</code>
         </p>
       )}
 
       {ai.models.length > 1 && (
         <label className="settings-field">
-          <span className="settings-hint">Modello</span>
+          <span className="settings-hint">{t("Modello")}</span>
           <select className="field" value={ai.model || ""} onChange={(event) => set("aiModel", event.target.value)}>
             {ai.models.map((name) => (
               <option key={name} value={name}>
@@ -74,7 +75,7 @@ function AiSection({ ai, settings, set }) {
       )}
 
       <label className="settings-field">
-        <span className="settings-hint">Indirizzo di Ollama</span>
+        <span className="settings-hint">{t("Indirizzo di Ollama")}</span>
         <input
           className="field"
           defaultValue={settings.aiUrl}
@@ -91,13 +92,13 @@ function AiSection({ ai, settings, set }) {
 
       <div className="settings-row">
         <div>
-          <p className="settings-name">Carte infinite</p>
-          <p className="settings-hint">Quando arrivi all'ultima carta del feed ne genera altre</p>
+          <p className="settings-name">{t("Carte infinite")}</p>
+          <p className="settings-hint">{t("Quando arrivi all'ultima carta del feed ne genera altre")}</p>
         </div>
         <Switch
           checked={settings.aiAutoCards}
           onChange={(value) => set("aiAutoCards", value)}
-          label="Carte infinite"
+          label={t("Carte infinite")}
         />
       </div>
     </div>
@@ -120,16 +121,16 @@ function BackgroundSection({ settings, set, image, onPick, onRemove }) {
     <div className="settings-bg">
       <div className="settings-row">
         <div>
-          <p className="settings-name">Sfondo</p>
-          <p className="settings-hint">{isImage ? "La tua foto, velata dalla tinta dell'app" : "Luci morbide che si muovono piano"}</p>
+          <p className="settings-name">{t("Sfondo")}</p>
+          <p className="settings-hint">{isImage ? t("La tua foto, velata dalla tinta dell'app") : t("Luci morbide che si muovono piano")}</p>
         </div>
       </div>
-      <div className="segmented settings-segmented" role="group" aria-label="Tipo di sfondo">
+      <div className="segmented settings-segmented" role="group" aria-label={t("Tipo di sfondo")}>
         <button type="button" aria-pressed={!isImage} onClick={() => choose("lava")}>
-          Lava
+          {t("Lava")}
         </button>
         <button type="button" aria-pressed={Boolean(isImage)} onClick={() => choose("image")}>
-          La tua foto
+          {t("La tua foto")}
         </button>
       </div>
       <input
@@ -149,18 +150,18 @@ function BackgroundSection({ settings, set, image, onPick, onRemove }) {
       {isImage ? (
         <>
           <div className="settings-bg-preview">
-            <img src={image} alt="Anteprima dello sfondo" />
+            <img src={image} alt={t("Anteprima dello sfondo")} />
             <div className="settings-bg-actions">
               <button type="button" className="button button--quiet" onClick={() => fileRef.current?.click()}>
-                Cambia foto
+                {t("Cambia foto")}
               </button>
               <button type="button" className="button button--quiet" onClick={onRemove}>
-                Rimuovi
+                {t("Rimuovi")}
               </button>
             </div>
           </div>
           <label className="settings-slider">
-            <span className="settings-hint">Velo scuro al {settings.backgroundDim}%</span>
+            <span className="settings-hint">{t("Velo scuro al {n}%", { n: settings.backgroundDim })}</span>
             <input
               type="range"
               className="range"
@@ -174,8 +175,8 @@ function BackgroundSection({ settings, set, image, onPick, onRemove }) {
         </>
       ) : (
         <div className="settings-row">
-          <p className="settings-hint">Lava in movimento</p>
-          <Switch checked={settings.lava} onChange={(value) => set("lava", value)} label="Lava in movimento" />
+          <p className="settings-hint">{t("Lava in movimento")}</p>
+          <Switch checked={settings.lava} onChange={(value) => set("lava", value)} label={t("Lava in movimento")} />
         </div>
       )}
     </div>
@@ -198,8 +199,23 @@ const SIZES = [
 function AppearanceSection({ settings, set }) {
   return (
     <div className="settings-bg">
-      <p className="settings-group">Aspetto</p>
-      <div className="settings-fonts" role="group" aria-label="Stile del testo">
+      <p className="settings-group">{t("Aspetto")}</p>
+      <div className="segmented settings-segmented" role="group" aria-label={t("Lingua")}>
+        {LANGUAGES.map((language) => (
+          <button
+            key={language.id}
+            type="button"
+            aria-pressed={(settings.language || "it") === language.id}
+            onClick={() => set("language", language.id)}
+          >
+            {language.label}
+          </button>
+        ))}
+      </div>
+      {settings.language === "en" && (
+        <p className="settings-hint">English is in beta: some sections are still in Italian.</p>
+      )}
+      <div className="settings-fonts" role="group" aria-label={t("Stile del testo")}>
         {FONTS.map((font) => (
           <button
             key={font.id}
@@ -211,15 +227,15 @@ function AppearanceSection({ settings, set }) {
             <span className="settings-font-sample" style={{ fontFamily: font.family }} aria-hidden="true">
               Aa
             </span>
-            {font.label}
+            {t(font.label)}
           </button>
         ))}
       </div>
       {settings.font === "leggibile" && (
-        <p className="settings-hint">Lexend è pensato per una lettura più scorrevole, anche con ADHD e dislessia.</p>
+        <p className="settings-hint">{t("Lexend è pensato per una lettura più scorrevole, anche con ADHD e dislessia.")}</p>
       )}
 
-      <div className="segmented settings-segmented" role="group" aria-label="Dimensione del testo">
+      <div className="segmented settings-segmented" role="group" aria-label={t("Dimensione del testo")}>
         {SIZES.map((size) => (
           <button
             key={size.id}
@@ -227,32 +243,32 @@ function AppearanceSection({ settings, set }) {
             aria-pressed={settings.textSize === size.id}
             onClick={() => set("textSize", size.id)}
           >
-            {size.label}
+            {t(size.label)}
           </button>
         ))}
       </div>
 
       <div className="settings-row">
         <div>
-          <p className="settings-name">Contrasto alto</p>
-          <p className="settings-hint">Testi secondari e bordi più marcati</p>
+          <p className="settings-name">{t("Contrasto alto")}</p>
+          <p className="settings-hint">{t("Testi secondari e bordi più marcati")}</p>
         </div>
         <Switch
           checked={settings.contrast === "high"}
           onChange={(value) => set("contrast", value ? "high" : "normal")}
-          label="Contrasto alto"
+          label={t("Contrasto alto")}
         />
       </div>
 
       <div className="settings-row">
         <div>
-          <p className="settings-name">Riduci i movimenti</p>
-          <p className="settings-hint">Ferma onde, lava e animazioni: meno stimoli, più calma</p>
+          <p className="settings-name">{t("Riduci i movimenti")}</p>
+          <p className="settings-hint">{t("Ferma onde, lava e animazioni: meno stimoli, più calma")}</p>
         </div>
         <Switch
           checked={settings.motion === "reduced"}
           onChange={(value) => set("motion", value ? "reduced" : "full")}
-          label="Riduci i movimenti"
+          label={t("Riduci i movimenti")}
         />
       </div>
     </div>
@@ -271,15 +287,15 @@ function AlertsSection({ settings, set }) {
     <div className="settings-bg">
       <div className="settings-row">
         <div>
-          <p className="settings-name">Promemoria dei blocchi</p>
-          <p className="settings-hint">Un avviso prima di iniziare, all'inizio e alla fine, per non perdere la cognizione del tempo</p>
+          <p className="settings-name">{t("Promemoria dei blocchi")}</p>
+          <p className="settings-hint">{t("Un avviso prima di iniziare, all'inizio e alla fine, per non perdere la cognizione del tempo")}</p>
         </div>
-        <Switch checked={settings.blockAlerts} onChange={(value) => set("blockAlerts", value)} label="Promemoria dei blocchi" />
+        <Switch checked={settings.blockAlerts} onChange={(value) => set("blockAlerts", value)} label={t("Promemoria dei blocchi")} />
       </div>
       {settings.blockAlerts && (
         <>
           <label className="settings-slider">
-            <span className="settings-hint">Avvisami {settings.alertMinutes} minuti prima</span>
+            <span className="settings-hint">{t("Avvisami {n} minuti prima", { n: settings.alertMinutes })}</span>
             <input
               type="range"
               className="range"
@@ -291,14 +307,14 @@ function AlertsSection({ settings, set }) {
           </label>
           {supported && permission === "default" && (
             <button type="button" className="button button--ghost" onClick={askPermission}>
-              Avvisami anche quando l'app è in background
+              {t("Avvisami anche quando l'app è in background")}
             </button>
           )}
           {supported && permission === "granted" && (
-            <p className="settings-hint">Notifiche di sistema attive quando l'app è aperta in background.</p>
+            <p className="settings-hint">{t("Notifiche di sistema attive quando l'app è aperta in background.")}</p>
           )}
           {supported && permission === "denied" && (
-            <p className="settings-hint">Notifiche bloccate dal browser: gli avvisi compaiono solo dentro l'app.</p>
+            <p className="settings-hint">{t("Notifiche bloccate dal browser: gli avvisi compaiono solo dentro l'app.")}</p>
           )}
         </>
       )}
@@ -312,22 +328,22 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
   }
 
   return (
-    <div className="settings" role="dialog" aria-label="Impostazioni">
+    <div className="settings" role="dialog" aria-label={t("Impostazioni")}>
       <AppearanceSection settings={settings} set={set} />
 
-      <p className="settings-group">Colori e sfondo</p>
+      <p className="settings-group">{t("Colori e sfondo")}</p>
       <div className="settings-row">
         <div>
-          <p className="settings-name">Onda di colori</p>
-          <p className="settings-hint">La palette gira lentamente da rosso a rosso</p>
+          <p className="settings-name">{t("Onda di colori")}</p>
+          <p className="settings-hint">{t("La palette gira lentamente da rosso a rosso")}</p>
         </div>
-        <Switch checked={settings.wave} onChange={(value) => set("wave", value)} label="Onda di colori" />
+        <Switch checked={settings.wave} onChange={(value) => set("wave", value)} label={t("Onda di colori")} />
       </div>
 
       {settings.wave ? (
         <label className="settings-slider">
           <span className="settings-hint">
-            Un giro completo in {settings.waveSeconds} secondi
+            {t("Un giro completo in {n} secondi", { n: settings.waveSeconds })}
           </span>
           <input
             type="range"
@@ -341,7 +357,7 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
         </label>
       ) : (
         <label className="settings-slider">
-          <span className="settings-hint">Tinta fissa</span>
+          <span className="settings-hint">{t("Tinta fissa")}</span>
           <input
             type="range"
             className="range range--hue"
@@ -363,20 +379,20 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
 
       <div className="settings-row">
         <div>
-          <p className="settings-name">Full gas</p>
-          <p className="settings-hint">Annunci a schermo quando chiudi blocchi e obiettivi</p>
+          <p className="settings-name">{t("Full gas")}</p>
+          <p className="settings-hint">{t("Annunci a schermo quando chiudi blocchi e obiettivi")}</p>
         </div>
-        <Switch checked={settings.fullGas} onChange={(value) => set("fullGas", value)} label="Full gas" />
+        <Switch checked={settings.fullGas} onChange={(value) => set("fullGas", value)} label={t("Full gas")} />
       </div>
 
       <div className="settings-row">
         <div>
-          <p className="settings-name">Rischio overload</p>
-          <p className="settings-hint">Quando un giorno del calendario va segnalato come troppo pieno</p>
+          <p className="settings-name">{t("Rischio overload")}</p>
+          <p className="settings-hint">{t("Quando un giorno del calendario va segnalato come troppo pieno")}</p>
         </div>
       </div>
       <label className="settings-slider">
-        <span className="settings-hint">Più di {settings.energyMaxHigh} blocchi a energia alta</span>
+        <span className="settings-hint">{t("Più di {n} blocchi a energia alta", { n: settings.energyMaxHigh })}</span>
         <input
           type="range"
           className="range"
@@ -387,7 +403,7 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
         />
       </label>
       <label className="settings-slider">
-        <span className="settings-hint">Oppure più di {settings.energyMaxLoad} punti di energia (alta 3, media 2, bassa 1)</span>
+        <span className="settings-hint">{t("Oppure più di {n} punti di energia (alta 3, media 2, bassa 1)", { n: settings.energyMaxLoad })}</span>
         <input
           type="range"
           className="range"
@@ -398,21 +414,21 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
         />
       </label>
 
-      <p className="settings-group">Tempo</p>
+      <p className="settings-group">{t("Tempo")}</p>
       <AlertsSection settings={settings} set={set} />
 
-      <p className="settings-group">AI e scorciatoie</p>
+      <p className="settings-group">{t("AI e scorciatoie")}</p>
       <AiSection ai={ai} settings={settings} set={set} />
 
       <div className="settings-shortcuts">
-        <p className="settings-name">Scorciatoie</p>
+        <p className="settings-name">{t("Scorciatoie")}</p>
         <dl>
           {SHORTCUTS.map(([keys, description]) => (
             <div key={keys} className="settings-shortcut">
               <dt>
                 <kbd>{keys}</kbd>
               </dt>
-              <dd>{description}</dd>
+              <dd>{t(description)}</dd>
             </div>
           ))}
         </dl>

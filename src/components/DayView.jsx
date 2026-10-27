@@ -4,6 +4,7 @@ import { IconClose, IconPlus } from "./Icons";
 import { getCurrentAndNext, minutesOfDay } from "../logic/time";
 import { getBlockTone } from "../logic/tone";
 import "./DayView.css";
+import { t } from "../i18n";
 
 function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onFocusBlock }) {
   const [activityId, setActivityId] = useState("");
@@ -22,7 +23,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
     const activity = activitiesById.get(block.activityId);
     return {
       ...block,
-      name: activity ? activity.name : "Attività eliminata",
+      name: activity ? activity.name : t("Attività eliminata"),
       tone: getBlockTone(block, activity, now),
     };
   });
@@ -33,11 +34,11 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
   function handleSubmit(event) {
     event.preventDefault();
     if (activityId === "") {
-      setError("Scegli un'attività per il blocco.");
+      setError(t("Scegli un'attività per il blocco."));
       return;
     }
     if (start >= end) {
-      setError("L'orario di fine deve venire dopo quello di inizio.");
+      setError(t("L'orario di fine deve venire dopo quello di inizio."));
       return;
     }
     setError("");
@@ -47,7 +48,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
   return (
     <section className="day" aria-labelledby="day-title">
       <h2 id="day-title" className="sr-only">
-        La tua giornata
+        {t("La tua giornata")}
       </h2>
 
       <DayRing
@@ -86,7 +87,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
                     type="button"
                     className="icon-button"
                     onClick={() => onDelete(block.id)}
-                    aria-label={`Elimina il blocco ${block.name} delle ${block.start}`}
+                    aria-label={t("Elimina il blocco {name} delle {time}", { name: block.name, time: block.start })}
                   >
                     <IconClose />
                   </button>
@@ -101,9 +102,9 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
             className="field day-form-activity"
             value={activityId}
             onChange={(event) => setActivityId(event.target.value)}
-            aria-label="Attività del blocco"
+            aria-label={t("Attività del blocco")}
           >
-            <option value="">Scegli attività</option>
+            <option value="">{t("Scegli attività")}</option>
             {availableActivities.map((activity) => (
               <option key={activity.id} value={activity.id}>
                 {activity.name}
@@ -116,7 +117,7 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
               className="field"
               value={start}
               onChange={(event) => setStart(event.target.value)}
-              aria-label="Inizio"
+              aria-label={t("Inizio")}
             />
             <span className="day-form-dash" aria-hidden="true">
               –
@@ -126,12 +127,12 @@ function DayView({ now, date, blocks, activities, onAdd, onToggle, onDelete, onF
               className="field"
               value={end}
               onChange={(event) => setEnd(event.target.value)}
-              aria-label="Fine"
+              aria-label={t("Fine")}
             />
           </div>
           <button type="submit" className="button button--primary">
             <IconPlus />
-            Aggiungi blocco
+            {t("Aggiungi blocco")}
           </button>
           {error && (
             <p className="form-error" role="alert">
