@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { loadBackgroundImage, loadData, saveBackgroundImage, saveData } from "./storage/storage";
 import { compressImage } from "./logic/backgroundImage";
 import {
@@ -48,11 +48,16 @@ import Background from "./components/Background";
 import TopBar from "./components/TopBar";
 import { VIEWS } from "./logic/views";
 import TodayView from "./components/TodayView";
-import CalendarView from "./components/calendar/CalendarView";
 import GoalsView from "./components/goals/GoalsView";
-import ActivitiesView from "./components/activities/ActivitiesView";
 import BrainstormView from "./components/brainstorm/BrainstormView";
 import FocusMode from "./components/FocusMode";
+
+// Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
+// Appena il browser è libero li precarichiamo, così il primo cambio di sezione è istantaneo.
+const loadCalendar = () => import("./components/calendar/CalendarView");
+const loadActivities = () => import("./components/activities/ActivitiesView");
+const CalendarView = lazy(loadCalendar);
+const ActivitiesView = lazy(loadActivities);
 import Announcer from "./components/Announcer";
 import Toast from "./components/Toast";
 import "./App.css";
@@ -66,6 +71,14 @@ function isTypingTarget(target) {
 function App() {
   const [data, setData] = useState(loadData);
   const [backgroundImage, setBackgroundImage] = useState(loadBackgroundImage);
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback || ((callback) => setTimeout(callback, 1500));
+    idle(() => {
+      loadCalendar();
+      loadActivities();
+    });
+  }, []);
   const [view, setView] = useState("today");
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
@@ -523,7 +536,7 @@ function App() {
         <main className="app-main">
           {page && (
             <div key={view} className="app-page">
-              {page}
+              <Suspense fallback={null}>{page}</Suspense>
             </div>
           )}
           {/* Obiettivi e Idee restano montati anche quando sono nascosti:
