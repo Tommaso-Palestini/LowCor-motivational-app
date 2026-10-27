@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import {
   ACTION_COUNT,
@@ -12,14 +13,50 @@ import {
 import { suggestActions, suggestPillars } from "../../logic/aiTasks";
 import { CenterBlock, PillarBlock } from "./MandalaBlock";
 import GoalBreakdowns from "./GoalBreakdowns";
-import { IconChevronLeft, IconChevronRight, IconGrid, IconSparkle, IconStop } from "../Icons";
+import PillarFocus from "./PillarFocus";
+import { IconSparkle, IconStop } from "../Icons";
 import "./Goals.css";
 
 const BLOCK_POSITIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const MORPH_NAME = "pillar-focus";
+
+// Il pilastro cresce dalla sua posizione nella griglia fino al centro dello schermo (e ritorno).
+// Dove la View Transitions API manca, o con "riduci movimento", il cambio è immediato.
+function morph(update, source, findTarget, after) {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!document.startViewTransition || reduce) {
+    flushSync(update);
+    after?.();
+    return;
+  }
+  let target = null;
+  if (source) {
+    source.style.viewTransitionName = MORPH_NAME;
+  }
+  document.documentElement.dataset.morph = "";
+  const transition = document.startViewTransition(() => {
+    if (source) {
+      source.style.viewTransitionName = "";
+    }
+    flushSync(update);
+    after?.();
+    target = findTarget ? findTarget() : null;
+    if (target) {
+      target.style.viewTransitionName = MORPH_NAME;
+    }
+  });
+  transition.finished.finally(() => {
+    if (target) {
+      target.style.viewTransitionName = "";
+    }
+    delete document.documentElement.dataset.morph;
+  });
+}
 
 function GoalsView({ mandala, ai, actions, hidden }) {
   const isCompact = useMediaQuery("(max-width: 760px)");
   const [zoom, setZoom] = useState(null);
+  const [focusAction, setFocusAction] = useState(null);
   const [job, setJob] = useState(null);
   const controllerRef = useRef(null);
 
@@ -77,78 +114,77 @@ function GoalsView({ mandala, ai, actions, hidden }) {
     }
   }
 
+  function openPillar(pillarIndex, actionIndex = null, source = null) {
+    morph(
+      () => {
+        setZoom(pillarIndex);
+        setFocusAction(actionIndex);
+      },
+      source,
+      null
+    );
+  }
+
+  function closePillar() {
+    const pillarIndex = zoom;
+    const findAnchor = () =>
+      document.querySelector(
+        isCompact ? `[data-pillar-cell="${pillarIndex}"]` : `[data-pillar-block="${pillarIndex}"]`
+      );
+    // Il focus torna dove eri partito
+    const returnFocus = () => {
+      const anchor = findAnchor();
+      (anchor?.matches("button") ? anchor : anchor?.querySelector("button"))?.focus({ preventScroll: true });
+    };
+    morph(() => setZoom(null), null, findAnchor, returnFocus);
+  }
+
   function movePillar(step) {
+    setFocusAction(null);
     setZoom((current) => (current + step + PILLAR_COUNT) % PILLAR_COUNT);
   }
 
   const isPillarThinking = (index) => Boolean(job) && (job.pillar === index || job.pillar === null);
+  const isOpen = zoom !== null && !hidden;
 
-  let board;
-  if (isCompact && zoom !== null) {
-    const pillar = mandala.pillars[zoom];
-    board = (
-      <div className="mandala-zoom">
-        <div className="mandala-zoom-nav">
-          <button type="button" className="icon-button" onClick={() => movePillar(-1)} aria-label="Pilastro precedente">
-            <IconChevronLeft />
-          </button>
-          <p>
-            Pilastro {zoom + 1} di {PILLAR_COUNT}
-          </p>
-          <button type="button" className="icon-button" onClick={() => movePillar(1)} aria-label="Pilastro successivo">
-            <IconChevronRight />
-          </button>
-        </div>
-        <PillarBlock mandala={mandala} pillarIndex={zoom} actions={actions} isThinking={isPillarThinking(zoom)} large />
-        <div className="mandala-zoom-actions">
-          <button type="button" className="button button--ghost" onClick={() => setZoom(null)}>
-            <IconGrid />
-            Torna allo schema
-          </button>
-          {ai.isReady && hasGoal && pillar.title !== "" && emptyActionCount(pillar) > 0 && !job && (
-            <button type="button" className="button button--quiet" onClick={() => fillWithAi(zoom)}>
-              <IconSparkle />
-              Suggerisci azioni
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  } else if (isCompact) {
-    board = (
-      <div className="mandala-overview">
-        <CenterBlock mandala={mandala} actions={actions} onOpenPillar={setZoom} isThinking={Boolean(job) && job.pillar === null} />
-        <p className="goals-hint">Tocca un pilastro per scrivere le sue 8 azioni.</p>
-      </div>
-    );
-  } else {
-    board = (
-      <div className="mandala" role="group" aria-label="Schema 9 per 9">
-        {BLOCK_POSITIONS.map((position) =>
-          position === 4 ? (
-            <CenterBlock
-              key="center"
-              mandala={mandala}
-              actions={actions}
-              isThinking={Boolean(job) && job.pillar === null}
-            />
-          ) : (
-            <PillarBlock
-              key={position}
-              mandala={mandala}
-              pillarIndex={RING_POSITIONS.indexOf(position)}
-              actions={actions}
-              isThinking={isPillarThinking(RING_POSITIONS.indexOf(position))}
-            />
-          )
-        )}
-      </div>
-    );
-  }
+  const board = isCompact ? (
+    <div className="mandala-overview">
+      <CenterBlock
+        mandala={mandala}
+        actions={actions}
+        onOpenPillar={openPillar}
+        isThinking={Boolean(job) && job.pillar === null}
+      />
+      <p className="goals-hint">Tocca un pilastro per scrivere le sue 8 azioni.</p>
+    </div>
+  ) : (
+    <div className="mandala" role="group" aria-label="Schema 9 per 9">
+      {BLOCK_POSITIONS.map((position) =>
+        position === 4 ? (
+          <CenterBlock
+            key="center"
+            mandala={mandala}
+            actions={actions}
+            onOpenPillar={openPillar}
+            isThinking={Boolean(job) && job.pillar === null}
+          />
+        ) : (
+          <PillarBlock
+            key={position}
+            mandala={mandala}
+            pillarIndex={RING_POSITIONS.indexOf(position)}
+            actions={actions}
+            onOpen={openPillar}
+            isThinking={isPillarThinking(RING_POSITIONS.indexOf(position))}
+          />
+        )
+      )}
+    </div>
+  );
 
   return (
     <div className="goals-view" hidden={hidden}>
-      <header className="goals-head">
+      <header className="goals-head" inert={isOpen}>
         <div className="goals-intro">
           <p className="today-greeting">Obiettivi</p>
           <h1 className="goals-title">Lo schema 9×9</h1>
@@ -206,9 +242,25 @@ function GoalsView({ mandala, ai, actions, hidden }) {
         </div>
       </header>
 
-      {board}
+      <div className="goals-board" inert={isOpen}>
+        {board}
+        <GoalBreakdowns mandala={mandala} ai={ai} />
+      </div>
 
-      <GoalBreakdowns mandala={mandala} ai={ai} pillarIndex={isCompact ? zoom : null} />
+      {isOpen && (
+        <PillarFocus
+          mandala={mandala}
+          pillarIndex={zoom}
+          focusAction={focusAction}
+          ai={ai}
+          actions={actions}
+          canFill={ai.isReady && hasGoal && !job}
+          isThinking={isPillarThinking(zoom)}
+          onFill={() => fillWithAi(zoom)}
+          onMove={movePillar}
+          onClose={closePillar}
+        />
+      )}
     </div>
   );
 }
