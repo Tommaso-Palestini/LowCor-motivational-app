@@ -403,3 +403,65 @@
     justify-content: flex-start;
   }
 }
+
+/* Micro-step con l'AI sotto lo schema */
+
+.goal-breakdowns {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 1040px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.goal-breakdowns-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.goal-breakdowns-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  align-items: start;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goal-breakdown-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-row);
+  background: color-mix(in oklch, var(--dusk) 85%, transparent);
+  backdrop-filter: blur(12px);
+  transition: border-color 200ms ease;
+}
+
+.goal-breakdown-card:hover {
+  border-color: var(--line-strong);
+}
+
+.goal-breakdown-head {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.goal-breakdown-kind {
+  color: var(--mist);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.goal-breakdown-name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.goal-breakdown-card .task-breakdown-actions-row {
+  display: flex;
+}

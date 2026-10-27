@@ -11,6 +11,7 @@ import {
 } from "../../logic/mandala";
 import { suggestActions, suggestPillars } from "../../logic/aiTasks";
 import { CenterBlock, PillarBlock } from "./MandalaBlock";
+import GoalBreakdowns from "./GoalBreakdowns";
 import { IconChevronLeft, IconChevronRight, IconGrid, IconSparkle, IconStop } from "../Icons";
 import "./Goals.css";
 
@@ -206,6 +207,8 @@ function GoalsView({ mandala, ai, actions, hidden }) {
       </header>
 
       {board}
+
+      <GoalBreakdowns mandala={mandala} ai={ai} pillarIndex={isCompact ? zoom : null} />
     </div>
   );
 }
