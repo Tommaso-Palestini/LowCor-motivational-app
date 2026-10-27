@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { formatDuration, timeToMinutes } from "../logic/time";
 
 const RING_START = 6 * 60;
@@ -41,6 +42,61 @@ function blockArc(block) {
   return arcPath(middle, middle + 0.1);
 }
 
+// Due contorni sottili che ondeggiano piano attorno all'anello, come la superficie dell'acqua.
+// Il path si aggiorna direttamente nel DOM a ogni frame, senza far ridisegnare React.
+const WAVES = [
+  { radius: RADIUS + STROKE / 2 + 7, amplitude: 2.2, lobes: 5, speed: 0.00042, drift: 3, drift2: 0.00027 },
+  { radius: RADIUS - STROKE / 2 - 3, amplitude: 1.4, lobes: 7, speed: -0.00031, drift: 4, drift2: -0.00019 },
+];
+const WAVE_POINTS = 144;
+
+function wavePath({ radius, amplitude, lobes, speed, drift, drift2 }, time) {
+  let path = "";
+  for (let index = 0; index <= WAVE_POINTS; index += 1) {
+    const theta = (index / WAVE_POINTS) * Math.PI * 2;
+    const r =
+      radius +
+      amplitude * Math.sin(lobes * theta + time * speed * 10) +
+      amplitude * 0.5 * Math.sin(drift * theta - time * drift2 * 10);
+    const x = CENTER + r * Math.cos(theta);
+    const y = CENTER + r * Math.sin(theta);
+    path += `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+  }
+  return `${path}Z`;
+}
+
+function RingWaves() {
+  const pathRefs = useRef([]);
+
+  useEffect(() => {
+    const paint = (time) => WAVES.forEach((wave, index) => pathRefs.current[index]?.setAttribute("d", wavePath(wave, time)));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      paint(0);
+      return undefined;
+    }
+    let frame = requestAnimationFrame(function loop(time) {
+      paint(time);
+      frame = requestAnimationFrame(loop);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  return (
+    <g className="ring-waves" aria-hidden="true">
+      {WAVES.map((wave, index) => (
+        <path
+          key={index}
+          ref={(node) => {
+            pathRefs.current[index] = node;
+          }}
+          className={`ring-wave ring-wave--${index}`}
+          d={wavePath(wave, 0)}
+        />
+      ))}
+    </g>
+  );
+}
+
 function getCenterText(blocks, current, next, nowMinutes) {
   if (current) {
     return { label: "Adesso", title: current.name, sub: `fino alle ${current.end}` };
@@ -77,6 +133,7 @@ function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
         role="img"
         aria-label={`Giornata dalle 6 alle 24 con ${blocks.length} blocchi`}
       >
+        <RingWaves />
         <circle className="ring-track" cx={CENTER} cy={CENTER} r={RADIUS} />
         {showNow && nowAngle > 0 && (
           <path className="ring-elapsed" d={arcPath(0, nowAngle)} />
