@@ -22,6 +22,8 @@ const defaultData = {
   lowDays: [],
   // Rito della settimana chiuso: { [lunedì]: { doneAt, proud, change, focusId } }
   reviews: {},
+  // Calendari esterni importati (.ics): { id, name, url, importedAt, events: [{ id, date, start, end, title }] }
+  calendars: [],
 };
 
 export function loadData() {

@@ -20,7 +20,8 @@ export function missedBlocks(blocks, now) {
 }
 
 // Il primo spazio libero, da adesso in avanti, che non manda il giorno in overload.
-export function suggestSlot(block, blocks, activities, now, limits) {
+// busy: impegni esterni (calendari importati), occupano tempo ma non contano per l'energia
+export function suggestSlot(block, blocks, activities, now, limits, busy = []) {
   const today = toDateString(now);
   const duration = blockDuration(block);
   const others = blocks.filter((item) => item.id !== block.id);
@@ -33,7 +34,8 @@ export function suggestSlot(block, blocks, activities, now, limits) {
       continue;
     }
     const dayBlocks = others.filter((item) => item.date === date);
-    const window = freeWindows(dayBlocks, from, DAY_END, duration)[0];
+    const occupied = [...dayBlocks, ...busy.filter((event) => event.date === date)];
+    const window = freeWindows(occupied, from, DAY_END, duration)[0];
     if (!window) {
       continue;
     }

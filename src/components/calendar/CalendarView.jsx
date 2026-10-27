@@ -3,6 +3,7 @@ import WeekGrid from "./WeekGrid";
 import MonthGrid from "./MonthGrid";
 import WeekGoals from "./WeekGoals";
 import BlockEditor from "./BlockEditor";
+import ExternalCalendars from "./ExternalCalendars";
 import {
   addDays,
   formatDate,
@@ -13,7 +14,7 @@ import {
 } from "../../logic/dates";
 import { minutesOfDay, minutesToTime } from "../../logic/time";
 import { energyLimits, suggestRebalance, weekEnergy } from "../../logic/energy";
-import { IconChevronLeft, IconChevronRight, IconPlus } from "../Icons";
+import { IconCalendarPlus, IconChevronLeft, IconChevronRight, IconPlus } from "../Icons";
 import "./Calendar.css";
 
 function formatWeekTitle(dates) {
@@ -34,6 +35,7 @@ function CalendarView({ data, now, actions }) {
   const [mode, setMode] = useState("week");
   const [anchor, setAnchor] = useState(today);
   const [editor, setEditor] = useState(null);
+  const [isLinking, setIsLinking] = useState(false);
 
   const dates = mode === "week" ? weekDates(anchor) : monthDates(anchor);
   const weekStart = weekDates(anchor)[0];
@@ -65,7 +67,7 @@ function CalendarView({ data, now, actions }) {
 
   useEffect(() => {
     function handleKey(event) {
-      if (editor || event.ctrlKey || event.metaKey || event.altKey || isTypingTarget(event.target)) {
+      if (editor || isLinking || event.ctrlKey || event.metaKey || event.altKey || isTypingTarget(event.target)) {
         return;
       }
       if (document.querySelector('[aria-modal="true"]')) {
@@ -120,6 +122,11 @@ function CalendarView({ data, now, actions }) {
               Mese
             </button>
           </div>
+          <button type="button" className="button button--ghost" onClick={() => setIsLinking(true)}>
+            <IconCalendarPlus />
+            Calendari esterni
+            {(data.calendars || []).length > 0 && <span className="ext-count">{data.calendars.length}</span>}
+          </button>
           <button type="button" className="button button--primary" onClick={openNextFreeHour}>
             <IconPlus />
             Nuovo blocco
@@ -133,6 +140,7 @@ function CalendarView({ data, now, actions }) {
             dates={dates}
             blocks={data.blocks}
             activities={data.activities}
+            external={(data.calendars || []).flatMap((calendar) => calendar.events)}
             energy={energy}
             limits={limits}
             now={now}
@@ -173,6 +181,10 @@ function CalendarView({ data, now, actions }) {
         Trascina su uno spazio vuoto per creare un blocco, trascina un blocco per spostarlo e il suo bordo basso per
         allungarlo.
       </p>
+
+      {isLinking && (
+        <ExternalCalendars calendars={data.calendars || []} actions={actions.calendars} onClose={() => setIsLinking(false)} />
+      )}
 
       {editingBlockExists && (
         <BlockEditor

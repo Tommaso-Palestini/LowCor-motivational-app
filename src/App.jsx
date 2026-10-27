@@ -4,6 +4,7 @@ import { compressImage } from "./logic/backgroundImage";
 import { applyLowDay, minimumVersion } from "./logic/rescue";
 import { energyLimits } from "./logic/energy";
 import { reviewWeekStart } from "./logic/review";
+import { externalBusy, normalizeCalendarUrl, parseIcs } from "./logic/icsImport";
 import {
   addActivity,
   setActivityEnergy,
@@ -216,6 +217,7 @@ function App() {
     const { created, unplaced } = planWeek(data.activities, data.blocks, weekStart, new Date(), {
       limits: energyLimits(data.settings),
       skipDates: data.lowDays || [],
+      busy: externalBusy(data.calendars),
     });
     if (created.length === 0) {
       showToast(unplaced > 0 ? "Non ci sono buchi liberi per le sessioni mancanti" : "Niente da pianificare");
@@ -281,6 +283,73 @@ function App() {
   function dismissNudge(key) {
     setNudges((current) => current.filter((nudge) => nudge.key !== key));
   }
+
+  // ---- Calendari esterni ----
+
+  async function fetchCalendar(url) {
+    let response;
+    try {
+      response = await fetch(normalizeCalendarUrl(url));
+    } catch {
+      throw new Error(
+        "Il calendario non si lascia leggere dal browser (succede con Google e iCloud): scarica il file .ics e importalo"
+      );
+    }
+    if (!response.ok) {
+      throw new Error(`Il link non risponde (errore ${response.status}): controlla che sia l'indirizzo .ics pubblico`);
+    }
+    return parseIcs(await response.text());
+  }
+
+  function saveCalendar(calendar) {
+    commit(
+      (current) => ({
+        ...current,
+        calendars: [...(current.calendars || []).filter((item) => item.id !== calendar.id), calendar],
+      }),
+      { record: false }
+    );
+  }
+
+  const calendarActions = {
+    importFile: async (file) => {
+      const parsed = parseIcs(await file.text());
+      saveCalendar({
+        id: crypto.randomUUID(),
+        name: parsed.name || file.name.replace(/\.ics$/i, ""),
+        url: null,
+        importedAt: new Date().toISOString(),
+        events: parsed.events,
+      });
+      showToast(`${parsed.events.length} impegni importati`);
+    },
+    importUrl: async (url) => {
+      const parsed = await fetchCalendar(url);
+      saveCalendar({
+        id: crypto.randomUUID(),
+        name: parsed.name || new URL(normalizeCalendarUrl(url)).hostname,
+        url: normalizeCalendarUrl(url),
+        importedAt: new Date().toISOString(),
+        events: parsed.events,
+      });
+      showToast(`${parsed.events.length} impegni importati`);
+    },
+    refresh: async (calendar) => {
+      const parsed = await fetchCalendar(calendar.url);
+      saveCalendar({ ...calendar, events: parsed.events, importedAt: new Date().toISOString() });
+    },
+    remove: (id) =>
+      commit((current) => ({ ...current, calendars: (current.calendars || []).filter((item) => item.id !== id) })),
+  };
+
+  // I calendari collegati via link si aggiornano da soli all'apertura, se l'ultimo aggiornamento ha più di 6 ore
+  useEffect(() => {
+    const stale = (data.calendars || []).filter(
+      (calendar) => calendar.url && Date.now() - new Date(calendar.importedAt).getTime() > 6 * 3600000
+    );
+    stale.forEach((calendar) => calendarActions.refresh(calendar).catch(() => {}));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ---- Sfondo personalizzato ----
 
@@ -493,6 +562,7 @@ function App() {
     updateActivity: (id, changes) =>
       updateField("activities", (activities) => updateActivity(activities, id, changes)),
     setActivityType: changeActivityType,
+    calendars: calendarActions,
     openReview: (weekStart) => setReviewWeek(weekStart || reviewWeekStart(new Date())),
     completeReview: (weekStart, answers) => {
       const firstTime = !(data.reviews || {})[weekStart];

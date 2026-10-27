@@ -32,7 +32,7 @@ function overloadReason(day, limits) {
   return `Rischio overload: ${parts.join(", ")}. Sposta qualche blocco in un giorno più leggero.`;
 }
 
-function WeekGrid({ dates, blocks, activities, energy, limits, now, onCreateDraft, onOpenBlock, onMoveBlock }) {
+function WeekGrid({ dates, blocks, activities, external = [], energy, limits, now, onCreateDraft, onOpenBlock, onMoveBlock }) {
   const scrollRef = useRef(null);
   const columnsRef = useRef(null);
   const dragRef = useRef(null);
@@ -235,6 +235,25 @@ function WeekGrid({ dates, blocks, activities, energy, limits, now, onCreateDraf
                 key={date}
                 className={`week-column ${isToday ? "week-column--today" : ""}`}
               >
+                {external
+                  .filter((event) => event.date === date)
+                  .map((event) => {
+                    const start = timeToMinutes(event.start);
+                    const height = Math.max(minutesToPixels(timeToMinutes(event.end) - start) - 3, 16);
+                    return (
+                      <div
+                        key={event.id}
+                        className={`cal-external ${height < 34 ? "cal-external--compact" : ""}`}
+                        style={{ top: minutesToPixels(start) + 1, height }}
+                        title={`${event.title}, ${event.start}–${event.end} (calendario esterno)`}
+                      >
+                        <span className="cal-external-name">{event.title}</span>
+                        <span className="cal-external-time">
+                          {event.start} – {event.end}
+                        </span>
+                      </div>
+                    );
+                  })}
                 {layoutDay(dayBlocks).map(({ block, column, columns }) => {
                   const activity = activitiesById.get(block.activityId);
                   const start = timeToMinutes(block.start);

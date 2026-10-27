@@ -89,7 +89,7 @@ function priority(activity) {
 }
 
 // limits: soglie di energia (un giorno non viene riempito oltre); skipDates: giornate no da lasciare in pace
-export function planWeek(activities, blocks, weekStart, now, { limits = null, skipDates = [] } = {}) {
+export function planWeek(activities, blocks, weekStart, now, { limits = null, skipDates = [], busy = [] } = {}) {
   const today = toDateString(now);
   const dates = weekDates(weekStart).filter((date) => date >= today && !skipDates.includes(date));
   const created = [];
@@ -130,7 +130,8 @@ export function planWeek(activities, blocks, weekStart, now, { limits = null, sk
           break;
         }
         const earliest = candidate.date === today ? minutesOfDay(now) : 0;
-        const start = findFreeSlot(candidate.dayBlocks, preferred, earliest, duration);
+        const occupied = [...candidate.dayBlocks, ...busy.filter((event) => event.date === candidate.date)];
+        const start = findFreeSlot(occupied, preferred, earliest, duration);
         if (start === null) {
           continue;
         }

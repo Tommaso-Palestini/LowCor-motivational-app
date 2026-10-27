@@ -3,6 +3,7 @@ import { formatDate, toDateString } from "../logic/dates";
 import { blockDuration } from "../logic/time";
 import { MINIMUM_MINUTES, missedBlocks, suggestSlot } from "../logic/rescue";
 import { isBlockPast } from "../logic/tone";
+import { externalBusy } from "../logic/icsImport";
 import { IconCheck, IconRepeat } from "./Icons";
 import "./FlexPlan.css";
 
@@ -28,7 +29,10 @@ function FlexPlan({ data, now, actions }) {
   const isLowDay = (data.lowDays || []).includes(today);
   const missed = missedBlocks(data.blocks, now)
     .slice(0, 4)
-    .map((block) => ({ block, slot: suggestSlot(block, data.blocks, data.activities, now, limits) }));
+    .map((block) => ({
+      block,
+      slot: suggestSlot(block, data.blocks, data.activities, now, limits, externalBusy(data.calendars)),
+    }));
   const fixedToday = data.blocks.filter((block) => {
     const activity = activitiesById.get(block.activityId);
     return (
