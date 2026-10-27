@@ -27,8 +27,11 @@
   --wash: color-mix(in oklch, var(--ink) 6%, transparent);
   --glass: color-mix(in oklch, var(--dusk) 62%, transparent);
 
-  --font-display: "Unbounded Variable", system-ui, sans-serif;
+  /* Stile del testo: "morbido" di base, gli altri si scelgono in Impostazioni > Aspetto */
+  --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
   --font-body: "Onest Variable", system-ui, sans-serif;
+  --display-tracking: -0.022em;
+  --body-leading: 1.55;
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --radius-panel: 28px;
@@ -36,6 +39,51 @@
   --radius-pill: 999px;
 
   color-scheme: dark;
+}
+
+/* ---- Aspetto personalizzabile (attributi messi su <html> da useAppearance) ---- */
+
+:root[data-font="deciso"] {
+  --font-display: "Unbounded Variable", system-ui, sans-serif;
+  --display-tracking: -0.01em;
+}
+
+:root[data-font="elegante"] {
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --display-tracking: -0.015em;
+}
+
+/* Lexend è disegnato per rendere la lettura più scorrevole: utile con ADHD e dislessia */
+:root[data-font="leggibile"] {
+  --font-display: "Lexend Variable", system-ui, sans-serif;
+  --font-body: "Lexend Variable", system-ui, sans-serif;
+  --display-tracking: -0.01em;
+  --body-leading: 1.65;
+}
+
+:root[data-size="small"] {
+  font-size: 93.75%;
+}
+
+:root[data-size="large"] {
+  font-size: 112.5%;
+}
+
+:root[data-contrast="high"] {
+  --mist: oklch(0.88 0.035 var(--hue));
+  --line: color-mix(in oklch, var(--mist) 34%, transparent);
+  --line-strong: color-mix(in oklch, var(--mist) 58%, transparent);
+  --glass: color-mix(in oklch, var(--dusk) 90%, transparent);
+}
+
+/* Riduci i movimenti dall'app, anche se il sistema non lo chiede */
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 *,
@@ -51,8 +99,9 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: var(--body-leading);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -60,6 +109,18 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+/* Titoli: a capo bilanciati e spaziatura stretta; paragrafi senza parole orfane */
+h1,
+h2,
+h3 {
+  letter-spacing: var(--display-tracking);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 button,
@@ -167,9 +228,10 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   font-size: 0.875rem;
 }
 
-/* Pulsanti */
+/* Pulsanti: un filo di luce in alto e un'ombra morbida danno profondità; al tocco si abbassano */
 
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -178,18 +240,35 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   padding: 0.625rem 1.25rem;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
-  font-weight: 500;
+  font-weight: 550;
+  letter-spacing: 0.005em;
   white-space: nowrap;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
-    transform 160ms var(--ease),
-    background-color 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease;
+    transform 180ms var(--ease),
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 200ms ease,
+    box-shadow 260ms var(--ease);
 }
 
-.button:active {
-  transform: scale(0.96);
+.button svg {
+  flex-shrink: 0;
+  transition: transform 260ms var(--ease);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:hover:not(:disabled) svg {
+  transform: scale(1.08);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 80ms;
 }
 
 .button:disabled {
@@ -197,22 +276,40 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   cursor: not-allowed;
 }
 
-.button--primary {
-  background: var(--ink);
-  color: var(--night);
+.button:focus-visible {
+  outline: 2px solid var(--planned);
+  outline-offset: 3px;
 }
 
-.button--primary:hover {
-  background: #ffffff;
+.button--primary {
+  background: linear-gradient(180deg, #ffffff, var(--ink));
+  color: var(--night);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 color-mix(in oklch, var(--planned) 22%, transparent),
+    0 6px 18px -6px color-mix(in oklch, var(--planned) 55%, transparent);
+}
+
+.button--primary:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 color-mix(in oklch, var(--planned) 22%, transparent),
+    0 10px 28px -6px color-mix(in oklch, var(--planned) 70%, transparent);
+}
+
+.button--primary:active:not(:disabled) {
+  box-shadow: inset 0 2px 4px color-mix(in oklch, var(--night) 25%, transparent);
 }
 
 .button--ghost {
-  background: transparent;
+  background: color-mix(in oklch, var(--ink) 4%, transparent);
   border-color: var(--line-strong);
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--ink) 10%, transparent);
 }
 
-.button--ghost:hover {
-  border-color: var(--ink);
+.button--ghost:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--ink) 70%, transparent);
+  background: color-mix(in oklch, var(--ink) 9%, transparent);
 }
 
 .button--quiet {
@@ -222,9 +319,10 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   color: var(--mist);
 }
 
-.button--quiet:hover {
+.button--quiet:hover:not(:disabled) {
   background: var(--wash);
   color: var(--ink);
+  transform: none;
 }
 
 .button--danger {
@@ -233,8 +331,9 @@ input[type="date"].field::-webkit-calendar-picker-indicator {
   color: var(--focus);
 }
 
-.button--danger:hover {
+.button--danger:hover:not(:disabled) {
   border-color: var(--focus);
+  background: color-mix(in oklch, var(--focus) 10%, transparent);
 }
 
 .icon-button {

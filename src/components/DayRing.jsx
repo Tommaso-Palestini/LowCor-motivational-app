@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { formatDuration, timeToMinutes } from "../logic/time";
+import { prefersReducedMotion } from "../logic/motion";
 
 const RING_START = 6 * 60;
 const RING_SPAN = 18 * 60;
@@ -70,12 +71,15 @@ function RingWaves() {
 
   useEffect(() => {
     const paint = (time) => WAVES.forEach((wave, index) => pathRefs.current[index]?.setAttribute("d", wavePath(wave, time)));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (prefersReducedMotion()) {
       paint(0);
       return undefined;
     }
     let frame = requestAnimationFrame(function loop(time) {
-      paint(time);
+      // Se l'utente attiva "riduci i movimenti" mentre l'anello è a schermo, le onde si fermano
+      if (!prefersReducedMotion()) {
+        paint(time);
+      }
       frame = requestAnimationFrame(loop);
     });
     return () => cancelAnimationFrame(frame);

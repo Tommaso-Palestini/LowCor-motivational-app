@@ -125,6 +125,63 @@
   font-weight: 600;
 }
 
+/* Titoletti che dividono le impostazioni in gruppi */
+.settings-group {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: var(--mist);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.settings-group:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Scelta del font: quattro anteprime "Aa" */
+.settings-fonts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.settings-font {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  padding: 0.5rem 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in oklch, var(--night) 35%, transparent);
+  color: var(--mist);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 200ms ease, background-color 200ms ease, color 200ms ease, transform 160ms var(--ease);
+}
+
+.settings-font:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.settings-font:active {
+  transform: scale(0.96);
+}
+
+.settings-font[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: color-mix(in oklch, var(--ink) 10%, transparent);
+  color: var(--ink);
+}
+
+.settings-font-sample {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .settings-hint {
   color: var(--mist);
   font-size: 0.8125rem;

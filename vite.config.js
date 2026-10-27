@@ -37,7 +37,19 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // I font non vengono precaricati tutti: ognuno finisce in cache la prima volta che serve
+        // (di solito solo lo stile di testo scelto), poi funziona anche offline.
+        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.destination === 'font',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts',
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
+          },
+        ],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
       },

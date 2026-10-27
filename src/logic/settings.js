@@ -1,6 +1,11 @@
 export const DEFAULT_AI_URL = "http://localhost:11434";
 
 export const defaultSettings = {
+  // Aspetto: stile del testo, dimensione, contrasto, movimento
+  font: "morbido",
+  textSize: "medium",
+  contrast: "normal",
+  motion: "full",
   wave: true,
   waveSeconds: 90,
   hue: 290,

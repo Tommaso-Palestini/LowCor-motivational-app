@@ -53,6 +53,7 @@ import BrainstormView from "./components/brainstorm/BrainstormView";
 import FocusMode from "./components/FocusMode";
 import Nudges from "./components/Nudges";
 import { useBlockAlerts } from "./hooks/useBlockAlerts";
+import { useAppearance } from "./hooks/useAppearance";
 
 // Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
 // Appena il browser è libero li precarichiamo, così il primo cambio di sezione è istantaneo.
@@ -92,6 +93,7 @@ function App() {
   const today = toDateString(now);
   const ai = useOllama(data.settings.aiUrl, data.settings.aiModel);
 
+  useAppearance(data.settings);
   useHueWave(data.settings);
 
   useEffect(() => {

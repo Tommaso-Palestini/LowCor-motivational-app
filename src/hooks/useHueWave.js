@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { WAVE_START_HUE } from "../logic/settings";
+import { prefersReducedMotion } from "../logic/motion";
 
 // Cambiare --hue fa ricalcolare i colori di tutta la pagina: lo aggiorniamo una volta per grado
 // (sotto il grado l'occhio non vede differenza), mai più di 10 volte al secondo,
@@ -8,12 +9,10 @@ const MIN_TICK_MS = 100;
 
 // Fa girare la tinta di tutta l'app aggiornando la variabile CSS --hue.
 // Da rosso fa il giro di tutti i colori e torna al rosso, come le tastiere gaming a onda.
-export function useHueWave({ wave, waveSeconds, hue }) {
+export function useHueWave({ wave, waveSeconds, hue, motion }) {
   useEffect(() => {
     const root = document.documentElement;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (!wave || reduceMotion) {
+    if (!wave || prefersReducedMotion()) {
       root.style.setProperty("--hue", String(hue));
       return undefined;
     }
@@ -61,5 +60,5 @@ export function useHueWave({ wave, waveSeconds, hue }) {
       stop();
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [wave, waveSeconds, hue]);
+  }, [wave, waveSeconds, hue, motion]);
 }

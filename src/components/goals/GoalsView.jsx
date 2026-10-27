@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { prefersReducedMotion } from "../../logic/motion";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import {
   ACTION_COUNT,
@@ -23,8 +24,7 @@ const MORPH_NAME = "pillar-focus";
 // Il pilastro cresce dalla sua posizione nella griglia fino al centro dello schermo (e ritorno).
 // Dove la View Transitions API manca, o con "riduci movimento", il cambio è immediato.
 function morph(update, source, findTarget, after) {
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!document.startViewTransition || reduce) {
+  if (!document.startViewTransition || prefersReducedMotion()) {
     flushSync(update);
     after?.();
     return;

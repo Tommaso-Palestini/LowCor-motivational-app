@@ -182,6 +182,83 @@ function BackgroundSection({ settings, set, image, onPick, onRemove }) {
   );
 }
 
+const FONTS = [
+  { id: "morbido", label: "Morbido", family: '"Bricolage Grotesque Variable"' },
+  { id: "deciso", label: "Deciso", family: '"Unbounded Variable"' },
+  { id: "elegante", label: "Elegante", family: '"Fraunces Variable"' },
+  { id: "leggibile", label: "Leggibile", family: '"Lexend Variable"' },
+];
+
+const SIZES = [
+  { id: "small", label: "Piccolo" },
+  { id: "medium", label: "Normale" },
+  { id: "large", label: "Grande" },
+];
+
+function AppearanceSection({ settings, set }) {
+  return (
+    <div className="settings-bg">
+      <p className="settings-group">Aspetto</p>
+      <div className="settings-fonts" role="group" aria-label="Stile del testo">
+        {FONTS.map((font) => (
+          <button
+            key={font.id}
+            type="button"
+            className="settings-font"
+            aria-pressed={settings.font === font.id}
+            onClick={() => set("font", font.id)}
+          >
+            <span className="settings-font-sample" style={{ fontFamily: font.family }} aria-hidden="true">
+              Aa
+            </span>
+            {font.label}
+          </button>
+        ))}
+      </div>
+      {settings.font === "leggibile" && (
+        <p className="settings-hint">Lexend è pensato per una lettura più scorrevole, anche con ADHD e dislessia.</p>
+      )}
+
+      <div className="segmented settings-segmented" role="group" aria-label="Dimensione del testo">
+        {SIZES.map((size) => (
+          <button
+            key={size.id}
+            type="button"
+            aria-pressed={settings.textSize === size.id}
+            onClick={() => set("textSize", size.id)}
+          >
+            {size.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">Contrasto alto</p>
+          <p className="settings-hint">Testi secondari e bordi più marcati</p>
+        </div>
+        <Switch
+          checked={settings.contrast === "high"}
+          onChange={(value) => set("contrast", value ? "high" : "normal")}
+          label="Contrasto alto"
+        />
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">Riduci i movimenti</p>
+          <p className="settings-hint">Ferma onde, lava e animazioni: meno stimoli, più calma</p>
+        </div>
+        <Switch
+          checked={settings.motion === "reduced"}
+          onChange={(value) => set("motion", value ? "reduced" : "full")}
+          label="Riduci i movimenti"
+        />
+      </div>
+    </div>
+  );
+}
+
 function AlertsSection({ settings, set }) {
   const supported = typeof window !== "undefined" && "Notification" in window;
   const [permission, setPermission] = useState(supported ? Notification.permission : "denied");
@@ -236,6 +313,9 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
 
   return (
     <div className="settings" role="dialog" aria-label="Impostazioni">
+      <AppearanceSection settings={settings} set={set} />
+
+      <p className="settings-group">Colori e sfondo</p>
       <div className="settings-row">
         <div>
           <p className="settings-name">Onda di colori</p>
@@ -318,8 +398,10 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
         />
       </label>
 
+      <p className="settings-group">Tempo</p>
       <AlertsSection settings={settings} set={set} />
 
+      <p className="settings-group">AI e scorciatoie</p>
       <AiSection ai={ai} settings={settings} set={set} />
 
       <div className="settings-shortcuts">

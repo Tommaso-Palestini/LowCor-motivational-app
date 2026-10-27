@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { IconCheck, IconSparkle } from "./Icons";
+import { prefersReducedMotion } from "../logic/motion";
 
 const ADVANCE_DELAY = 450;
 
@@ -41,9 +42,7 @@ function FeedCard({
     if (!nextCard) {
       return;
     }
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const reduceMotion = prefersReducedMotion();
     window.setTimeout(() => {
       element.parentElement.scrollTo({
         top: nextCard.offsetTop,
