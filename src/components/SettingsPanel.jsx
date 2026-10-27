@@ -576,6 +576,13 @@ function SettingsPanel({
 
       <p className="settings-group">{t("Tempo")}</p>
       <AlertsSection settings={settings} set={set} />
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">{t("Suono di fine focus")}</p>
+          <p className="settings-hint">{t("Due note morbide quando il timer arriva a zero. Il rumore di sottofondo si sceglie dentro il focus.")}</p>
+        </div>
+        <Switch checked={settings.focusChime} onChange={(value) => set("focusChime", value)} label={t("Suono di fine focus")} />
+      </div>
 
       <p className="settings-group">{t("I tuoi dati")}</p>
       <BackupSection onExport={onExportBackup} onRestore={onRestoreBackup} />

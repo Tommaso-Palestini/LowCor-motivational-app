@@ -811,6 +811,8 @@ function App() {
         onPause={() => commit((current) => ({ ...current, focus: pauseFocus(current.focus) }), { record: false })}
         onResume={() => commit((current) => ({ ...current, focus: resumeFocus(current.focus) }), { record: false })}
         onFinish={finishFocus}
+        sound={data.settings}
+        onSoundChange={setSetting}
         onCancel={() => {
           commit((current) => ({ ...current, focus: null }), { record: false });
           setIsFocusOpen(false);

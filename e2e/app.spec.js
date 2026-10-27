@@ -106,6 +106,9 @@ test("focus: parte, mostra il timer e si riduce a icona", async ({ page }) => {
   await page.getByRole("button", { name: /Inizia \d+ minuti/ }).click();
   await expect(page.getByRole("timer")).toBeVisible();
   await expect(page.locator(".focus-timer-wedge")).toBeAttached();
+  await page.getByRole("button", { name: "Marrone" }).click();
+  await expect(page.getByRole("button", { name: "Marrone" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("slider", { name: "Volume" })).toBeVisible();
   await page.getByRole("button", { name: "Riduci a icona" }).click();
   await expect(page.getByRole("button", { name: /Torna al focus/ })).toBeVisible();
 });

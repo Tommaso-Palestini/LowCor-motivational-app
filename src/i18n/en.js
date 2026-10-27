@@ -341,4 +341,15 @@ export default {
   "Solo sul computer": "Computer only",
   "L'AI gira con Ollama sul tuo computer, niente cloud. Usa LowCor dal browser del computer per carte generate, brainstorming e schema 9x9.":
     "The AI runs with Ollama on your computer, no cloud. Use LowCor in your computer's browser for generated cards, brainstorming and the 9x9 grid.",
+
+  // Suoni del focus
+  "Suono di sottofondo": "Background sound",
+  Silenzio: "Silence",
+  Marrone: "Brown",
+  Rosa: "Pink",
+  Bianco: "White",
+  Volume: "Volume",
+  "Suono di fine focus": "End-of-focus sound",
+  "Due note morbide quando il timer arriva a zero. Il rumore di sottofondo si sceglie dentro il focus.":
+    "Two soft notes when the timer hits zero. Pick the background noise inside focus.",
 };

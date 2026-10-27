@@ -22,6 +22,10 @@ export const defaultSettings = {
   blockAlerts: true,
   alertMinutes: 5,
   fullGas: true,
+  // Focus: rumore di sottofondo ("off", "brown", "pink", "white"), volume 0-100, suono di fine sessione
+  focusSound: "off",
+  focusVolume: 40,
+  focusChime: true,
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",
   aiAutoCards: true,

@@ -12,6 +12,7 @@ import {
 } from "../logic/time";
 import { IconClose, IconMinimize, IconPause, IconPlay, IconTarget } from "./Icons";
 import { vibrate } from "../logic/haptics";
+import { FOCUS_SOUNDS, playChime, playNoise, stopNoise, unlockAudio } from "../logic/focusSound";
 import "./FocusMode.css";
 import { t } from "../i18n";
 
@@ -149,7 +150,41 @@ function FocusSetup({ activities, blocks, now, onStart, onClose }) {
   );
 }
 
-function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish, onCancel, onMinimize }) {
+function SoundPicker({ sound, onSoundChange }) {
+  return (
+    <div className="focus-sound">
+      <div className="segmented" role="group" aria-label={t("Suono di sottofondo")}>
+        {FOCUS_SOUNDS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={sound.focusSound === item.id}
+            onClick={() => {
+              unlockAudio();
+              onSoundChange("focusSound", item.id);
+            }}
+          >
+            {t(item.label)}
+          </button>
+        ))}
+      </div>
+      {sound.focusSound !== "off" && (
+        <input
+          type="range"
+          className="range focus-sound-volume"
+          min="5"
+          max="100"
+          step="5"
+          value={sound.focusVolume}
+          aria-label={t("Volume")}
+          onChange={(event) => onSoundChange("focusVolume", Number(event.target.value))}
+        />
+      )}
+    </div>
+  );
+}
+
+function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish, onCancel, onMinimize, sound, onSoundChange }) {
   const elapsedMs = getFocusElapsedMs(focus, nowMs);
   const remainingMs = Math.max(focus.durationMs - elapsedMs, 0);
   const progress = Math.min(elapsedMs / focus.durationMs, 1);
@@ -229,7 +264,14 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
 
       <div className="focus-controls">
         {isPaused ? (
-          <button type="button" className="button button--primary" onClick={onResume}>
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={() => {
+              unlockAudio();
+              onResume();
+            }}
+          >
             <IconPlay />
             {t("Riprendi")}
           </button>
@@ -246,6 +288,7 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
           {t("Annulla sessione")}
         </button>
       </div>
+      <SoundPicker sound={sound} onSoundChange={onSoundChange} />
       {elapsedMinutes < MIN_SAVED_MINUTES && (
         <p className="focus-note">{t("Sotto i {n} minuti la sessione non viene salvata.", { n: MIN_SAVED_MINUTES })}</p>
       )}
@@ -265,6 +308,8 @@ function FocusMode({
   onCancel,
   onOpen,
   onClose,
+  sound,
+  onSoundChange,
 }) {
   const now = useNow(focus ? 500 : 30000);
   const nowMs = now.getTime();
@@ -280,14 +325,28 @@ function FocusMode({
   const activityName = activity ? activity.name : "Focus";
   const remainingMs = focus ? focus.durationMs - getFocusElapsedMs(focus, nowMs) : null;
 
+  // Il rumore di sottofondo suona finché la sessione corre, anche ridotta a icona
+  const isRunning = Boolean(focus && !focus.pausedAt);
+  useEffect(() => {
+    if (isRunning) {
+      playNoise(sound.focusSound, sound.focusVolume);
+    } else {
+      stopNoise();
+    }
+  }, [isRunning, sound.focusSound, sound.focusVolume]);
+  useEffect(() => stopNoise, []);
+
   // Quando il tempo finisce chiude la sessione da sola, anche se è ridotta a icona.
   useEffect(() => {
     if (focus && !focus.pausedAt && remainingMs <= 0 && finishedRef.current !== focus.startedAt) {
       finishedRef.current = focus.startedAt;
       vibrate("done");
+      if (sound.focusChime) {
+        playChime();
+      }
       onFinish(true);
     }
-  }, [focus, remainingMs, onFinish]);
+  }, [focus, remainingMs, onFinish, sound.focusChime]);
 
   useEffect(() => {
     document.title = focus ? `${formatClock(remainingMs / 1000)} – ${activityName}` : "LowCor";
@@ -346,13 +405,18 @@ function FocusMode({
           onFinish={onFinish}
           onCancel={onCancel}
           onMinimize={onClose}
+          sound={sound}
+          onSoundChange={onSoundChange}
         />
       ) : (
         <FocusSetup
           activities={activities}
           blocks={blocks}
           now={now}
-          onStart={onStart}
+          onStart={(options) => {
+            unlockAudio();
+            onStart(options);
+          }}
           onClose={onClose}
         />
       )}

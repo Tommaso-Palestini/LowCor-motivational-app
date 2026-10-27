@@ -251,6 +251,26 @@
   gap: 0.5rem;
 }
 
+.focus-sound {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.focus-sound .segmented {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.focus-sound .segmented button {
+  padding-inline: 0.75rem;
+}
+
+.focus-sound-volume {
+  width: min(220px, 70vw);
+}
+
 .focus-note {
   color: var(--mist);
   font-size: 0.8125rem;
