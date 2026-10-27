@@ -1,6 +1,7 @@
 import { findActivityByName } from "../../logic/activities";
 import { formatDate } from "../../logic/dates";
 import { IconCheck, IconPlus, IconSparkle } from "../Icons";
+import TaskBreakdown from "../TaskBreakdown";
 
 const KIND_LABEL = {
   impara: "Da imparare",
@@ -74,7 +75,7 @@ function Proposals({ proposals, data, actions }) {
   );
 }
 
-function Ideas({ ideas, data, actions }) {
+function Ideas({ ideas, data, actions, ai }) {
   return (
     <ul className="idea-list">
       {ideas.map((idea, index) => {
@@ -88,15 +89,22 @@ function Ideas({ ideas, data, actions }) {
               <span>Primo passo</span>
               {idea.firstStep}
             </p>
-            <button
-              type="button"
-              className={`button ${adopted ? "button--quiet" : "button--ghost"}`}
-              disabled={adopted}
-              onClick={() => actions.adoptIdea(idea)}
-            >
-              {adopted ? <IconCheck /> : <IconSparkle />}
-              {adopted ? "È tra le tue attività" : "Provala"}
-            </button>
+            <div className="idea-actions">
+              <button
+                type="button"
+                className={`button ${adopted ? "button--quiet" : "button--ghost"}`}
+                disabled={adopted}
+                onClick={() => actions.adoptIdea(idea)}
+              >
+                {adopted ? <IconCheck /> : <IconSparkle />}
+                {adopted ? "È tra le tue attività" : "Provala"}
+              </button>
+            </div>
+            <TaskBreakdown
+              title={idea.title}
+              ai={ai}
+              taskId={`idea-${index}-${idea.title.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
+            />
           </li>
         );
       })}
@@ -104,7 +112,7 @@ function Ideas({ ideas, data, actions }) {
   );
 }
 
-function BrainstormMessage({ message, data, actions }) {
+function BrainstormMessage({ message, data, actions, ai }) {
   if (message.role === "user") {
     return (
       <div className="bubble bubble--user">
@@ -126,7 +134,9 @@ function BrainstormMessage({ message, data, actions }) {
       {message.proposals && message.proposals.length > 0 && (
         <Proposals proposals={message.proposals} data={data} actions={actions} />
       )}
-      {message.ideas && message.ideas.length > 0 && <Ideas ideas={message.ideas} data={data} actions={actions} />}
+      {message.ideas && message.ideas.length > 0 && (
+        <Ideas ideas={message.ideas} data={data} actions={actions} ai={ai} />
+      )}
     </div>
   );
 }

@@ -381,3 +381,173 @@ export async function suggestActions({ ai, mandala, pillarIndex, signal }) {
   });
   return (result.items || []).slice(0, ACTION_COUNT);
 }
+
+// ---- Scomposizione task / obiettivi in micro-step da meno di 10 minuti ----
+
+function generateMockMicroSteps(title) {
+  const lower = (title || "").toLowerCase();
+
+  if (lower.includes("inglese") || lower.includes("lingua") || lower.includes("spagnolo") || lower.includes("tedesco")) {
+    return [
+      { text: "Ascolta 1 breve podcast o spezzone audio da 3 minuti in lingua originale", minutes: 3 },
+      { text: "Trascrivi 3 nuovi vocaboli incontrati e cerca un sinonimo comune", minutes: 4 },
+      { text: "Formula e pronuncia ad alta voce 2 frasi usando i nuovi vocaboli", minutes: 3 },
+      { text: "Ripassa velocemente le 3 parole con la tecnica del richiamo attivo", minutes: 2 },
+    ];
+  }
+
+  if (lower.includes("palestra") || lower.includes("allen") || lower.includes("corsa") || lower.includes("sport") || lower.includes("workout")) {
+    return [
+      { text: "Prepara la borsa, la borraccia d'acqua e allacciati le scarpe da ginnastica", minutes: 3 },
+      { text: "Esegui 4 minuti di mobilità articolare e riscaldamento dinamico", minutes: 4 },
+      { text: "Completa la prima serie del primo esercizio a carico controllato", minutes: 5 },
+      { text: "Bevi un sorso d'acqua e registra peso e ripetizioni sulle note", minutes: 2 },
+    ];
+  }
+
+  if (lower.includes("dieta") || lower.includes("mangia") || lower.includes("cucina") || lower.includes("pasto") || lower.includes("nutriz")) {
+    return [
+      { text: "Pianifica i macronutrienti e gli ingredienti del prossimo pasto", minutes: 3 },
+      { text: "Controlla nel frigo le verdure fresche e lavane una porzione", minutes: 4 },
+      { text: "Pesa e porziona la fonte proteica principale", minutes: 3 },
+      { text: "Bevi un bicchiere d'acqua grande prima di accendere i fornelli", minutes: 1 },
+    ];
+  }
+
+  if (lower.includes("blender") || lower.includes("3d") || lower.includes("modell") || lower.includes("render")) {
+    return [
+      { text: "Apri il file di progetto ed elimina le geometrie o i modificatori inutilizzati", minutes: 4 },
+      { text: "Posiziona la camera e imposta una prima luce guida per la scena", minutes: 5 },
+      { text: "Modella o rifinisci un singolo dettaglio o loop di vertici sull'oggetto", minutes: 7 },
+      { text: "Lancia un render di prova veloce a bassa risoluzione (viewport render)", minutes: 2 },
+    ];
+  }
+
+  if (lower.includes("studio") || lower.includes("studi") || lower.includes("esame") || lower.includes("leggi") || lower.includes("libro")) {
+    return [
+      { text: "Sfoglia il capitolo leggendo solo titoli, sottotitoli e grafici riassuntivi", minutes: 3 },
+      { text: "Leggi con attenzione le prime 2 pagine evidenziando i concetti cardine", minutes: 6 },
+      { text: "Scrivi a margine una domanda chiave per testare la comprensione", minutes: 3 },
+      { text: "Spiega il concetto principale ad alta voce senza guardare il testo", minutes: 3 },
+    ];
+  }
+
+  if (lower.includes("podcast") || lower.includes("audio") || lower.includes("video") || lower.includes("post")) {
+    return [
+      { text: "Scrivi su carta l'idea centrale o la domanda a cui vuoi rispondere", minutes: 3 },
+      { text: "Butta giù una scaletta essenziale in 3 punti chiave (intro, corpo, chiusura)", minutes: 5 },
+      { text: "Registra una prima prova vocale di 60 secondi col registratore dello smartphone", minutes: 4 },
+      { text: "Riascolta al volo e segna l'eventuale passaggio da chiarire o rifinire", minutes: 2 },
+    ];
+  }
+
+  if (lower.includes("codice") || lower.includes("programm") || lower.includes("app") || lower.includes("bug") || lower.includes("svilupp")) {
+    return [
+      { text: "Definisci lo scopo della funzione o del componente in un commento iniziale", minutes: 3 },
+      { text: "Crea il file e imposta i parametri di input e il valore atteso in output", minutes: 5 },
+      { text: "Scrivi il primo blocco logico di base per il caso comune (happy path)", minutes: 8 },
+      { text: "Verifica subito il funzionamento con un test rapido o log a schermo", minutes: 2 },
+    ];
+  }
+
+  const clean = title.length > 30 ? title.slice(0, 30) + "..." : title;
+  return [
+    { text: `Definisci su carta il risultato minimo del primo passo per "${clean}"`, minutes: 3 },
+    { text: `Raccogli gli strumenti o apri i file necessari chiudendo ogni altra distrazione`, minutes: 4 },
+    { text: `Esegui la prima micro-azione pratica per 7 minuti filati senza cercare la perfezione`, minutes: 7 },
+    { text: `Verifica il progresso ottenuto e annota la prima mossa per la sessione successiva`, minutes: 2 },
+  ];
+}
+
+export async function decomposeTask({ ai, title, signal }) {
+  if (ai && ai.isReady) {
+    try {
+      const schema = {
+        type: "object",
+        properties: {
+          steps: {
+            type: "array",
+            minItems: 3,
+            maxItems: 4,
+            items: {
+              type: "object",
+              properties: {
+                text: { type: "string" },
+                minutes: { type: "number" },
+              },
+              required: ["text", "minutes"],
+            },
+          },
+        },
+        required: ["steps"],
+      };
+
+      const prompt = [
+        `Scomponi questo task o obiettivo complesso in esattamente 3 o 4 micro-step pratici, concreti ed eseguibili in meno di 10 minuti ciascuno:`,
+        `"${title}"`,
+        `Regole tassative:`,
+        `- Restituisci tra 3 e 4 micro-step (non di meno, non di più).`,
+        `- Ogni micro-step deve essere rapido e richiedere tra 2 e 10 minuti (indica la stima in minuti).`,
+        `- Inizia ogni micro-step con un verbo d'azione all'infinito o imperativo (es: "Scrivi...", "Apri...", "Verifica...").`,
+        `- Nessuna teoria o frase generica: solo azioni concrete e fattibili subito che sbloccano l'inerzia.`,
+        `- Lingua: italiano.`,
+      ].join("\n");
+
+      let timeoutId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("Timeout AI")), 12000);
+      });
+
+      const chatPromise = chatJson({
+        ai,
+        schema,
+        signal,
+        temperature: 0.6,
+        messages: [
+          { role: "system", content: COACH },
+          { role: "user", content: prompt },
+        ],
+      });
+
+      const result = await Promise.race([chatPromise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+      if (result && Array.isArray(result.steps) && result.steps.length >= 2) {
+        return result.steps.slice(0, 4).map((step, index) => ({
+          id: `step-${Date.now()}-${index}`,
+          text: step.text,
+          minutes: typeof step.minutes === "number" && step.minutes > 0 ? Math.min(step.minutes, 10) : 5,
+          done: false,
+        }));
+      }
+    } catch (error) {
+      if (error.name === "AbortError") {
+        throw error;
+      }
+      console.warn("Chiamata Ollama non riuscita o lenta, uso mock API locale:", error.message);
+    }
+  }
+
+  // Fallback: mock API con simulazione di caricamento (850ms) per mostrare l'animazione
+  await new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
+      return;
+    }
+    const timer = setTimeout(resolve, 850);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(new DOMException("Aborted", "AbortError"));
+      },
+      { once: true }
+    );
+  });
+
+  const rawSteps = generateMockMicroSteps(title);
+  return rawSteps.map((step, index) => ({
+    id: `step-${Date.now()}-${index}`,
+    text: step.text,
+    minutes: step.minutes || 5,
+    done: false,
+  }));
+}

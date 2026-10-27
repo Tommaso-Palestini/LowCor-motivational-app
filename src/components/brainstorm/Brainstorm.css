@@ -365,6 +365,15 @@
   margin-top: 0.25rem;
 }
 
+.idea-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
 /* Barra per scrivere */
 
 .composer {

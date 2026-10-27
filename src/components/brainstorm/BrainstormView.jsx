@@ -222,7 +222,7 @@ function BrainstormView({ data, now, ai, actions, hidden }) {
           <ol className="brainstorm-messages">
             {messages.map((message) => (
               <li key={message.id}>
-                <BrainstormMessage message={message} data={data} actions={actions} />
+                <BrainstormMessage message={message} data={data} actions={actions} ai={ai} />
               </li>
             ))}
             {pendingHere && (

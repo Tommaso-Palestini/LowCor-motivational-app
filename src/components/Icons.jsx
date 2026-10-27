@@ -204,3 +204,12 @@ export function IconCalendarPlus() {
     </svg>
   );
 }
+
+export function IconSpinner({ className = "" }) {
+  return (
+    <svg {...baseProps} className={`spin ${className}`}>
+      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" fill="none" />
+      <path d="M14 8a6 6 0 0 0-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}

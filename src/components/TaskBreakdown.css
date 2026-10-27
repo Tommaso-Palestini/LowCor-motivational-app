@@ -1,0 +1,378 @@
+/* Scomposizione Task / Obiettivi con AI */
+
+.task-breakdown-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+/* Pulsante 'Scomponi con AI' */
+
+.task-breakdown-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 36px;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid color-mix(in oklch, var(--focus) 35%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--focus) 10%, transparent);
+  color: var(--focus);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 160ms var(--ease),
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 250ms ease;
+}
+
+.task-breakdown-btn:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--focus) 20%, transparent);
+  border-color: var(--focus);
+  box-shadow: 0 0 16px -2px color-mix(in oklch, var(--focus) 35%, transparent);
+  transform: translateY(-1px);
+}
+
+.task-breakdown-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.task-breakdown-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.task-breakdown-btn--has-steps {
+  border-color: var(--line-strong);
+  background: color-mix(in oklch, var(--ink) 8%, transparent);
+  color: var(--ink);
+}
+
+.task-breakdown-btn--has-steps:hover:not(:disabled) {
+  border-color: var(--planned);
+  background: color-mix(in oklch, var(--planned) 15%, transparent);
+  color: var(--ink);
+}
+
+.task-breakdown-chevron {
+  font-size: 0.625rem;
+  opacity: 0.7;
+  margin-left: 0.15rem;
+}
+
+/* Spinner icon animation (Tailwind & CSS compatibile) */
+
+.spin,
+.animate-spin {
+  animation: breakdown-spin 900ms linear infinite;
+}
+
+@keyframes breakdown-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loader durante la generazione */
+
+.task-breakdown-loader {
+  display: grid;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid color-mix(in oklch, var(--focus) 40%, transparent);
+  border-radius: var(--radius-row);
+  background: color-mix(in oklch, var(--dusk) 88%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px -4px color-mix(in oklch, var(--focus) 20%, transparent);
+  animation: breakdown-enter 260ms var(--ease) both;
+}
+
+.task-breakdown-loader-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-breakdown-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--focus);
+  box-shadow: 0 0 10px var(--focus);
+  animation: breakdown-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes breakdown-pulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+.task-breakdown-loader-title {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.task-breakdown-badge {
+  margin-left: auto;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--focus) 15%, transparent);
+  color: var(--focus);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.task-breakdown-loader-desc {
+  color: var(--mist);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* Skeleton animati con shimmer (Tailwind & CSS compatibile) */
+
+.task-breakdown-skeletons {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--mist) 10%, transparent) 0%,
+    color-mix(in oklch, var(--focus) 22%, transparent) 50%,
+    color-mix(in oklch, var(--mist) 10%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: breakdown-shimmer 1.5s infinite linear;
+}
+
+.skeleton-line--1 {
+  width: 86%;
+}
+
+.skeleton-line--2 {
+  width: 94%;
+  animation-delay: 150ms;
+}
+
+.skeleton-line--3 {
+  width: 72%;
+  animation-delay: 300ms;
+}
+
+@keyframes breakdown-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Pannello Checklist Interattiva */
+
+.task-breakdown-panel {
+  display: grid;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-row);
+  background: color-mix(in oklch, var(--dusk) 92%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.4);
+  animation: breakdown-enter 260ms var(--ease) both;
+}
+
+@keyframes breakdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-breakdown-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.task-breakdown-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.task-breakdown-panel-title svg {
+  color: var(--planned);
+  width: 14px;
+  height: 14px;
+}
+
+.task-breakdown-count-chip {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--wash);
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.task-breakdown-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--mist);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.task-breakdown-action-btn:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+.task-breakdown-action-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Banner di successo quando tutti i micro-step sono spuntati */
+
+.task-breakdown-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid color-mix(in oklch, var(--done) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--done) 12%, transparent);
+  color: var(--done);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  animation: breakdown-enter 220ms var(--ease);
+}
+
+.task-breakdown-success-banner svg {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+/* Lista dei micro-step */
+
+.task-breakdown-list {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-breakdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--ink) 3.5%, transparent);
+  transition:
+    background-color 200ms ease,
+    opacity 250ms ease,
+    transform 160ms var(--ease);
+}
+
+.task-breakdown-item:hover {
+  background: color-mix(in oklch, var(--ink) 7%, transparent);
+}
+
+.task-breakdown-item--done {
+  opacity: 0.6;
+}
+
+.task-breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.task-breakdown-text {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--ink);
+  transition: color 200ms ease, text-decoration 200ms ease;
+  word-break: break-word;
+}
+
+.task-breakdown-item--done .task-breakdown-text {
+  color: var(--mist);
+  text-decoration: line-through;
+}
+
+.task-breakdown-time {
+  flex-shrink: 0;
+  padding: 0.125rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--wash);
+  color: var(--mist);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.task-breakdown-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid color-mix(in oklch, var(--focus) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--focus) 10%, transparent);
+  color: var(--focus);
+  font-size: 0.8125rem;
+}
