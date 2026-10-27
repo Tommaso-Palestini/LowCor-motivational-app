@@ -5,6 +5,7 @@ import { canShareFiles, downloadBlob, sharePdf } from "../../logic/pdfExport";
 import { toDateString } from "../../logic/dates";
 import { recentMonths } from "../../logic/monthStats";
 import { IconClose, IconDownload, IconSend, IconSpinner } from "../Icons";
+import { isNative } from "../../native";
 import "./Share.css";
 
 function slug(text) {
@@ -71,7 +72,11 @@ function ShareDialog({ data, now, userName, onUserNameChange, onClose, onError }
     try {
       await sharePdf(result.blob, filename, title);
     } catch {
-      downloadBlob(result.blob, filename);
+      if (isNative) {
+        onError("Non sono riuscito a condividere il PDF, riprova");
+      } else {
+        downloadBlob(result.blob, filename);
+      }
     }
   }
 
@@ -172,14 +177,17 @@ function ShareDialog({ data, now, userName, onUserNameChange, onClose, onError }
                     Condividi
                   </button>
                 )}
-                <button
-                  type="button"
-                  className={`button ${canShare ? "button--ghost" : "button--primary"}`}
-                  onClick={() => downloadBlob(result.blob, filename)}
-                >
-                  <IconDownload />
-                  Scarica il PDF
-                </button>
+                {/* Nell'app nativa non c'è un download: si salva dal pannello di condivisione */}
+                {!isNative && (
+                  <button
+                    type="button"
+                    className={`button ${canShare ? "button--ghost" : "button--primary"}`}
+                    onClick={() => downloadBlob(result.blob, filename)}
+                  >
+                    <IconDownload />
+                    Scarica il PDF
+                  </button>
+                )}
                 <button type="button" className="button button--quiet" onClick={() => setPhase("idle")}>
                   Modifica
                 </button>

@@ -110,3 +110,34 @@ export async function scheduleBlockNotifications({ blocks, activities, enabled, 
     await LocalNotifications.schedule({ notifications: notifications.slice(0, MAX_SCHEDULED) });
   }
 }
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1]);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Nell'app nativa i download del browser non esistono: il file va scritto nella cache
+// e passato al pannello di condivisione del sistema (Salva su File, Drive, Mail, …).
+export async function shareNativeFile(blob, filename, title) {
+  const [{ Filesystem, Directory }, { Share }] = await Promise.all([
+    import("@capacitor/filesystem"),
+    import("@capacitor/share"),
+  ]);
+  const { uri } = await Filesystem.writeFile({
+    path: filename,
+    data: await blobToBase64(blob),
+    directory: Directory.Cache,
+  });
+  try {
+    await Share.share({ title, files: [uri] });
+  } catch (error) {
+    // Chiudere il pannello senza scegliere non è un errore
+    if (!/cancel/i.test(error.message || "")) {
+      throw error;
+    }
+  }
+}

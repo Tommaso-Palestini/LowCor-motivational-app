@@ -332,7 +332,8 @@ kbd {
 
 /* Spento: anello vuoto, così non si confonde con "connessa" qualunque sia la tinta */
 .settings-status--offline span,
-.settings-status--no-model span {
+.settings-status--no-model span,
+.settings-status--unavailable span {
   background: transparent;
   border: 1.5px solid var(--mist);
 }
@@ -386,6 +387,15 @@ kbd {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+}
+
+.settings-backup-confirm {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--wash);
 }
 
 .settings-bg-actions .button {

@@ -31,21 +31,25 @@ const defaultData = {
   onboarded: false,
 };
 
+// Completa dei dati salvati (o arrivati da un backup) con i campi aggiunti nelle versioni successive
+export function normalizeData(saved) {
+  return {
+    ...defaultData,
+    // Chi aveva già dati prima dell'onboarding non deve rifarlo
+    onboarded: true,
+    ...saved,
+    settings: { ...defaultSettings, ...(saved.settings || {}) },
+    brainstorm: { ...defaultData.brainstorm, ...(saved.brainstorm || {}) },
+  };
+}
+
 export function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) {
       return defaultData;
     }
-    const saved = JSON.parse(raw);
-    return {
-      ...defaultData,
-      // Chi aveva già dati prima dell'onboarding non deve rifarlo
-      onboarded: true,
-      ...saved,
-      settings: { ...defaultSettings, ...(saved.settings || {}) },
-      brainstorm: { ...defaultData.brainstorm, ...(saved.brainstorm || {}) },
-    };
+    return normalizeData(JSON.parse(raw));
   } catch (error) {
     console.error("Could not load data:", error);
     return defaultData;

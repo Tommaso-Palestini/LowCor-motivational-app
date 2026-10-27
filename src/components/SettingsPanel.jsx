@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
-import { LANGUAGES, t } from "../i18n";
+import { backupSummary, parseBackup } from "../logic/backup";
+import { LANGUAGES, locale, t } from "../i18n";
 
 function Switch({ checked, onChange, label }) {
   return (
@@ -29,9 +30,28 @@ const AI_STATUS = {
   ready: "Connessa",
   offline: "Ollama non risponde",
   "no-model": "Nessun modello installato",
+  unavailable: "Solo sul computer",
 };
 
 function AiSection({ ai, settings, set }) {
+  if (ai.status === "unavailable") {
+    return (
+      <div className="settings-ai">
+        <div className="settings-row">
+          <div>
+            <p className="settings-name">{t("AI locale")}</p>
+            <p className="settings-status settings-status--unavailable">
+              <span aria-hidden="true" />
+              {t(AI_STATUS.unavailable)}
+            </p>
+          </div>
+        </div>
+        <p className="settings-hint">
+          {t("L'AI gira con Ollama sul tuo computer, niente cloud. Usa LowCor dal browser del computer per carte generate, brainstorming e schema 9x9.")}
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="settings-ai">
       <div className="settings-row">
@@ -322,7 +342,102 @@ function AlertsSection({ settings, set }) {
   );
 }
 
-function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackground, onRemoveBackground }) {
+function BackupSection({ onExport, onRestore }) {
+  const fileRef = useRef(null);
+  const [pending, setPending] = useState(null);
+  const [error, setError] = useState("");
+
+  async function read(file) {
+    setError("");
+    try {
+      setPending(parseBackup(await file.text()));
+    } catch (problem) {
+      setPending(null);
+      setError(problem.message);
+    }
+  }
+
+  const summary = pending && backupSummary(pending.data);
+  const when = pending?.exportedAt
+    ? new Date(pending.exportedAt).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <div className="settings-bg">
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">{t("Backup")}</p>
+          <p className="settings-hint">
+            {t("I dati vivono solo su questo dispositivo: salva ogni tanto un backup per cambiare telefono o non perdere nulla.")}
+          </p>
+        </div>
+      </div>
+      <div className="settings-bg-actions">
+        <button type="button" className="button button--ghost" onClick={onExport}>
+          {t("Salva un backup")}
+        </button>
+        <button type="button" className="button button--quiet" onClick={() => fileRef.current?.click()}>
+          {t("Ripristina da file")}
+        </button>
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json,.json"
+        hidden
+        onChange={(event) => {
+          const file = event.target.files[0];
+          event.target.value = "";
+          if (file) {
+            read(file);
+          }
+        }}
+      />
+      {error && (
+        <p className="settings-hint" role="alert">
+          {t(error)}
+        </p>
+      )}
+      {pending && (
+        <div className="settings-backup-confirm" role="alert">
+          <p className="settings-hint">
+            {when ? t("Backup del {date}", { date: when }) + ": " : ""}
+            {t("{a} attività e {b} blocchi. Sostituisce tutto quello che c'è ora.", {
+              a: summary.activities,
+              b: summary.blocks,
+            })}
+          </p>
+          <div className="settings-bg-actions">
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => {
+                onRestore(pending);
+                setPending(null);
+              }}
+            >
+              {t("Ripristina")}
+            </button>
+            <button type="button" className="button button--quiet" onClick={() => setPending(null)}>
+              {t("Lascia tutto com'è")}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SettingsPanel({
+  settings,
+  onChange,
+  ai,
+  backgroundImage,
+  onPickBackground,
+  onRemoveBackground,
+  onExportBackup,
+  onRestoreBackup,
+}) {
   function set(key, value) {
     onChange({ ...settings, [key]: value });
   }
@@ -416,6 +531,14 @@ function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackgrou
 
       <p className="settings-group">{t("Tempo")}</p>
       <AlertsSection settings={settings} set={set} />
+
+      <p className="settings-group">{t("I tuoi dati")}</p>
+      <BackupSection onExport={onExportBackup} onRestore={onRestoreBackup} />
+      <p className="settings-hint">
+        <a href="privacy.html" target="_blank" rel="noopener">
+          {t("Privacy")}
+        </a>
+      </p>
 
       <p className="settings-group">{t("AI e scorciatoie")}</p>
       <AiSection ai={ai} settings={settings} set={set} />

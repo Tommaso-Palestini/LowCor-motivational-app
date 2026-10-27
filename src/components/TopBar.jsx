@@ -35,6 +35,8 @@ function TopBar({
   backgroundImage,
   onPickBackground,
   onRemoveBackground,
+  onExportBackup,
+  onRestoreBackup,
 }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -103,6 +105,8 @@ function TopBar({
                 backgroundImage={backgroundImage}
                 onPickBackground={onPickBackground}
                 onRemoveBackground={onRemoveBackground}
+                onExportBackup={onExportBackup}
+                onRestoreBackup={onRestoreBackup}
               />
             )}
           </div>

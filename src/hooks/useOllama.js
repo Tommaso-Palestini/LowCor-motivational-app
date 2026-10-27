@@ -5,11 +5,15 @@ const RETRY_MS = 20000;
 
 // Controlla se Ollama è acceso e quali modelli hai. Se è spento riprova ogni 20 secondi,
 // così appena lo avvii l'app se ne accorge da sola.
-export function useOllama(url, preferredModel) {
+// enabled = false nell'app nativa: sul telefono non c'è Ollama e iOS blocca le richieste http in chiaro.
+export function useOllama(url, preferredModel, enabled = true) {
   const [state, setState] = useState({ status: "checking", models: [] });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    if (!enabled) {
+      return undefined;
+    }
     const controller = new AbortController();
     let timerId = null;
     listModels(url, controller.signal)
@@ -25,10 +29,10 @@ export function useOllama(url, preferredModel) {
       controller.abort();
       clearTimeout(timerId);
     };
-  }, [url, attempt]);
+  }, [url, attempt, enabled]);
 
   const model = pickModel(state.models, preferredModel);
-  let status = state.status;
+  let status = enabled ? state.status : "unavailable";
   if (status === "ready" && !model) {
     status = "no-model";
   }

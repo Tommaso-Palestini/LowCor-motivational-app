@@ -1,5 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { loadBackgroundImage, loadData, saveBackgroundImage, saveData } from "./storage/storage";
+import { loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
+import { backupFilename, createBackup } from "./logic/backup";
+import { shareFile } from "./logic/pdfExport";
 import { compressImage } from "./logic/backgroundImage";
 import { applyLowDay, minimumVersion } from "./logic/rescue";
 import { energyLimits } from "./logic/energy";
@@ -102,7 +104,7 @@ function App() {
   const historyRef = useRef([]);
   const now = useNow();
   const today = toDateString(now);
-  const ai = useOllama(data.settings.aiUrl, data.settings.aiModel);
+  const ai = useOllama(data.settings.aiUrl, data.settings.aiModel, !isNative);
 
   // La lingua va impostata prima che i figli disegnino i loro testi
   setLanguage(data.settings.language);
@@ -448,6 +450,27 @@ function App() {
     setSetting("background", "lava");
   }
 
+  // ---- Backup ----
+
+  async function exportBackup() {
+    const backup = createBackup(data, backgroundImage);
+    const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
+    try {
+      await shareFile(blob, backupFilename(today), t("Backup di LowCor"));
+    } catch {
+      showToast("Non sono riuscito a salvare il backup, riprova");
+    }
+  }
+
+  // Sostituisce tutti i dati con quelli del backup; resta annullabile (tranne lo sfondo)
+  function restoreBackup(backup) {
+    commit(() => normalizeData(backup.data));
+    if (backup.backgroundImage && saveBackgroundImage(backup.backgroundImage)) {
+      setBackgroundImage(backup.backgroundImage);
+    }
+    showToast("Backup ripristinato", true);
+  }
+
   // ---- Attività ----
 
   // Elimina l'attività insieme ai suoi blocchi: resta annullabile con Ctrl+Z o dal toast.
@@ -744,6 +767,8 @@ function App() {
           backgroundImage={backgroundImage}
           onPickBackground={pickBackground}
           onRemoveBackground={removeBackground}
+          onExportBackup={exportBackup}
+          onRestoreBackup={restoreBackup}
         />
 
         <main className="app-main">
@@ -760,7 +785,12 @@ function App() {
 
         <footer className="app-footer">
           <p>{t("© {year} LowCor. Tutti i diritti riservati.", { year: now.getFullYear() })}</p>
-          <p className="app-footer-note">{t("I tuoi dati restano su questo dispositivo.")}</p>
+          <p className="app-footer-note">
+            {t("I tuoi dati restano su questo dispositivo.")}{" "}
+            <a href="privacy.html" target="_blank" rel="noopener">
+              {t("Privacy")}
+            </a>
+          </p>
         </footer>
       </div>
 

@@ -150,6 +150,23 @@ test("rito della settimana: quattro passi fino in fondo", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Chiudi la settimana" })).toHaveCount(0);
 });
 
+test("backup: salvo un file e lo ripristino", async ({ page }) => {
+  const errors = watchErrors(page);
+  await seed(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Impostazioni" }).click();
+  const downloading = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Salva un backup" }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toMatch(/^lowcor-backup-\d{4}-\d{2}-\d{2}\.json$/);
+
+  await page.locator('input[type="file"][accept*="json"]').setInputFiles(await download.path());
+  await expect(page.getByText("Sostituisce tutto quello che c'è ora")).toBeVisible();
+  await page.getByRole("button", { name: "Ripristina", exact: true }).click();
+  await expect(page.getByText("Backup ripristinato")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 // Fluidità: misura i fotogrammi mentre la home scorre e l'anello ondeggia.
 // In un browser headless i numeri sono indicativi, ma un rallentamento serio si vede.
 test("fluidità della home", async ({ page }, testInfo) => {

@@ -1,3 +1,5 @@
+import { isNative, shareNativeFile } from "../native";
+
 export function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -8,6 +10,9 @@ export function downloadBlob(blob, filename) {
 }
 
 export function canShareFiles() {
+  if (isNative) {
+    return true;
+  }
   try {
     const probe = new File([""], "probe.pdf", { type: "application/pdf" });
     return Boolean(navigator.canShare && navigator.canShare({ files: [probe] }));
@@ -17,8 +22,12 @@ export function canShareFiles() {
 }
 
 // Sul telefono apre il pannello di condivisione (WhatsApp, Mail, …); altrove scarica il file.
-export async function sharePdf(blob, filename, title) {
-  const file = new File([blob], filename, { type: "application/pdf" });
+export async function shareFile(blob, filename, title) {
+  if (isNative) {
+    await shareNativeFile(blob, filename, title);
+    return;
+  }
+  const file = new File([blob], filename, { type: blob.type });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title });
@@ -30,4 +39,8 @@ export async function sharePdf(blob, filename, title) {
     return;
   }
   downloadBlob(blob, filename);
+}
+
+export function sharePdf(blob, filename, title) {
+  return shareFile(new Blob([blob], { type: "application/pdf" }), filename, title);
 }

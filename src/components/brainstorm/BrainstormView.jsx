@@ -187,7 +187,15 @@ function BrainstormView({ data, now, ai, actions, hidden }) {
         </div>
       </header>
 
-      {!ai.isReady && (
+      {ai.status === "unavailable" && (
+        <div className="brainstorm-offline">
+          <p className="settings-name">L'AI locale è solo sul computer</p>
+          <p>
+            Il brainstorming usa Ollama sul tuo computer, niente cloud. Apri LowCor dal browser del computer per usarlo.
+          </p>
+        </div>
+      )}
+      {!ai.isReady && ai.status !== "unavailable" && (
         <div className="brainstorm-offline">
           <p className="settings-name">L'AI locale non è collegata</p>
           <p>

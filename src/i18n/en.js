@@ -301,4 +301,29 @@ export default {
   // Varie
   blocco: "block",
   blocchi: "blocks",
+
+  // Backup e privacy
+  "I tuoi dati": "Your data",
+  Backup: "Backup",
+  "I dati vivono solo su questo dispositivo: salva ogni tanto un backup per cambiare telefono o non perdere nulla.":
+    "Your data lives only on this device: save a backup now and then to switch phones or lose nothing.",
+  "Salva un backup": "Save a backup",
+  "Ripristina da file": "Restore from file",
+  "Backup del {date}": "Backup from {date}",
+  "{a} attività e {b} blocchi. Sostituisce tutto quello che c'è ora.":
+    "{a} activities and {b} blocks. It replaces everything you have now.",
+  Ripristina: "Restore",
+  "Lascia tutto com'è": "Keep things as they are",
+  "Backup di LowCor": "LowCor backup",
+  "Backup ripristinato": "Backup restored",
+  "Non sono riuscito a salvare il backup, riprova": "Couldn't save the backup, try again",
+  "Il file non è un backup valido": "This file isn't a valid backup",
+  "Il file non è un backup di LowCor": "This file isn't a LowCor backup",
+  "Backup creato da una versione più nuova dell'app: aggiornala e riprova":
+    "This backup comes from a newer version of the app: update it and try again",
+  "Il backup è incompleto": "The backup is incomplete",
+  Privacy: "Privacy",
+  "Solo sul computer": "Computer only",
+  "L'AI gira con Ollama sul tuo computer, niente cloud. Usa LowCor dal browser del computer per carte generate, brainstorming e schema 9x9.":
+    "The AI runs with Ollama on your computer, no cloud. Use LowCor in your computer's browser for generated cards, brainstorming and the 9x9 grid.",
 };
