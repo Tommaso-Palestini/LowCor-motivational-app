@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import PdfDocument, { PAGE_HEIGHT, PAGE_WIDTH } from "./PdfDocument";
 import { canShareFiles, downloadBlob, sharePdf } from "../../logic/pdfExport";
 import { toDateString } from "../../logic/dates";
+import { recentMonths } from "../../logic/monthStats";
 import { IconClose, IconDownload, IconSend, IconSpinner } from "../Icons";
 import "./Share.css";
 
@@ -25,6 +26,8 @@ function ShareDialog({ data, now, userName, onUserNameChange, onClose, onError }
   const dialogRef = useRef(null);
   const [name, setName] = useState(userName || "");
   const [includeParked, setIncludeParked] = useState(true);
+  const months = recentMonths(now);
+  const [month, setMonth] = useState(months[0].key);
   // idle, rendering, ready
   const [phase, setPhase] = useState("idle");
   const [result, setResult] = useState(null);
@@ -115,6 +118,22 @@ function ShareDialog({ data, now, userName, onUserNameChange, onClose, onError }
                   disabled={phase === "rendering"}
                 />
               </label>
+              <label className="editor-field">
+                <span>Mese da raccontare, con calendario e numeri</span>
+                <select
+                  className="field"
+                  value={month}
+                  onChange={(event) => setMonth(event.target.value)}
+                  disabled={phase === "rendering"}
+                >
+                  {months.map((item) => (
+                    <option key={item.key} value={item.key}>
+                      {item.label.charAt(0).toUpperCase() + item.label.slice(1)}
+                    </option>
+                  ))}
+                  <option value="">Nessun mese</option>
+                </select>
+              </label>
               <label className="share-check">
                 <input
                   type="checkbox"
@@ -179,6 +198,7 @@ function ShareDialog({ data, now, userName, onUserNameChange, onClose, onError }
               blocks={data.blocks}
               now={now}
               includeParked={includeParked}
+              month={month || null}
               hue={hue}
               onPagesReady={handlePagesReady}
             />

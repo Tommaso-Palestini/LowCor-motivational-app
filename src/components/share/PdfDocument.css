@@ -436,3 +436,173 @@
   color: var(--pdf-mist);
   font-size: 14px;
 }
+
+/* Pagina del mese */
+
+.pdf-month-inner {
+  display: grid;
+  gap: 30px;
+  padding: 88px 72px 0;
+}
+
+.pdf-month-head {
+  display: grid;
+  gap: 10px;
+}
+
+.pdf-month-title {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.pdf-month-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+  border-top: 1px solid var(--pdf-line);
+}
+
+.pdf-month-stats > div {
+  display: grid;
+  gap: 6px;
+  padding-top: 18px;
+}
+
+.pdf-month-stats > div + div {
+  padding-left: 20px;
+  border-left: 1px solid var(--pdf-line);
+}
+
+.pdf-month-stats dt {
+  color: var(--pdf-mist);
+  font-size: 13px;
+}
+
+.pdf-month-stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.pdf-month-stats dd span {
+  color: var(--pdf-mist);
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+/* Heatmap: ogni giorno si accende in proporzione ai blocchi chiusi */
+.pdf-month-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.pdf-month-weekday {
+  padding-bottom: 2px;
+  color: var(--pdf-mist);
+  font-size: 12px;
+  text-align: center;
+}
+
+.pdf-month-day {
+  position: relative;
+  height: 56px;
+  border: 1px solid oklch(0.78 0.05 var(--h) / 0.12);
+  border-radius: 14px;
+  background: oklch(0.78 0.05 var(--h) / 0.05);
+}
+
+.pdf-month-day--on {
+  border-color: transparent;
+  background: oklch(calc(0.38 + 0.5 * var(--i)) calc(0.08 + 0.07 * var(--i)) calc(var(--h) - 120 * var(--i)));
+}
+
+.pdf-month-day--out {
+  opacity: 0.25;
+}
+
+.pdf-month-day-number {
+  position: absolute;
+  top: 7px;
+  left: 10px;
+  color: var(--pdf-mist);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pdf-month-day--on .pdf-month-day-number {
+  color: oklch(0.15 0.04 var(--h) / 0.75);
+}
+
+.pdf-month-day-count {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  color: oklch(0.13 0.04 var(--h));
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.pdf-month-highlights {
+  display: grid;
+  gap: 6px;
+  color: var(--pdf-mist);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.pdf-month-highlights strong {
+  color: var(--pdf-ink);
+  font-weight: 600;
+}
+
+.pdf-month-ranking {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pdf-month-ranking li {
+  display: grid;
+  grid-template-columns: 170px 1fr 170px;
+  align-items: center;
+  gap: 16px;
+}
+
+.pdf-month-rank-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdf-month-rank-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: oklch(0.78 0.05 var(--h) / 0.12);
+  overflow: hidden;
+}
+
+.pdf-month-rank-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pdf-accent), var(--pdf-done));
+}
+
+.pdf-month-rank-value {
+  color: var(--pdf-mist);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

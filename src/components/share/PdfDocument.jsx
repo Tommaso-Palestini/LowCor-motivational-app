@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { activityStats } from "../../logic/activityStats";
 import { formatDate, toDateString, weekDates } from "../../logic/dates";
 import { ENERGY, activityEnergy } from "../../logic/energy";
+import { monthStats } from "../../logic/monthStats";
 import "./PdfDocument.css";
 
 // Pagina A4 a 96 dpi
@@ -77,6 +78,102 @@ function StreakLine({ stats }) {
     );
   }
   return "Si comincia adesso";
+}
+
+const WEEKDAYS = ["L", "M", "M", "G", "V", "S", "D"];
+
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function MonthPage({ stats, page, total }) {
+  const hours = formatHours(stats.minutes);
+  const topMinutes = stats.ranking[0] ? stats.ranking[0].minutes : 1;
+  return (
+    <section className="pdf-page pdf-month">
+      <div className="pdf-month-inner">
+        <header className="pdf-month-head">
+          <p className="pdf-cover-week">Il mese in numeri</p>
+          <h2 className="pdf-month-title">{capitalize(stats.label)}</h2>
+        </header>
+
+        <dl className="pdf-month-stats">
+          <div>
+            <dt>Sessioni</dt>
+            <dd>{stats.sessions}</dd>
+          </div>
+          <div>
+            <dt>Tempo dedicato</dt>
+            <dd>
+              {hours.value} <span>{hours.unit}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Giorni attivi</dt>
+            <dd>{stats.activeDays}</dd>
+          </div>
+          <div>
+            <dt>Blocchi rispettati</dt>
+            <dd>{stats.completion === null ? "–" : `${Math.round(stats.completion * 100)}%`}</dd>
+          </div>
+        </dl>
+
+        <div className="pdf-month-calendar">
+          {WEEKDAYS.map((day, index) => (
+            <span key={index} className="pdf-month-weekday">
+              {day}
+            </span>
+          ))}
+          {stats.days.map((day) => (
+            <span
+              key={day.date}
+              className={`pdf-month-day ${day.inMonth ? "" : "pdf-month-day--out"} ${day.count > 0 ? "pdf-month-day--on" : ""}`}
+              style={{ "--i": day.intensity }}
+            >
+              <span className="pdf-month-day-number">{Number(day.date.slice(8))}</span>
+              {day.count > 0 && <span className="pdf-month-day-count">{day.count}</span>}
+            </span>
+          ))}
+        </div>
+
+        <div className="pdf-month-highlights">
+          {stats.bestDay && (
+            <p>
+              Il giorno più pieno è stato{" "}
+              <strong>{formatDate(stats.bestDay.date, { weekday: "long", day: "numeric" })}</strong>, con{" "}
+              {stats.bestDay.count} {stats.bestDay.count === 1 ? "blocco chiuso" : "blocchi chiusi"}.
+            </p>
+          )}
+          {stats.bestRun > 1 && (
+            <p>
+              Record del mese: <strong>{stats.bestRun} giorni di fila</strong> senza saltarne uno.
+            </p>
+          )}
+          {stats.sessions === 0 && <p>Un mese ancora tutto da scrivere.</p>}
+        </div>
+
+        {stats.ranking.length > 0 && (
+          <ol className="pdf-month-ranking">
+            {stats.ranking.slice(0, 6).map(({ activity, sessions, minutes }) => {
+              const time = formatHours(minutes);
+              return (
+                <li key={activity.id}>
+                  <span className="pdf-month-rank-name">{activity.name}</span>
+                  <span className="pdf-month-rank-bar">
+                    <span style={{ width: `${(minutes / topMinutes) * 100}%` }} />
+                  </span>
+                  <span className="pdf-month-rank-value">
+                    {time.value} {time.unit}, {sessions} {sessions === 1 ? "sessione" : "sessioni"}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
+      <PageFooter page={page} total={total} />
+    </section>
+  );
 }
 
 function FixedItem({ activity, stats, index }) {
@@ -207,7 +304,7 @@ function paginate(flow, heights, gap) {
   return pages;
 }
 
-function PdfDocument({ name, activities, blocks, now, includeParked, hue, onPagesReady }) {
+function PdfDocument({ name, activities, blocks, now, includeParked, month, hue, onPagesReady }) {
   const measureRef = useRef(null);
   const pagesRef = useRef(null);
   const [pages, setPages] = useState(null);
@@ -240,7 +337,9 @@ function PdfDocument({ name, activities, blocks, now, includeParked, hue, onPage
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pages]);
 
-  const totalPages = pages ? pages.length + 1 : 1;
+  const monthData = month ? monthStats(month, activities, blocks, now) : null;
+  const leadPages = monthData ? 2 : 1;
+  const totalPages = pages ? pages.length + leadPages : leadPages;
 
   return (
     <div className="pdf-doc" style={{ "--h": hue }} ref={pagesRef}>
@@ -286,6 +385,8 @@ function PdfDocument({ name, activities, blocks, now, includeParked, hue, onPage
         <PageFooter page={1} total={totalPages} />
       </section>
 
+      {monthData && <MonthPage stats={monthData} page={2} total={totalPages} />}
+
       {pages ? (
         pages.map((indexes, pageIndex) => (
           <section key={pageIndex} className="pdf-page pdf-inner">
@@ -294,7 +395,7 @@ function PdfDocument({ name, activities, blocks, now, includeParked, hue, onPage
                 <FlowItem key={index} item={flow[index]} name={name} dateLabel={dateLabel} />
               ))}
             </div>
-            <PageFooter page={pageIndex + 2} total={totalPages} />
+            <PageFooter page={pageIndex + leadPages + 1} total={totalPages} />
           </section>
         ))
       ) : (
