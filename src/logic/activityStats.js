@@ -24,10 +24,19 @@ export function activityStats(activity, blocks, now) {
   });
 
   // La settimana in corso conta solo se è già centrata: non ti rompe la serie a metà settimana.
+  // Il jolly: una settimana saltata nelle ultime 8 non azzera la serie, se prima e dopo l'avevi centrata.
   let streak = 0;
+  let jollyUsed = false;
   const history = weeks[WEEKS - 1].met ? weeks : weeks.slice(0, -1);
-  for (let index = history.length - 1; index >= 0 && history[index].met; index -= 1) {
-    streak += 1;
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    if (history[index].met) {
+      streak += 1;
+    } else if (!jollyUsed && streak > 0 && index > 0 && history[index - 1].met) {
+      jollyUsed = true;
+      history[index].jolly = true;
+    } else {
+      break;
+    }
   }
 
   const next =
@@ -43,6 +52,7 @@ export function activityStats(activity, blocks, now) {
     weeks,
     thisWeek: weeks[WEEKS - 1].count,
     streak,
+    jollyUsed,
     next,
     firstDate: done.length > 0 ? done.reduce((min, block) => (block.date < min ? block.date : min), done[0].date) : null,
   };

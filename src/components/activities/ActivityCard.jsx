@@ -24,8 +24,8 @@ function WeekStrip({ weeks, target }) {
       {weeks.map((week) => (
         <span
           key={week.start}
-          className={`act-week ${week.met ? "act-week--met" : ""} ${week.current ? "act-week--current" : ""}`}
-          title={`Settimana del ${formatDate(week.start, { day: "numeric", month: "short" })}: ${week.count}/${target}`}
+          className={`act-week ${week.met ? "act-week--met" : ""} ${week.jolly ? "act-week--jolly" : ""} ${week.current ? "act-week--current" : ""}`}
+          title={`Settimana del ${formatDate(week.start, { day: "numeric", month: "short" })}: ${week.count}/${target}${week.jolly ? ", coperta dal jolly" : ""}`}
         >
           <span style={{ height: `${Math.min(week.count / target, 1) * 100}%` }} />
         </span>
@@ -97,7 +97,7 @@ function ActivityCard({ activity, blocks, now, actions }) {
         <WeekStrip weeks={stats.weeks} target={stats.target} />
         <dl className="act-stats">
           <div>
-            <dt>Serie</dt>
+            <dt>Serie{stats.jollyUsed ? ", con jolly" : ""}</dt>
             <dd>
               {stats.streak} <span>{stats.streak === 1 ? "settimana" : "settimane"}</span>
             </dd>

@@ -24,6 +24,9 @@ const defaultData = {
   reviews: {},
   // Calendari esterni importati (.ics): { id, name, url, importedAt, events: [{ id, date, start, end, title }] }
   calendars: [],
+  // Traguardi sbloccati: { [id]: data ISO } e contatori che servono a sbloccarli
+  achievements: {},
+  counters: {},
 };
 
 export function loadData() {

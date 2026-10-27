@@ -5,6 +5,7 @@ import { applyLowDay, minimumVersion } from "./logic/rescue";
 import { energyLimits } from "./logic/energy";
 import { reviewWeekStart } from "./logic/review";
 import { externalBusy, normalizeCalendarUrl, parseIcs } from "./logic/icsImport";
+import { evaluateAchievements } from "./logic/achievements";
 import {
   addActivity,
   setActivityEnergy,
@@ -283,6 +284,31 @@ function App() {
   function dismissNudge(key) {
     setNudges((current) => current.filter((nudge) => nudge.key !== key));
   }
+
+  // ---- Traguardi ----
+
+  // Quando un traguardo viene raggiunto lo segniamo con la data e lo festeggiamo una volta sola.
+  useEffect(() => {
+    const fresh = evaluateAchievements(data, new Date()).filter((item) => item.reached && !item.unlockedAt);
+    if (fresh.length === 0) {
+      return;
+    }
+    const stamp = new Date().toISOString();
+    setData((current) => ({
+      ...current,
+      achievements: {
+        ...(current.achievements || {}),
+        ...Object.fromEntries(fresh.map((item) => [item.id, stamp])),
+      },
+    }));
+    const firstLook = Object.keys(data.achievements || {}).length === 0 && fresh.length > 1;
+    announce(
+      firstLook
+        ? [{ title: `${fresh.length} traguardi`, sub: "Già raggiunti: li trovi nella sezione Attività", tone: "done", size: "big" }]
+        : fresh.map((item) => ({ title: item.title, sub: item.text, tone: "done", size: "big" }))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.blocks, data.reviews, data.lowDays, data.counters]);
 
   // ---- Calendari esterni ----
 
@@ -563,6 +589,14 @@ function App() {
       updateField("activities", (activities) => updateActivity(activities, id, changes)),
     setActivityType: changeActivityType,
     calendars: calendarActions,
+    rescueBlock: (id, slot) => {
+      commit((current) => ({
+        ...current,
+        blocks: updateBlock(current.blocks, id, slot),
+        counters: { ...(current.counters || {}), rescued: ((current.counters || {}).rescued || 0) + 1 },
+      }));
+      showToast("Rimesso in agenda", true);
+    },
     openReview: (weekStart) => setReviewWeek(weekStart || reviewWeekStart(new Date())),
     completeReview: (weekStart, answers) => {
       const firstTime = !(data.reviews || {})[weekStart];

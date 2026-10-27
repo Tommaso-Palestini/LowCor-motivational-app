@@ -2,6 +2,7 @@ import { useState } from "react";
 import ActivityCard from "./ActivityCard";
 import ActivityEditor from "./ActivityEditor";
 import ShareDialog from "../share/ShareDialog";
+import Achievements from "./Achievements";
 import { IconPlus, IconSend, IconSparkle } from "../Icons";
 import "./Activities.css";
 
@@ -101,6 +102,8 @@ function ActivitiesView({ data, now, actions }) {
           </section>
         );
       })}
+      <Achievements data={data} now={now} />
+
       {isSharing && (
         <ShareDialog
           data={data}

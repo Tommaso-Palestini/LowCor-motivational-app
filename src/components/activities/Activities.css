@@ -209,6 +209,25 @@
   background: var(--done);
 }
 
+/* Settimana coperta dal jolly: un segno a stella al posto della barra, la serie continua */
+.act-week--jolly {
+  position: relative;
+  outline: 1px dashed var(--focus);
+  outline-offset: 1px;
+}
+
+.act-week--jolly::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--focus);
+  transform: translateX(-50%);
+}
+
 .act-week--current {
   outline: 1px solid var(--line-strong);
   outline-offset: 2px;
@@ -359,4 +378,94 @@
   .act-card-delete {
     margin-left: 0;
   }
+}
+
+/* Traguardi */
+
+.trophies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trophy {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: color-mix(in oklch, var(--dusk) 40%, transparent);
+}
+
+.trophy--reached {
+  border-color: color-mix(in oklch, var(--done) 45%, transparent);
+  background:
+    radial-gradient(120% 120% at 0% 50%, color-mix(in oklch, var(--done) 16%, transparent), transparent 60%),
+    var(--glass);
+}
+
+.trophy-seal {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--mist);
+}
+
+.trophy--reached .trophy-seal {
+  background: var(--done);
+  color: var(--night);
+  box-shadow: 0 0 22px color-mix(in oklch, var(--done) 45%, transparent);
+}
+
+.trophy-seal svg {
+  width: 44px;
+  height: 44px;
+}
+
+.trophy--reached .trophy-seal svg {
+  width: 20px;
+  height: 20px;
+}
+
+.trophy-track {
+  fill: none;
+  stroke: var(--haze);
+  stroke-width: 3;
+}
+
+.trophy-fill {
+  fill: none;
+  stroke: var(--planned);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.trophy-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.trophy:not(.trophy--reached) .trophy-title {
+  color: var(--mist);
+}
+
+.trophy-desc {
+  color: var(--mist);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.trophy-progress {
+  margin-top: 0.125rem;
+  color: var(--planned);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }

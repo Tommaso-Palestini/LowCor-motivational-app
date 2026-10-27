@@ -113,7 +113,7 @@ function FlexPlan({ data, now, actions }) {
                   </span>
                   <span className="flex-item-actions">
                     {slot && (
-                      <button type="button" className="button button--ghost" onClick={() => actions.moveBlock(block.id, slot)}>
+                      <button type="button" className="button button--ghost" onClick={() => actions.rescueBlock(block.id, slot)}>
                         <IconRepeat />
                         Ripiazza
                       </button>
