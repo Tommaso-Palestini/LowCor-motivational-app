@@ -39,6 +39,32 @@ export function loadData() {
   }
 }
 
+// Lo sfondo personalizzato sta in una chiave a parte: è grande e non serve riscriverlo a ogni modifica.
+const BACKGROUND_KEY = "daily-app-background";
+
+export function loadBackgroundImage() {
+  try {
+    return localStorage.getItem(BACKGROUND_KEY);
+  } catch {
+    return null;
+  }
+}
+
+// Restituisce false se il browser non ha spazio per l'immagine.
+export function saveBackgroundImage(dataUrl) {
+  try {
+    if (dataUrl) {
+      localStorage.setItem(BACKGROUND_KEY, dataUrl);
+    } else {
+      localStorage.removeItem(BACKGROUND_KEY);
+    }
+    return true;
+  } catch (error) {
+    console.error("Could not save background:", error);
+    return false;
+  }
+}
+
 export function saveData(data) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));

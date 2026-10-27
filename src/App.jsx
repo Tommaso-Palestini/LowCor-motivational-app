@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { loadData, saveData } from "./storage/storage";
+import { loadBackgroundImage, loadData, saveBackgroundImage, saveData } from "./storage/storage";
+import { compressImage } from "./logic/backgroundImage";
 import {
   addActivity,
   setActivityEnergy,
@@ -64,6 +65,7 @@ function isTypingTarget(target) {
 
 function App() {
   const [data, setData] = useState(loadData);
+  const [backgroundImage, setBackgroundImage] = useState(loadBackgroundImage);
   const [view, setView] = useState("today");
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
@@ -232,6 +234,32 @@ function App() {
       showToast(error.message);
     }
     setIsGeneratingCards(false);
+  }
+
+  // ---- Sfondo personalizzato ----
+
+  function setSetting(key, value) {
+    commit((current) => ({ ...current, settings: { ...current.settings, [key]: value } }), { record: false });
+  }
+
+  async function pickBackground(file) {
+    try {
+      const dataUrl = await compressImage(file);
+      if (!saveBackgroundImage(dataUrl)) {
+        showToast("Non c'è spazio nel browser per questa foto: provane una più piccola");
+        return;
+      }
+      setBackgroundImage(dataUrl);
+      setSetting("background", "image");
+    } catch (error) {
+      showToast(error.message || "Non riesco ad aprire questa immagine");
+    }
+  }
+
+  function removeBackground() {
+    saveBackgroundImage(null);
+    setBackgroundImage(null);
+    setSetting("background", "lava");
   }
 
   // ---- Attività ----
@@ -469,7 +497,11 @@ function App() {
 
   return (
     <>
-      <Background animated={data.settings.lava} />
+      <Background
+        animated={data.settings.lava}
+        image={data.settings.background === "image" ? backgroundImage : null}
+        dim={data.settings.backgroundDim}
+      />
 
       <div className="app">
         <TopBar
@@ -481,6 +513,9 @@ function App() {
           settings={data.settings}
           onSettingsChange={(settings) => commit((current) => ({ ...current, settings }), { record: false })}
           ai={ai}
+          backgroundImage={backgroundImage}
+          onPickBackground={pickBackground}
+          onRemoveBackground={removeBackground}
         />
 
         <main className="app-main">

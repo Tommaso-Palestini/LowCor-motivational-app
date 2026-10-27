@@ -126,3 +126,44 @@
     transform: translate(26vmax, -4vmax) scale(1);
   }
 }
+
+/* Sfondo personalizzato: la foto dell'utente con un velo della tinta dell'app,
+   così testi e pannelli restano leggibili qualunque immagine sia */
+
+.custom-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--night);
+  pointer-events: none;
+}
+
+.custom-bg-image {
+  position: absolute;
+  inset: -2%;
+  background-position: center;
+  background-size: cover;
+  animation: custom-bg-in 900ms var(--ease) both;
+}
+
+.custom-bg-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 30%, color-mix(in oklch, var(--night) 70%, transparent) 100%),
+    color-mix(in oklch, var(--night) var(--dim), transparent);
+}
+
+@keyframes custom-bg-in {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-bg-image {
+    animation: none;
+  }
+}

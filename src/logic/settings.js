@@ -5,6 +5,9 @@ export const defaultSettings = {
   waveSeconds: 90,
   hue: 290,
   lava: true,
+  // "lava" o "image" (la foto scelta dall'utente); backgroundDim è quanto la scuriamo, in %
+  background: "lava",
+  backgroundDim: 55,
   fullGas: true,
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",

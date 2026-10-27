@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
 
 function Switch({ checked, onChange, label }) {
@@ -103,7 +104,85 @@ function AiSection({ ai, settings, set }) {
   );
 }
 
-function SettingsPanel({ settings, onChange, ai }) {
+function BackgroundSection({ settings, set, image, onPick, onRemove }) {
+  const fileRef = useRef(null);
+  const isImage = settings.background === "image" && image;
+
+  function choose(mode) {
+    if (mode === "image" && !image) {
+      fileRef.current?.click();
+      return;
+    }
+    set("background", mode);
+  }
+
+  return (
+    <div className="settings-bg">
+      <div className="settings-row">
+        <div>
+          <p className="settings-name">Sfondo</p>
+          <p className="settings-hint">{isImage ? "La tua foto, velata dalla tinta dell'app" : "Luci morbide che si muovono piano"}</p>
+        </div>
+      </div>
+      <div className="segmented settings-segmented" role="group" aria-label="Tipo di sfondo">
+        <button type="button" aria-pressed={!isImage} onClick={() => choose("lava")}>
+          Lava
+        </button>
+        <button type="button" aria-pressed={Boolean(isImage)} onClick={() => choose("image")}>
+          La tua foto
+        </button>
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(event) => {
+          const file = event.target.files[0];
+          event.target.value = "";
+          if (file) {
+            onPick(file);
+          }
+        }}
+      />
+
+      {isImage ? (
+        <>
+          <div className="settings-bg-preview">
+            <img src={image} alt="Anteprima dello sfondo" />
+            <div className="settings-bg-actions">
+              <button type="button" className="button button--quiet" onClick={() => fileRef.current?.click()}>
+                Cambia foto
+              </button>
+              <button type="button" className="button button--quiet" onClick={onRemove}>
+                Rimuovi
+              </button>
+            </div>
+          </div>
+          <label className="settings-slider">
+            <span className="settings-hint">Velo scuro al {settings.backgroundDim}%</span>
+            <input
+              type="range"
+              className="range"
+              min="10"
+              max="85"
+              step="5"
+              value={settings.backgroundDim}
+              onChange={(event) => set("backgroundDim", Number(event.target.value))}
+            />
+          </label>
+        </>
+      ) : (
+        <div className="settings-row">
+          <p className="settings-hint">Lava in movimento</p>
+          <Switch checked={settings.lava} onChange={(value) => set("lava", value)} label="Lava in movimento" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SettingsPanel({ settings, onChange, ai, backgroundImage, onPickBackground, onRemoveBackground }) {
   function set(key, value) {
     onChange({ ...settings, [key]: value });
   }
@@ -147,13 +226,13 @@ function SettingsPanel({ settings, onChange, ai }) {
         </label>
       )}
 
-      <div className="settings-row">
-        <div>
-          <p className="settings-name">Sfondo lava</p>
-          <p className="settings-hint">Luci morbide che si muovono piano</p>
-        </div>
-        <Switch checked={settings.lava} onChange={(value) => set("lava", value)} label="Sfondo lava" />
-      </div>
+      <BackgroundSection
+        settings={settings}
+        set={set}
+        image={backgroundImage}
+        onPick={onPickBackground}
+        onRemove={onRemoveBackground}
+      />
 
       <div className="settings-row">
         <div>

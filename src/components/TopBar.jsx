@@ -22,7 +22,19 @@ function ViewTabs({ className, view, onViewChange }) {
   );
 }
 
-function TopBar({ view, onViewChange, aura, hasFocus, onOpenFocus, settings, onSettingsChange, ai }) {
+function TopBar({
+  view,
+  onViewChange,
+  aura,
+  hasFocus,
+  onOpenFocus,
+  settings,
+  onSettingsChange,
+  ai,
+  backgroundImage,
+  onPickBackground,
+  onRemoveBackground,
+}) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
 
@@ -82,7 +94,16 @@ function TopBar({ view, onViewChange, aura, hasFocus, onOpenFocus, settings, onS
             >
               <IconSettings />
             </button>
-            {isSettingsOpen && <SettingsPanel settings={settings} onChange={onSettingsChange} ai={ai} />}
+            {isSettingsOpen && (
+              <SettingsPanel
+                settings={settings}
+                onChange={onSettingsChange}
+                ai={ai}
+                backgroundImage={backgroundImage}
+                onPickBackground={onPickBackground}
+                onRemoveBackground={onRemoveBackground}
+              />
+            )}
           </div>
         </div>
       </header>
