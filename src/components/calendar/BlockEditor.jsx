@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { buildSeries, defaultWeekdays, findConflicts } from "../../logic/calendar";
 import { toDateString } from "../../logic/dates";
 import { minutesOfDay, timeToMinutes } from "../../logic/time";
-import { IconClose, IconRepeat, IconTarget } from "../Icons";
+import { IconCalendarPlus, IconClose, IconRepeat, IconTarget } from "../Icons";
+import { googleCalendarUrl, shareIcs } from "../../logic/ics";
 
 const WEEKDAY_LABELS = [
   ["L", "lunedì"],
@@ -239,6 +240,47 @@ function BlockEditor({
             </button>
           )}
         </div>
+
+        {existing && (
+          <div className="editor-export">
+            <p className="editor-export-label">
+              <IconCalendarPlus />
+              Aggiungi al tuo calendario
+            </p>
+            <div className="editor-export-actions">
+              <a
+                className="button button--quiet"
+                href={googleCalendarUrl(existing, activities.find((activity) => activity.id === existing.activityId))}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google Calendar
+              </a>
+              <button
+                type="button"
+                className="button button--quiet"
+                onClick={() => shareIcs([existing], activities, `lowcor-${existing.date}-${existing.start.replace(":", "")}.ics`).catch(() => {})}
+              >
+                Apple, Outlook (.ics)
+              </button>
+              {existing.seriesId && (
+                <button
+                  type="button"
+                  className="button button--quiet"
+                  onClick={() =>
+                    shareIcs(
+                      blocks.filter((block) => block.seriesId === existing.seriesId),
+                      activities,
+                      `lowcor-serie-${existing.date}.ics`
+                    ).catch(() => {})
+                  }
+                >
+                  Tutta la serie (.ics)
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {existing && (
           <div className="editor-danger">

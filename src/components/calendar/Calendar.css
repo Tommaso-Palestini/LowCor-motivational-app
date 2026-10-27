@@ -640,6 +640,34 @@
   gap: 0.5rem;
 }
 
+.editor-export {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.editor-export-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.editor-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.editor-export-actions .button {
+  min-height: 34px;
+  padding-inline: 0.75rem;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
 .editor-danger {
   padding-top: 1rem;
   border-top: 1px solid var(--line);

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildIcs, googleCalendarUrl } from "../ics";
 import { normalizeCalendarUrl, parseIcs } from "../icsImport";
 import { NOW } from "./helpers";
 
@@ -53,5 +54,28 @@ describe("import .ics", () => {
   it("rifiuta file che non sono calendari e accetta i link webcal", () => {
     expect(() => parseIcs("ciao")).toThrow();
     expect(normalizeCalendarUrl(" webcal://example.com/a.ics ")).toBe("https://example.com/a.ics");
+  });
+});
+
+describe("scrivere nei calendari", () => {
+  const blockA = { id: "b1", date: "2026-10-28", start: "09:30", end: "10:45", activityId: "a1", done: false };
+  const activity = { id: "a1", name: "Studio, inglese" };
+
+  it("il file .ics ha l'evento con orari e nome escapati", () => {
+    const ics = buildIcs([blockA], [activity]);
+    expect(ics).toContain("DTSTART:20261028T093000");
+    expect(ics).toContain("DTEND:20261028T104500");
+    expect(ics).toContain("SUMMARY:Studio\\, inglese");
+    expect(ics).toContain("UID:b1@lowcor");
+    expect(ics.startsWith("BEGIN:VCALENDAR")).toBe(true);
+  });
+
+  it("il link di Google Calendar è precompilato con orari e fuso", () => {
+    const url = new URL(googleCalendarUrl(blockA, activity, "Europe/Rome"));
+    expect(url.hostname).toBe("calendar.google.com");
+    expect(url.searchParams.get("action")).toBe("TEMPLATE");
+    expect(url.searchParams.get("text")).toBe("Studio, inglese");
+    expect(url.searchParams.get("dates")).toBe("20261028T093000/20261028T104500");
+    expect(url.searchParams.get("ctz")).toBe("Europe/Rome");
   });
 });

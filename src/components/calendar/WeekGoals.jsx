@@ -1,7 +1,7 @@
 import { getWeekSummary } from "../../logic/planner";
 import { formatDuration } from "../../logic/time";
 import { formatDate, weekDates } from "../../logic/dates";
-import { downloadIcs } from "../../logic/ics";
+import { shareIcs } from "../../logic/ics";
 import { IconBatteryLow, IconCopy, IconDownload, IconWand } from "../Icons";
 import EnergyChip from "../EnergyChip";
 
@@ -101,7 +101,7 @@ function WeekGoals({
   function exportWeek() {
     const dates = weekDates(weekStart);
     const weekBlocks = blocks.filter((block) => block.date >= dates[0] && block.date <= dates[6]);
-    downloadIcs(weekBlocks, activities, `settimana-${weekStart}.ics`);
+    shareIcs(weekBlocks, activities, `lowcor-settimana-${weekStart}.ics`).catch(() => {});
   }
 
   return (
@@ -167,7 +167,7 @@ function WeekGoals({
         </button>
         <button type="button" className="button button--quiet" onClick={exportWeek}>
           <IconDownload />
-          Esporta in .ics
+          Esporta nel calendario (.ics)
         </button>
       </div>
       <p className="goals-note">
