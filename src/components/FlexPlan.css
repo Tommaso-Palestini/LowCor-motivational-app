@@ -1,0 +1,99 @@
+.flex {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Giornata no: il pannello si fa più morbido e caldo, come abbassare le luci */
+.flex--low {
+  border-color: color-mix(in oklch, var(--done) 40%, transparent);
+  background: color-mix(in oklch, var(--done) 7%, var(--glass));
+}
+
+.flex-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.flex-text {
+  margin-top: 0.25rem;
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.flex-low,
+.flex-rescue {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.flex-rescue {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.flex-low + .flex-rescue,
+.flex-quiet--inline + .flex-rescue {
+  margin-top: 0;
+}
+
+.flex-quiet--inline + .flex-rescue {
+  padding-top: 1rem;
+}
+
+.flex-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flex-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.625rem 0.75rem 0.625rem 1rem;
+  border-radius: 18px;
+  background: color-mix(in oklch, var(--night) 40%, transparent);
+  font-size: 0.9375rem;
+}
+
+.flex-item-text {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.flex-item-slot {
+  color: var(--done);
+  font-size: 0.8125rem;
+}
+
+.flex-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.flex-item .button {
+  min-height: 36px;
+  padding-inline: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.flex-off {
+  justify-self: start;
+}
+
+.flex-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0 0.25rem;
+  color: var(--mist);
+  font-size: 0.875rem;
+}

@@ -21,6 +21,10 @@
   order: 2;
 }
 
+.slot--flex {
+  order: 3;
+}
+
 .slot--feed {
   order: 3;
 }

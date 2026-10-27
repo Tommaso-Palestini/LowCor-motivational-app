@@ -18,6 +18,8 @@ const defaultData = {
   focus: null,
   mandala: createMandala(),
   brainstorm: { fit: [], explore: [] },
+  // Date delle "giornate no"
+  lowDays: [],
 };
 
 export function loadData() {

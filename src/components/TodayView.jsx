@@ -2,6 +2,7 @@ import DayView from "./DayView";
 import ActivityList from "./ActivityList";
 import Reminders from "./Reminders";
 import Feed from "./Feed";
+import FlexPlan from "./FlexPlan";
 import { getBlocksForDate } from "../logic/blocks";
 import "./TodayView.css";
 
@@ -41,6 +42,10 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
             onDelete={actions.deleteBlock}
             onFocusBlock={actions.focusBlock}
           />
+        </div>
+
+        <div className="slot slot--flex">
+          <FlexPlan data={data} now={now} actions={actions} />
         </div>
 
         <div className="slot slot--activities">

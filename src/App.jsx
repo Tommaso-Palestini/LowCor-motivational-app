@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { loadBackgroundImage, loadData, saveBackgroundImage, saveData } from "./storage/storage";
 import { compressImage } from "./logic/backgroundImage";
+import { applyLowDay, minimumVersion } from "./logic/rescue";
+import { energyLimits } from "./logic/energy";
 import {
   addActivity,
   setActivityEnergy,
@@ -208,7 +210,10 @@ function App() {
   }
 
   function handlePlanWeek(weekStart) {
-    const { created, unplaced } = planWeek(data.activities, data.blocks, weekStart, new Date());
+    const { created, unplaced } = planWeek(data.activities, data.blocks, weekStart, new Date(), {
+      limits: energyLimits(data.settings),
+      skipDates: data.lowDays || [],
+    });
     if (created.length === 0) {
       showToast(unplaced > 0 ? "Non ci sono buchi liberi per le sessioni mancanti" : "Niente da pianificare");
       return;
@@ -485,6 +490,26 @@ function App() {
     updateActivity: (id, changes) =>
       updateField("activities", (activities) => updateActivity(activities, id, changes)),
     setActivityType: changeActivityType,
+    releaseBlock: (id) => {
+      updateField("blocks", (blocks) => updateBlock(blocks, id, { released: true }));
+      showToast("Lasciato andare. Si va avanti.", true);
+    },
+    shortenBlock: (id) => {
+      const block = data.blocks.find((item) => item.id === id);
+      if (block) {
+        updateField("blocks", (blocks) => updateBlock(blocks, id, minimumVersion(block)));
+        showToast("Versione minima: anche 15 minuti contano", true);
+      }
+    },
+    setLowDay: (date, on) => {
+      commit((current) => ({
+        ...current,
+        lowDays: on
+          ? [...new Set([...(current.lowDays || []), date])]
+          : (current.lowDays || []).filter((item) => item !== date),
+        blocks: applyLowDay(current.blocks, current.activities, date, on),
+      }));
+    },
     setSetting,
     deleteActivity: removeActivity,
     setActivityEnergy: (id, energy) =>

@@ -13,7 +13,8 @@ export function getBlockTone(block, activity, now) {
   if (block.done) {
     return "done";
   }
-  if (isBlockPast(block, now)) {
+  // Lasciato andare (o in pausa per la giornata no): grigio come i saltati, ma senza chiedere niente
+  if (block.released || isBlockPast(block, now)) {
     return "missed";
   }
   if (activity && activity.status === "focus") {

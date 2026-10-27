@@ -1,6 +1,7 @@
 import { toDateString, weekDates } from "./dates";
 import { blockDuration, minutesOfDay, minutesToTime, timeToMinutes } from "./time";
 import { isBlockPast } from "./tone";
+import { weekEnergy } from "./energy";
 
 const DAY_START = 8 * 60;
 const DAY_END = 22 * 60;
@@ -87,9 +88,10 @@ function priority(activity) {
   return activity.type === "fixed" ? 1 : 2;
 }
 
-export function planWeek(activities, blocks, weekStart, now) {
+// limits: soglie di energia (un giorno non viene riempito oltre); skipDates: giornate no da lasciare in pace
+export function planWeek(activities, blocks, weekStart, now, { limits = null, skipDates = [] } = {}) {
   const today = toDateString(now);
-  const dates = weekDates(weekStart).filter((date) => date >= today);
+  const dates = weekDates(weekStart).filter((date) => date >= today && !skipDates.includes(date));
   const created = [];
   let unplaced = 0;
 
@@ -132,12 +134,16 @@ export function planWeek(activities, blocks, weekStart, now) {
         if (start === null) {
           continue;
         }
-        created.push({
+        const draft = {
           date: candidate.date,
           start: minutesToTime(start),
           end: minutesToTime(start + duration),
           activityId: activity.id,
-        });
+        };
+        if (limits && weekEnergy([candidate.date], [...candidate.dayBlocks, draft], activities, limits)[0].overloaded) {
+          continue;
+        }
+        created.push(draft);
         remaining -= 1;
       }
     }
