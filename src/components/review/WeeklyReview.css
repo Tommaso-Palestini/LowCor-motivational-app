@@ -1,0 +1,310 @@
+/* Il rito della settimana: a tutto schermo, una colonna sola, un passo alla volta */
+
+.review {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding:
+    calc(1rem + env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    calc(1rem + env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  background:
+    radial-gradient(80% 60% at 50% 0%, color-mix(in oklch, var(--planned) 22%, transparent), transparent 70%),
+    color-mix(in oklch, var(--night) 94%, transparent);
+  backdrop-filter: blur(26px);
+  animation: review-in 380ms var(--ease) both;
+}
+
+@keyframes review-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.review-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100%, 720px);
+  margin: 0 auto;
+}
+
+/* Avanzamento: quattro passi in fila, quello corrente si allunga */
+.review-steps {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.review-step-dot {
+  width: 22px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--ink) 18%, transparent);
+  transition: width 400ms var(--ease), background-color 300ms ease;
+}
+
+.review-steps .is-done .review-step-dot {
+  background: var(--done);
+}
+
+.review-steps .is-current .review-step-dot {
+  width: 44px;
+  background: var(--ink);
+}
+
+.review-step-label {
+  display: none;
+}
+
+.review-steps .is-current .review-step-label {
+  display: inline;
+  color: var(--ink);
+}
+
+.review-body {
+  width: min(100%, 640px);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 6vh, 4rem) 0 2rem;
+  overflow-y: auto;
+}
+
+.review-kicker {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.review-step {
+  display: grid;
+  gap: 1.25rem;
+  animation: unfold 360ms var(--ease) both;
+}
+
+.review-title {
+  margin-top: 0.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.review-title:focus {
+  outline: none;
+}
+
+.review-lead {
+  color: var(--mist);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+/* Le vittorie si leggono come una frase detta ad alta voce, una dopo l'altra */
+.review-wins {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-wins li {
+  padding-left: 1rem;
+  border-left: 3px solid var(--done);
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 3.4vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.25;
+  animation: review-win 520ms var(--ease) both;
+  animation-delay: calc(var(--i) * 260ms + 150ms);
+}
+
+@keyframes review-win {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+.review-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2rem;
+  margin: 0.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.review-numbers dt {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.review-numbers dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.review-numbers dd span {
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+}
+
+.review-numbers-day {
+  text-transform: capitalize;
+}
+
+.review-bars {
+  display: grid;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-bars li {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) 1fr 3rem;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+}
+
+.review-bar-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-bar-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--haze);
+  overflow: hidden;
+}
+
+.review-bar-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--done);
+}
+
+.review-bar-count {
+  color: var(--mist);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.review-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.review-field span {
+  font-weight: 600;
+}
+
+.review-field textarea {
+  border-radius: 18px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.review-choices {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.review-choice {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 3rem 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: color-mix(in oklch, var(--dusk) 60%, transparent);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 200ms ease, background-color 200ms ease, transform 160ms var(--ease);
+}
+
+.review-choice:hover {
+  border-color: var(--line-strong);
+}
+
+.review-choice:active {
+  transform: scale(0.99);
+}
+
+.review-choice[aria-pressed="true"] {
+  border-color: var(--focus);
+  background: color-mix(in oklch, var(--focus) 12%, transparent);
+}
+
+.review-choice svg {
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  color: var(--focus);
+  transform: translateY(-50%);
+}
+
+.review-choice-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.review-choice-why {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.review-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100%, 640px);
+  margin: 0 auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 640px) {
+  .review-step-label {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review,
+  .review-wins li {
+    animation: none;
+  }
+}

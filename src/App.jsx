@@ -3,6 +3,7 @@ import { loadBackgroundImage, loadData, saveBackgroundImage, saveData } from "./
 import { compressImage } from "./logic/backgroundImage";
 import { applyLowDay, minimumVersion } from "./logic/rescue";
 import { energyLimits } from "./logic/energy";
+import { reviewWeekStart } from "./logic/review";
 import {
   addActivity,
   setActivityEnergy,
@@ -62,6 +63,7 @@ import { useAppearance } from "./hooks/useAppearance";
 const loadCalendar = () => import("./components/calendar/CalendarView");
 const loadActivities = () => import("./components/activities/ActivitiesView");
 const CalendarView = lazy(loadCalendar);
+const WeeklyReview = lazy(() => import("./components/review/WeeklyReview"));
 const ActivitiesView = lazy(loadActivities);
 import Announcer from "./components/Announcer";
 import Toast from "./components/Toast";
@@ -77,6 +79,7 @@ function App() {
   const [data, setData] = useState(loadData);
   const [backgroundImage, setBackgroundImage] = useState(loadBackgroundImage);
   const [nudges, setNudges] = useState([]);
+  const [reviewWeek, setReviewWeek] = useState(null);
 
   useEffect(() => {
     const idle = window.requestIdleCallback || ((callback) => setTimeout(callback, 1500));
@@ -490,6 +493,18 @@ function App() {
     updateActivity: (id, changes) =>
       updateField("activities", (activities) => updateActivity(activities, id, changes)),
     setActivityType: changeActivityType,
+    openReview: (weekStart) => setReviewWeek(weekStart || reviewWeekStart(new Date())),
+    completeReview: (weekStart, answers) => {
+      const firstTime = !(data.reviews || {})[weekStart];
+      commit((current) => ({
+        ...current,
+        reviews: { ...(current.reviews || {}), [weekStart]: { ...answers, doneAt: new Date().toISOString() } },
+        aura: current.aura + (firstTime ? AURA.review : 0),
+      }));
+      announce([
+        { title: "Settimana chiusa", sub: firstTime ? `+${AURA.review} aura, si riparte lunedì` : "Si riparte lunedì", tone: "done", size: "big" },
+      ]);
+    },
     releaseBlock: (id) => {
       updateField("blocks", (blocks) => updateBlock(blocks, id, { released: true }));
       showToast("Lasciato andare. Si va avanti.", true);
@@ -614,6 +629,18 @@ function App() {
       />
 
       <Announcer announcement={announcements[0] || null} onDone={nextAnnouncement} />
+      {reviewWeek && (
+        <Suspense fallback={null}>
+          <WeeklyReview
+            data={data}
+            now={now}
+            weekStart={reviewWeek}
+            actions={actions}
+            onClose={() => setReviewWeek(null)}
+          />
+        </Suspense>
+      )}
+
       <Nudges
         nudges={nudges}
         onDismiss={dismissNudge}

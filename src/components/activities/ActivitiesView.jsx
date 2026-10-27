@@ -2,7 +2,7 @@ import { useState } from "react";
 import ActivityCard from "./ActivityCard";
 import ActivityEditor from "./ActivityEditor";
 import ShareDialog from "../share/ShareDialog";
-import { IconPlus, IconSend } from "../Icons";
+import { IconPlus, IconSend, IconSparkle } from "../Icons";
 import "./Activities.css";
 
 const GROUPS = [
@@ -55,6 +55,10 @@ function ActivitiesView({ data, now, actions }) {
           >
             <IconSend />
             Condividi in PDF
+          </button>
+          <button type="button" className="button button--quiet" onClick={() => actions.openReview()}>
+            <IconSparkle />
+            Rivedi la settimana
           </button>
         </div>
       </header>

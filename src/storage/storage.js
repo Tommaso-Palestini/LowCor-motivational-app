@@ -20,6 +20,8 @@ const defaultData = {
   brainstorm: { fit: [], explore: [] },
   // Date delle "giornate no"
   lowDays: [],
+  // Rito della settimana chiuso: { [lunedì]: { doneAt, proud, change, focusId } }
+  reviews: {},
 };
 
 export function loadData() {

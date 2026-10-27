@@ -3,6 +3,8 @@ import ActivityList from "./ActivityList";
 import Reminders from "./Reminders";
 import Feed from "./Feed";
 import FlexPlan from "./FlexPlan";
+import { shouldPromptReview } from "../logic/review";
+import { IconSparkle } from "./Icons";
 import { getBlocksForDate } from "../logic/blocks";
 import "./TodayView.css";
 
@@ -30,6 +32,21 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
           <p className="today-greeting">{getGreeting(now.getHours())}</p>
           <h1 className="today-title">{formattedDate}</h1>
         </header>
+
+        {shouldPromptReview(now, data.reviews || {}) && (
+          <div className="slot slot--review">
+            <div className="review-prompt">
+              <div>
+                <p className="review-prompt-title">Il rito della settimana</p>
+                <p className="review-prompt-text">Cinque minuti per chiudere questa settimana e preparare la prossima.</p>
+              </div>
+              <button type="button" className="button button--primary" onClick={() => actions.openReview()}>
+                <IconSparkle />
+                Inizia
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="slot slot--day">
           <DayView

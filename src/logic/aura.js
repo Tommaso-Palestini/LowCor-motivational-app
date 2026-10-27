@@ -5,6 +5,7 @@ export const AURA = {
   block: 25,
   goal: 100,
   focusMinute: 10,
+  review: 50,
 };
 
 const COMBOS = {
