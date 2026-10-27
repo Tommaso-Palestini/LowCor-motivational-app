@@ -67,6 +67,8 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
             isGenerating={isGeneratingCards}
             autoMore={data.settings.aiAutoCards}
             onGenerate={actions.generateCards}
+            filter={data.settings.feedFilter}
+            onFilterChange={(value) => actions.setSetting("feedFilter", value)}
           />
         </div>
 

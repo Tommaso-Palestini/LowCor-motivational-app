@@ -10,6 +10,8 @@ export const defaultSettings = {
   backgroundDim: 55,
   // Nome per la copertina e la firma del PDF da condividere
   userName: "",
+  // Cosa mostra "Mentre aspetti": "all", "micro-task" o "fact"
+  feedFilter: "all",
   fullGas: true,
   aiUrl: DEFAULT_AI_URL,
   aiModel: "",

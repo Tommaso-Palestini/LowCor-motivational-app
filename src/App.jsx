@@ -213,7 +213,7 @@ function App() {
 
   // ---- AI: carte del feed ----
 
-  async function generateCards({ silent = false } = {}) {
+  async function generateCards({ silent = false, only = null } = {}) {
     if (isGeneratingCards || !ai.isReady) {
       return;
     }
@@ -224,6 +224,7 @@ function App() {
         activities: data.activities,
         cards: data.cards,
         mandala: data.mandala,
+        only,
       });
       const { added } = addCards(data.cards, drafts);
       commit((current) => ({ ...current, cards: addCards(current.cards, drafts).cards }), { record: false });

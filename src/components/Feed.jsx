@@ -4,7 +4,25 @@ import FeedCard from "./FeedCard";
 import { IconShuffle, IconSparkle } from "./Icons";
 import "./Feed.css";
 
-function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenerating, autoMore, onGenerate }) {
+const FILTERS = [
+  { id: "all", label: "Tutte", empty: "Nessuna carta da mostrare. Le carte arrivano dalle attività che non hai parcheggiato." },
+  { id: "micro-task", label: "Micro-task", empty: "Nessun micro-task per ora: piccole cose da fare in pochi minuti." },
+  { id: "fact", label: "Curiosità", empty: "Nessuna curiosità per ora: fatti sorprendenti sulle tue attività." },
+];
+
+function Feed({
+  cards,
+  activities,
+  onView,
+  onComplete,
+  onSkip,
+  aiReady,
+  isGenerating,
+  autoMore,
+  onGenerate,
+  filter = "all",
+  onFilterChange,
+}) {
   const [order, setOrder] = useState(() =>
     sortFeed(cards, activities).map((card) => card.id)
   );
@@ -21,9 +39,17 @@ function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenera
     activities
   ).map((card) => card.id);
 
-  const visibleCards = [...order, ...appended]
+  const allCards = [...order, ...appended]
     .map((cardId) => cards.find((card) => card.id === cardId))
     .filter(Boolean);
+  const visibleCards = filter === "all" ? allCards : allCards.filter((card) => card.type === filter);
+  const counts = {
+    all: allCards.length,
+    "micro-task": allCards.filter((card) => card.type === "micro-task").length,
+    fact: allCards.filter((card) => card.type === "fact").length,
+  };
+  const only = filter === "all" ? null : filter;
+  const currentFilter = FILTERS.find((item) => item.id === filter) || FILTERS[0];
 
   const isAtEnd = visibleCards.length > 0 && activeIndex >= visibleCards.length - 1;
 
@@ -31,9 +57,20 @@ function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenera
   useEffect(() => {
     if (autoMore && aiReady && !isGenerating && isAtEnd && askedAtRef.current !== visibleCards.length) {
       askedAtRef.current = visibleCards.length;
-      onGenerate({ silent: true });
+      onGenerate({ silent: true, only });
     }
-  }, [autoMore, aiReady, isGenerating, isAtEnd, visibleCards.length, onGenerate]);
+  }, [autoMore, aiReady, isGenerating, isAtEnd, visibleCards.length, onGenerate, only]);
+
+  function changeFilter(value) {
+    if (value === filter) {
+      return;
+    }
+    onFilterChange(value);
+    setActiveIndex(0);
+    if (feedRef.current) {
+      feedRef.current.scrollTo({ top: 0 });
+    }
+  }
 
   function handleComplete(cardId) {
     setAnswers((current) => ({ ...current, [cardId]: "completed" }));
@@ -74,10 +111,10 @@ function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenera
             <button
               type="button"
               className={`icon-button ${isGenerating ? "feed-generate--busy" : ""}`}
-              onClick={() => onGenerate({ silent: false })}
+              onClick={() => onGenerate({ silent: false, only })}
               disabled={isGenerating}
               aria-label="Genera nuove carte con l'AI"
-              title="Genera nuove carte con l'AI"
+              title={only === "fact" ? "Genera nuove curiosità con l'AI" : only ? "Genera nuovi micro-task con l'AI" : "Genera nuove carte con l'AI"}
             >
               <IconSparkle />
             </button>
@@ -94,6 +131,21 @@ function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenera
         </div>
       </div>
 
+      <div className="feed-filters" role="group" aria-label="Cosa vuoi vedere">
+        {FILTERS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={filter === item.id}
+            className={`feed-filter feed-filter--${item.id}`}
+            onClick={() => changeFilter(item.id)}
+          >
+            {item.label}
+            <span className="feed-filter-count">{counts[item.id]}</span>
+          </button>
+        ))}
+      </div>
+
       <div
         ref={feedRef}
         className="feed"
@@ -103,11 +155,16 @@ function Feed({ cards, activities, onView, onComplete, onSkip, aiReady, isGenera
       >
         {visibleCards.length === 0 && !isGenerating ? (
           <div className="feed-empty">
-            <p>Nessuna carta da mostrare. Le carte arrivano dalle attività che non hai parcheggiato.</p>
+            <p>{currentFilter.empty}</p>
             {aiReady && (
-              <button type="button" className="button button--primary" onClick={() => onGenerate({ silent: false })}>
+              <button type="button" className="button button--primary" onClick={() => onGenerate({ silent: false, only })}>
                 <IconSparkle />
-                Genera le prime carte
+                {only === "fact" ? "Genera curiosità" : only ? "Genera micro-task" : "Genera le prime carte"}
+              </button>
+            )}
+            {!aiReady && filter !== "all" && (
+              <button type="button" className="button button--ghost" onClick={() => changeFilter("all")}>
+                Mostra tutte le carte
               </button>
             )}
           </div>

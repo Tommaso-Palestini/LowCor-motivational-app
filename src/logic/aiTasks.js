@@ -47,7 +47,8 @@ function trimHistory(messages) {
 
 // ---- Carte del feed ----
 
-export async function requestCards({ ai, activities, cards, mandala, count = 6, signal }) {
+// only: "micro-task" o "fact" per generare carte di un tipo solo (quando l'utente filtra il feed)
+export async function requestCards({ ai, activities, cards, mandala, count = 6, only = null, signal }) {
   const available = activities.filter((activity) => activity.status !== "parked");
   if (available.length === 0) {
     return [];
@@ -66,8 +67,14 @@ export async function requestCards({ ai, activities, cards, mandala, count = 6, 
     disliked.length ? `Carte che ha saltato (evita cose simili):\n${disliked.map((card) => `- ${card.text}`).join("\n")}` : "",
     recent.length ? `Carte che ha già, non ripeterle:\n${recent.join("\n")}` : "",
     "Regole:",
-    '- Circa metà "micro-task": una cosa concreta da fare in 2-10 minuti, con un numero o un dettaglio preciso.',
-    '- Circa metà "fact": una curiosità vera, sorprendente e verificabile legata all\'attività. Se non sei sicuro che sia vera, fai un micro-task.',
+    ...(only === "micro-task"
+      ? ['- Solo "micro-task": cose concrete da fare in 2-10 minuti, con un numero o un dettaglio preciso.']
+      : only === "fact"
+        ? ['- Solo "fact": curiosità vere, sorprendenti e verificabili legate all\'attività. Scegli solo fatti di cui sei sicuro.']
+        : [
+            '- Circa metà "micro-task": una cosa concreta da fare in 2-10 minuti, con un numero o un dettaglio preciso.',
+            '- Circa metà "fact": una curiosità vera, sorprendente e verificabile legata all\'attività. Se non sei sicuro che sia vera, fai un micro-task.',
+          ]),
     "- Dai più carte all'attività in focus.",
     "- Massimo 140 caratteri per carta, una frase sola, niente emoji.",
   ]
@@ -85,7 +92,7 @@ export async function requestCards({ ai, activities, cards, mandala, count = 6, 
           type: "object",
           properties: {
             activity: { type: "string", enum: names },
-            type: { type: "string", enum: ["micro-task", "fact"] },
+            type: { type: "string", enum: only ? [only] : ["micro-task", "fact"] },
             text: { type: "string" },
           },
           required: ["activity", "type", "text"],
