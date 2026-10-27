@@ -11,11 +11,49 @@ import {
   timeToMinutes,
 } from "../logic/time";
 import { IconClose, IconMinimize, IconPause, IconPlay, IconTarget } from "./Icons";
+import { vibrate } from "../logic/haptics";
 import "./FocusMode.css";
 
 const PRESETS = [25, 50, 90];
 const RING_RADIUS = 140;
 const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
+
+// Settore del "time timer": il disco colorato è il tempo che resta e si restringe in senso orario.
+function remainingWedge(fraction, radius) {
+  if (fraction >= 0.9999) {
+    return `M 160 ${160 - radius} A ${radius} ${radius} 0 1 1 159.99 ${160 - radius} Z`;
+  }
+  if (fraction <= 0) {
+    return "";
+  }
+  const startAngle = -90 + (1 - fraction) * 360;
+  const toPoint = (deg) => {
+    const rad = (deg * Math.PI) / 180;
+    return `${(160 + radius * Math.cos(rad)).toFixed(2)} ${(160 + radius * Math.sin(rad)).toFixed(2)}`;
+  };
+  const large = fraction > 0.5 ? 1 : 0;
+  return `M 160 160 L ${toPoint(startAngle)} A ${radius} ${radius} 0 ${large} 1 ${toPoint(270)} Z`;
+}
+
+// Una tacca ogni 5 minuti (ogni 15 per sessioni lunghe): il tempo si legge come su un quadrante.
+function minuteTicks(totalMinutes) {
+  const step = totalMinutes > 60 ? 15 : 5;
+  const count = Math.floor(totalMinutes / step);
+  return Array.from({ length: count }, (_, index) => {
+    const deg = -90 + ((index * step) / totalMinutes) * 360;
+    const rad = (deg * Math.PI) / 180;
+    const major = (index * step) % 15 === 0;
+    const inner = major ? 104 : 110;
+    return {
+      key: index,
+      major,
+      x1: 160 + inner * Math.cos(rad),
+      y1: 160 + inner * Math.sin(rad),
+      x2: 160 + 118 * Math.cos(rad),
+      y2: 160 + 118 * Math.sin(rad),
+    };
+  });
+}
 
 function getStage(progress) {
   if (progress < 0.34) {
@@ -116,6 +154,30 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
   const progress = Math.min(elapsedMs / focus.durationMs, 1);
   const elapsedMinutes = Math.floor(elapsedMs / 60000);
   const isPaused = Boolean(focus.pausedAt);
+  const totalMinutes = Math.round(focus.durationMs / 60000);
+  const milestoneRef = useRef({ startedAt: focus.startedAt, halfway: progress >= 0.5, lastMinute: remainingMs <= 60000 });
+
+  // Vibrazione a metà e all'ultimo minuto, una volta sola per sessione
+  useEffect(() => {
+    const seen = milestoneRef.current;
+    if (seen.startedAt !== focus.startedAt) {
+      milestoneRef.current = { startedAt: focus.startedAt, halfway: false, lastMinute: false };
+      return;
+    }
+    if (isPaused) {
+      return;
+    }
+    if (!seen.halfway && progress >= 0.5) {
+      seen.halfway = true;
+      vibrate("halfway");
+    }
+    if (!seen.lastMinute && remainingMs <= 60000 && remainingMs > 0 && totalMinutes > 2) {
+      seen.lastMinute = true;
+      vibrate("lastMinute");
+    }
+  }, [focus.startedAt, progress, remainingMs, isPaused, totalMinutes]);
+
+  const phase = remainingMs <= 60000 ? "last" : progress >= 0.5 ? "second" : "first";
 
   return (
     <div className="focus-running" style={{ "--progress": progress }}>
@@ -128,7 +190,19 @@ function FocusRunning({ focus, activityName, nowMs, onPause, onResume, onFinish,
         <span className="aura aura--middle" aria-hidden="true" />
         <span className="aura aura--inner" aria-hidden="true" />
 
-        <svg className="focus-ring" viewBox="0 0 320 320" aria-hidden="true">
+        <svg className={`focus-ring focus-ring--${phase}`} viewBox="0 0 320 320" aria-hidden="true">
+          <circle className="focus-timer-face" cx="160" cy="160" r="118" />
+          <path className="focus-timer-wedge" d={remainingWedge(1 - progress, 118)} />
+          {minuteTicks(totalMinutes).map((tick) => (
+            <line
+              key={tick.key}
+              className={`focus-timer-tick ${tick.major ? "focus-timer-tick--major" : ""}`}
+              x1={tick.x1}
+              y1={tick.y1}
+              x2={tick.x2}
+              y2={tick.y2}
+            />
+          ))}
           <circle className="focus-ring-track" cx="160" cy="160" r={RING_RADIUS} />
           <circle
             className="focus-ring-fill"
@@ -209,6 +283,7 @@ function FocusMode({
   useEffect(() => {
     if (focus && !focus.pausedAt && remainingMs <= 0 && finishedRef.current !== focus.startedAt) {
       finishedRef.current = focus.startedAt;
+      vibrate("done");
       onFinish(true);
     }
   }, [focus, remainingMs, onFinish]);

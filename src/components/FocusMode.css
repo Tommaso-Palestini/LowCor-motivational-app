@@ -165,6 +165,43 @@
   height: 100%;
 }
 
+/* Time timer: il disco è il tempo che resta. Si legge di colpo, senza fare conti. */
+.focus-timer-face {
+  fill: color-mix(in oklch, var(--night) 55%, transparent);
+}
+
+.focus-timer-wedge {
+  fill: color-mix(in oklch, var(--focus) 30%, transparent);
+  transition: fill 600ms ease;
+}
+
+.focus-ring--second .focus-timer-wedge {
+  fill: color-mix(in oklch, var(--focus) 38%, transparent);
+}
+
+/* Ultimo minuto: il disco si scalda verso l'ambra, senza allarmi */
+.focus-ring--last .focus-timer-wedge {
+  fill: color-mix(in oklch, var(--warn) 45%, transparent);
+  animation: timer-last 1.6s ease-in-out infinite;
+}
+
+@keyframes timer-last {
+  50% {
+    fill: color-mix(in oklch, var(--warn) 28%, transparent);
+  }
+}
+
+.focus-timer-tick {
+  stroke: color-mix(in oklch, var(--ink) 30%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.focus-timer-tick--major {
+  stroke: color-mix(in oklch, var(--ink) 60%, transparent);
+  stroke-width: 2.5;
+}
+
 .focus-ring-track {
   fill: none;
   stroke: color-mix(in oklch, var(--ink) 10%, transparent);

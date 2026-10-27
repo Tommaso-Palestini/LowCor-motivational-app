@@ -101,6 +101,22 @@ function RingWaves() {
   );
 }
 
+// Quanto manca alla fine del blocco in corso: il tempo che resta si vede, non si calcola.
+function RemainingBar({ block, nowMinutes }) {
+  const start = timeToMinutes(block.start);
+  const end = timeToMinutes(block.end);
+  const left = Math.max(end - nowMinutes, 0);
+  const fraction = end > start ? left / (end - start) : 0;
+  return (
+    <div className="ring-remaining">
+      <span className="ring-remaining-bar" aria-hidden="true">
+        <span style={{ width: `${fraction * 100}%` }} />
+      </span>
+      <span className="ring-remaining-text">{left > 0 ? `ancora ${formatDuration(left)}` : "tempo scaduto"}</span>
+    </div>
+  );
+}
+
 function getCenterText(blocks, current, next, nowMinutes) {
   if (current) {
     return { label: "Adesso", title: current.name, sub: `fino alle ${current.end}` };
@@ -171,6 +187,7 @@ function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
         <p className="ring-label">{center.label}</p>
         <p className="ring-title">{center.title}</p>
         <p className="ring-sub">{center.sub}</p>
+        {current && <RemainingBar block={current} nowMinutes={nowMinutes} />}
         {current && !current.done && (
           <button type="button" className="ring-focus" onClick={() => onFocusBlock(current)}>
             Entra in focus
