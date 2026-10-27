@@ -1,5 +1,7 @@
 .day {
   display: grid;
+  /* minmax(0, 1fr): sui telefoni stretti (320 px) l'anello si restringe invece di allargare la pagina */
+  grid-template-columns: minmax(0, 1fr);
   gap: 2rem;
   align-items: center;
 }
@@ -323,16 +325,29 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
+/* min-width 0: un nome di attività lungo non deve allargare la pagina sui telefoni stretti */
 .day-form-activity {
   flex: 1 1 11rem;
+  min-width: 0;
+  text-overflow: ellipsis;
 }
 
 .day-form-times {
   display: flex;
+  flex: 1 1 14rem;
   align-items: center;
   gap: 0.375rem;
+  min-width: 0;
+}
+
+/* I campi orario si stringono sugli schermi piccoli invece di uscire dal bordo */
+.day-form-times .field {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 0.75rem;
 }
 
 .day-form-dash {
