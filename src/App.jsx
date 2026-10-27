@@ -3,6 +3,9 @@ import { loadData, saveData } from "./storage/storage";
 import {
   addActivity,
   setActivityEnergy,
+  updateActivity,
+  setActivityType,
+  deleteActivity,
   findActivityByName,
   setFocus,
   parkActivity,
@@ -46,6 +49,7 @@ import { VIEWS } from "./logic/views";
 import TodayView from "./components/TodayView";
 import CalendarView from "./components/calendar/CalendarView";
 import GoalsView from "./components/goals/GoalsView";
+import ActivitiesView from "./components/activities/ActivitiesView";
 import BrainstormView from "./components/brainstorm/BrainstormView";
 import FocusMode from "./components/FocusMode";
 import Announcer from "./components/Announcer";
@@ -230,6 +234,32 @@ function App() {
     setIsGeneratingCards(false);
   }
 
+  // ---- Attività ----
+
+  // Elimina l'attività insieme ai suoi blocchi: resta annullabile con Ctrl+Z o dal toast.
+  function removeActivity(activityId) {
+    const activity = data.activities.find((item) => item.id === activityId);
+    commit((current) => ({
+      ...current,
+      activities: deleteActivity(current.activities, activityId),
+      blocks: current.blocks.filter((block) => block.activityId !== activityId),
+    }));
+    if (activity) {
+      showToast(`${activity.name} eliminata`, true);
+    }
+  }
+
+  function changeActivityType(activityId, type) {
+    updateField("activities", (activities) => setActivityType(activities, activityId, type));
+    const activity = data.activities.find((item) => item.id === activityId);
+    if (activity) {
+      showToast(
+        type === "fixed" ? `${activity.name} ora è non negoziabile` : `${activity.name} ora è una passione`,
+        true
+      );
+    }
+  }
+
   // ---- AI: brainstorming ----
 
   // Trova l'attività per nome o la crea, e restituisce attività aggiornate e id.
@@ -386,6 +416,10 @@ function App() {
     addActivity: (activity) => updateField("activities", (activities) => addActivity(activities, activity)),
     parkActivity: (id, note) => updateField("activities", (activities) => parkActivity(activities, id, note)),
     resumeActivity: (id) => updateField("activities", (activities) => resumeActivity(activities, id)),
+    updateActivity: (id, changes) =>
+      updateField("activities", (activities) => updateActivity(activities, id, changes)),
+    setActivityType: changeActivityType,
+    deleteActivity: removeActivity,
     setActivityEnergy: (id, energy) =>
       updateField("activities", (activities) => setActivityEnergy(activities, id, energy)),
     setFocusActivity: (id) => updateField("activities", (activities) => setFocus(activities, id)),
@@ -427,6 +461,8 @@ function App() {
         isGeneratingCards={isGeneratingCards}
       />
     );
+  } else if (view === "activities") {
+    page = <ActivitiesView data={data} now={now} actions={actions} />;
   } else if (view === "calendar") {
     page = <CalendarView data={data} now={now} actions={actions} />;
   }

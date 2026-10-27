@@ -1,0 +1,362 @@
+/* Sezione Attività: gestione completa, una scheda per attività */
+
+.acts {
+  display: grid;
+  gap: 2rem;
+}
+
+.acts-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.acts-intro {
+  display: grid;
+  gap: 0.375rem;
+  max-width: 60ch;
+}
+
+.acts-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.4vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  animation: unfold 500ms var(--ease) both;
+}
+
+.acts-lead {
+  color: var(--mist);
+}
+
+.acts-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.acts-empty {
+  padding: 2rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-panel);
+  color: var(--mist);
+  text-align: center;
+}
+
+.acts-group {
+  display: grid;
+  gap: 1rem;
+}
+
+.acts-group-head {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.acts-group-count {
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.acts-group-lead {
+  color: var(--mist);
+  font-size: 0.875rem;
+}
+
+.acts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  align-items: start;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Scheda */
+
+.act-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(1.2);
+  transition: border-color 300ms ease, box-shadow 400ms var(--ease);
+}
+
+/* Le non negoziabili hanno un doppio bordo, come un timbro: sono un patto */
+.act-card--fixed {
+  border-color: color-mix(in oklch, var(--ink) 38%, transparent);
+  box-shadow:
+    inset 0 0 0 4px color-mix(in oklch, var(--night) 55%, transparent),
+    inset 0 0 0 5px color-mix(in oklch, var(--ink) 14%, transparent);
+}
+
+.act-card--focus {
+  border-color: color-mix(in oklch, var(--focus) 55%, transparent);
+  box-shadow: 0 0 40px color-mix(in oklch, var(--focus) 16%, transparent);
+}
+
+.act-card--parked {
+  background: color-mix(in oklch, var(--dusk) 40%, transparent);
+  border-style: dashed;
+}
+
+.act-card--warning {
+  border-color: var(--warn);
+  box-shadow: 0 0 44px color-mix(in oklch, var(--warn) 22%, transparent);
+}
+
+.act-card--new {
+  border-color: var(--line-strong);
+  animation: unfold 300ms var(--ease);
+}
+
+.act-card-head {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.act-card-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.act-card-goal {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.act-card-description {
+  color: color-mix(in oklch, var(--ink) 88%, transparent);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.act-card-description--empty {
+  justify-self: start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--mist);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.act-card-description--empty:hover {
+  color: var(--ink);
+}
+
+.act-card-note {
+  padding: 0.5rem 0.875rem;
+  border-radius: 14px;
+  background: var(--wash);
+  font-size: 0.875rem;
+}
+
+.act-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 18px;
+  background: color-mix(in oklch, var(--night) 45%, transparent);
+}
+
+/* Ultime 8 settimane: una barretta per settimana, piena quando centri l'obiettivo */
+.act-weeks {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 36px;
+}
+
+.act-week {
+  display: flex;
+  align-items: flex-end;
+  width: 10px;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--haze);
+  overflow: hidden;
+}
+
+.act-week span {
+  width: 100%;
+  border-radius: inherit;
+  background: color-mix(in oklch, var(--planned) 70%, transparent);
+  transition: height 600ms var(--ease);
+}
+
+.act-week--met span {
+  background: var(--done);
+}
+
+.act-week--current {
+  outline: 1px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.act-stats {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.act-stats dt {
+  color: var(--mist);
+  font-size: 0.75rem;
+}
+
+.act-stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.act-stats dd span {
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+}
+
+.act-card-next {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.act-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0 -0.25rem -0.25rem;
+}
+
+.act-card-actions .button {
+  min-height: 36px;
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.act-card-delete {
+  margin-left: auto;
+}
+
+.act-card-delete:hover {
+  color: var(--focus);
+}
+
+/* Conferme dentro la scheda */
+
+.act-confirm {
+  display: grid;
+  gap: 0.625rem;
+  padding: 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: color-mix(in oklch, var(--night) 55%, transparent);
+  animation: unfold 260ms var(--ease);
+}
+
+.act-confirm--warn {
+  border-color: color-mix(in oklch, var(--warn) 60%, transparent);
+  background: color-mix(in oklch, var(--warn) 9%, color-mix(in oklch, var(--night) 60%, transparent));
+}
+
+.act-confirm-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.act-confirm--warn .act-confirm-title {
+  color: var(--warn);
+}
+
+.act-confirm-text {
+  color: color-mix(in oklch, var(--ink) 85%, transparent);
+  font-size: 0.875rem;
+}
+
+.act-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.button--warn {
+  background: transparent;
+  border-color: color-mix(in oklch, var(--warn) 55%, transparent);
+  color: var(--warn);
+}
+
+.button--warn:hover {
+  border-color: var(--warn);
+  background: color-mix(in oklch, var(--warn) 12%, transparent);
+}
+
+/* Form di creazione e modifica */
+
+.act-editor {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.act-editor-field {
+  display: grid;
+  flex: 1 1 8rem;
+  gap: 0.375rem;
+}
+
+.act-editor-field > span {
+  color: var(--mist);
+  font-size: 0.8125rem;
+}
+
+.act-editor-field--narrow {
+  flex: 0 1 7rem;
+}
+
+.act-editor-description {
+  min-height: 5.5rem;
+  border-radius: 18px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.act-editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.act-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 760px) {
+  .act-card-delete {
+    margin-left: 0;
+  }
+}

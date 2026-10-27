@@ -15,7 +15,7 @@ function Switch({ checked, onChange, label }) {
 
 const SHORTCUTS = [
   ["F", "Apre il focus"],
-  ["1 2 3 4", "Oggi, Calendario, Obiettivi, Idee"],
+  ["1 2 3 4 5", "Oggi, Attività, Calendario, Obiettivi, Idee"],
   ["← →", "Settimana o mese precedente e successivo"],
   ["T", "Torna a oggi nel calendario"],
   ["N", "Nuovo blocco nel calendario"],

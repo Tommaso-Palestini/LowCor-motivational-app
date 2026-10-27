@@ -1,30 +1,9 @@
 import { getWeekSummary } from "../../logic/planner";
 import { formatDuration } from "../../logic/time";
 import { formatDate, weekDates } from "../../logic/dates";
-import { ENERGY, activityEnergy, nextEnergy } from "../../logic/energy";
 import { downloadIcs } from "../../logic/ics";
 import { IconBatteryLow, IconCopy, IconDownload, IconWand } from "../Icons";
-
-function EnergyChip({ activity, onChange }) {
-  const level = activityEnergy(activity);
-  const { label } = ENERGY[level];
-  return (
-    <button
-      type="button"
-      className={`energy-chip energy-chip--${level}`}
-      onClick={() => onChange(activity.id, nextEnergy(level))}
-      aria-label={`Energia di ${activity.name}: ${label.toLowerCase()}. Tocca per cambiarla`}
-      title="Energia richiesta: tocca per cambiarla"
-    >
-      <span className="energy-pips" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </span>
-      {label}
-    </button>
-  );
-}
+import EnergyChip from "../EnergyChip";
 
 function shortDay(date) {
   return formatDate(date, { weekday: "short", day: "numeric" });

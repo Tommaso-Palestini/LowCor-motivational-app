@@ -1,7 +1,11 @@
-export function addActivity(activities, { id = crypto.randomUUID(), name, type, amount, period, energy = "medium" }) {
+export function addActivity(
+  activities,
+  { id = crypto.randomUUID(), name, description = "", type, amount, period, energy = "medium" }
+) {
   const newActivity = {
     id,
     name,
+    description,
     type,
     energy,
     status: "active",
@@ -44,4 +48,20 @@ export function resumeActivity(activities, activityId) {
   return activities.map((activity) =>
     activity.id === activityId ? { ...activity, status: "active" } : activity
   );
+}
+
+export function updateActivity(activities, activityId, changes) {
+  return activities.map((activity) => (activity.id === activityId ? { ...activity, ...changes } : activity));
+}
+
+// Non negoziabile <-> passione. Le non negoziabili non si parcheggiano e non sono "la fissa della settimana",
+// quindi passando da una all'altra lo stato torna attivo.
+export function setActivityType(activities, activityId, type) {
+  return activities.map((activity) =>
+    activity.id === activityId ? { ...activity, type, status: "active", resumeNote: "" } : activity
+  );
+}
+
+export function deleteActivity(activities, activityId) {
+  return activities.filter((activity) => activity.id !== activityId);
 }

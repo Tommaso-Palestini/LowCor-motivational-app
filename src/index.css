@@ -19,6 +19,8 @@
   --done: oklch(0.88 0.13 calc(var(--hue) - 120));
   --focus: oklch(0.84 0.11 calc(var(--hue) + 120));
   --missed: oklch(0.6 0.04 var(--hue));
+  /* Avvisi (overload, conferme delicate): tinta fissa, così restano riconoscibili mentre la palette gira */
+  --warn: oklch(0.8 0.15 55);
 
   --line: color-mix(in oklch, var(--mist) 18%, transparent);
   --line-strong: color-mix(in oklch, var(--mist) 36%, transparent);
