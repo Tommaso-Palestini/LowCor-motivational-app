@@ -364,7 +364,11 @@
   grid-template-rows: auto auto auto;
   align-content: start;
   gap: 1.5rem;
-  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 3rem) 3rem;
+  padding:
+    calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-top))
+    max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-right))
+    calc(3rem + env(safe-area-inset-bottom))
+    max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-left));
   overflow-y: auto;
   overscroll-behavior: contain;
   background:
