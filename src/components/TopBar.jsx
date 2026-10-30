@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
 import { VIEWS } from "../logic/views";
-import { IconPlus, IconSettings, IconSparkle, IconTarget } from "./Icons";
+import { IconPlus, IconSettings, IconSparkle, IconTarget, IconUser } from "./Icons";
 import "./TopBar.css";
 import { locale, t } from "../i18n";
 
@@ -40,6 +40,7 @@ function TopBar({
   consent,
   onDeleteAll,
   onCapture,
+  account,
 }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -99,6 +100,18 @@ function TopBar({
             <IconTarget />
             <span className="topbar-focus-label">{hasFocus ? t("Focus attivo") : t("Focus")}</span>
           </button>
+
+          {account && (
+            <button
+              type="button"
+              className={`icon-button topbar-account ${account.signedIn ? "topbar-account--in" : ""}`}
+              onClick={account.onOpen}
+              aria-label={account.signedIn ? t("Account e persone collegate") : t("Accedi o crea un account")}
+              title={account.signedIn ? t("Account e persone collegate") : t("Accedi o crea un account")}
+            >
+              <IconUser />
+            </button>
+          )}
 
           <div className="topbar-settings" ref={settingsRef}>
             <button

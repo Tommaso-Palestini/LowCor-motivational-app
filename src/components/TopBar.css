@@ -447,8 +447,40 @@ kbd {
   }
 }
 
+/* Tablet in verticale: le schede in alto si stringono per lasciare posto all'account */
+@media (min-width: 761px) and (max-width: 960px) {
+  .topbar-tab {
+    padding-inline: 0.75rem;
+  }
+}
+
+/* Telefoni: spazi più stretti, così c'è posto anche per il pulsante dell'account */
+@media (max-width: 460px) {
+  .topbar {
+    gap: 0.5rem;
+  }
+
+  .topbar-aura {
+    padding-inline: 0.25rem;
+  }
+
+  .topbar .topbar-focus {
+    padding-inline: 0.625rem;
+  }
+}
+
 @media (max-width: 380px) {
+  /* Sugli schermi più stretti il nome lascia posto ai pulsanti: l'app si riconosce già dall'icona */
+  .topbar .topbar-brand {
+    display: none;
+  }
+
   .topbar-focus-label {
     display: none;
   }
+}
+
+/* Account: il pallino verde quando si è dentro */
+.topbar-account--in {
+  color: var(--done);
 }

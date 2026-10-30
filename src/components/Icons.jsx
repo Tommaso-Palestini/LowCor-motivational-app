@@ -18,6 +18,15 @@ export function IconClose() {
   );
 }
 
+export function IconUser() {
+  return (
+    <svg {...baseProps}>
+      <circle cx="8" cy="5.5" r="2.75" />
+      <path d="M2.75 13.5c.8-2.6 2.8-4 5.25-4s4.45 1.4 5.25 4" />
+    </svg>
+  );
+}
+
 export function IconPlus() {
   return (
     <svg {...baseProps}>

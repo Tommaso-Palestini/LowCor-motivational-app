@@ -6,10 +6,40 @@ import { VitePWA } from 'vite-plugin-pwa'
 const THEME_COLOR = '#002813'
 const BACKGROUND_COLOR = '#01190a'
 
+// Content Security Policy della build: solo script dell'app, niente plugin, niente <base> estranei.
+// connect-src resta aperto a http/https perché calendari .ics e AI locale sono indirizzi scelti
+// dall'utente; la difesa contro gli script iniettati è script-src 'self'.
+// frame-ancestors e HSTS non valgono nel meta: stanno in public/_headers per l'hosting.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'self' https: http:",
+  "worker-src 'self' blob:",
+  "frame-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'self'",
+].join('; ')
+
+function contentSecurityPolicy() {
+  return {
+    name: 'lowcor-csp',
+    apply: 'build',
+    transformIndexHtml(html) {
+      return html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`)
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    contentSecurityPolicy(),
     VitePWA({
       registerType: 'autoUpdate',
       manifestFilename: 'manifest.json',

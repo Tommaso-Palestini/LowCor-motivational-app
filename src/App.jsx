@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
 import { clearAllData, loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
 import { consentRecord, hasConsent } from "./logic/consent";
 import { ConsentDialog, LegalLink, LegalViewer } from "./components/legal/Legal";
@@ -68,6 +68,9 @@ import FocusMode from "./components/FocusMode";
 import Nudges from "./components/Nudges";
 import { useBlockAlerts } from "./hooks/useBlockAlerts";
 import { useAppearance } from "./hooks/useAppearance";
+import { useCloud } from "./hooks/useCloud";
+import { capturePendingInvite } from "./logic/invite";
+import { signOut } from "./cloud/api";
 import { isNative, scheduleBlockNotifications } from "./native";
 
 // Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
@@ -78,6 +81,8 @@ const CalendarView = lazy(loadCalendar);
 const WeeklyReview = lazy(() => import("./components/review/WeeklyReview"));
 const Onboarding = lazy(() => import("./components/onboarding/Onboarding"));
 const ActivitiesView = lazy(loadActivities);
+const AccountDialog = lazy(() => import("./components/account/AccountDialog"));
+const ConflictDialog = lazy(() => import("./components/account/ConflictDialog"));
 import Announcer from "./components/Announcer";
 import Toast from "./components/Toast";
 import "./App.css";
@@ -104,6 +109,7 @@ function App() {
   const [view, setView] = useState("today");
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [announcements, setAnnouncements] = useState([]);
   const [toast, setToast] = useState(null);
   const [isGeneratingCards, setIsGeneratingCards] = useState(false);
@@ -120,6 +126,22 @@ function App() {
   useEffect(() => {
     saveData(data);
   }, [data]);
+
+  // ---- Account e salvataggio online (facoltativi) ----
+
+  // I dati arrivati dall'account sostituiscono quelli locali: la storia per annullare non vale più
+  const replaceData = useCallback((remote) => {
+    historyRef.current = [];
+    setData((current) => ({ ...normalizeData(remote), focus: current.focus }));
+  }, []);
+  const cloud = useCloud({ data, today, replaceData });
+
+  // Un link d'invito apre direttamente l'account, dove il codice è già pronto
+  useEffect(() => {
+    if (capturePendingInvite() && cloud.available) {
+      setIsAccountOpen(true);
+    }
+  }, [cloud.available]);
 
   // ---- Storia per annullare (Ctrl+Z) ----
 
@@ -480,6 +502,10 @@ function App() {
 
   async function deleteAllData() {
     await scheduleBlockNotifications({ blocks: [], activities: [], enabled: false }).catch(() => {});
+    // Si esce anche dall'account su questo dispositivo, altrimenti i dati tornerebbero giù dal server
+    if (cloud.user) {
+      await signOut().catch(() => {});
+    }
     clearAllData();
     window.location.reload();
   }
@@ -804,7 +830,7 @@ function App() {
   } else if (view === "activities") {
     page = <ActivitiesView data={data} now={now} actions={actions} />;
   } else if (view === "calendar") {
-    page = <CalendarView data={data} now={now} actions={actions} />;
+    page = <CalendarView data={data} now={now} actions={actions} shared={Boolean(cloud.user)} />;
   }
 
   return (
@@ -833,6 +859,7 @@ function App() {
           consent={data.consent}
           onDeleteAll={deleteAllData}
           onCapture={() => setIsCaptureOpen(true)}
+          account={cloud.available ? { signedIn: Boolean(cloud.user), status: cloud.status, onOpen: () => setIsAccountOpen(true) } : null}
         />
 
         <main className="app-main">
@@ -850,7 +877,7 @@ function App() {
         <footer className="app-footer">
           <p>{t("© {year} LowCor. Tutti i diritti riservati.", { year: now.getFullYear() })}</p>
           <p className="app-footer-note">
-            {t("I tuoi dati restano su questo dispositivo.")}{" "}
+            {cloud.user ? t("I tuoi dati sono su questo dispositivo e nel tuo account.") : t("I tuoi dati restano su questo dispositivo.")}{" "}
             <LegalLink page="privacy" /> · <LegalLink page="terms" />
           </p>
         </footer>
@@ -889,6 +916,22 @@ function App() {
 
       {data.onboarded && !hasConsent(data) && (
         <ConsentDialog onAccept={() => commit((current) => ({ ...current, consent: consentRecord() }), { record: false })} />
+      )}
+      {isAccountOpen && (
+        <Suspense fallback={null}>
+          <AccountDialog
+            cloud={cloud}
+            today={today}
+            onClose={() => setIsAccountOpen(false)}
+            onClearDevice={deleteAllData}
+            notify={(message) => showToast(message)}
+          />
+        </Suspense>
+      )}
+      {cloud.conflict && (
+        <Suspense fallback={null}>
+          <ConflictDialog conflict={cloud.conflict} onChoose={cloud.resolveConflict} />
+        </Suspense>
       )}
       <LegalViewer />
       {isCaptureOpen && <QuickCapture onSave={captureThought} onClose={() => setIsCaptureOpen(false)} />}

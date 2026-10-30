@@ -4,6 +4,7 @@ import MonthGrid from "./MonthGrid";
 import WeekGoals from "./WeekGoals";
 import BlockEditor from "./BlockEditor";
 import ExternalCalendars from "./ExternalCalendars";
+import SharedSchedule from "../account/SharedSchedule";
 import {
   addDays,
   formatDate,
@@ -30,7 +31,7 @@ function isTypingTarget(target) {
   return ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName) || target.isContentEditable;
 }
 
-function CalendarView({ data, now, actions }) {
+function CalendarView({ data, now, actions, shared = false }) {
   const today = toDateString(now);
   const [mode, setMode] = useState("week");
   const [anchor, setAnchor] = useState(today);
@@ -176,6 +177,8 @@ function CalendarView({ data, now, actions }) {
           }}
         />
       )}
+
+      {shared && mode === "week" && <SharedSchedule key={dates[0]} from={dates[0]} to={dates[6]} />}
 
       <p className="calendar-hint">
         Trascina su uno spazio vuoto per creare un blocco, trascina un blocco per spostarlo e il suo bordo basso per
