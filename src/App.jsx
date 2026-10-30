@@ -32,6 +32,7 @@ import {
 } from "./logic/blocks";
 import { addCards, incrementCardStat } from "./logic/cards";
 import { addReminder, toggleReminder, deleteReminder } from "./logic/reminders";
+import { addJob, clearDoneJobs, deleteJob, postponeJob, toggleJob } from "./logic/jobs";
 import { addThought, removeThought, thoughtToActivityName } from "./logic/inbox";
 import QuickCapture from "./components/inbox/QuickCapture";
 import { toDateString, weekDates } from "./logic/dates";
@@ -149,6 +150,7 @@ function App() {
       activities: previous.activities,
       blocks: previous.blocks,
       reminders: previous.reminders,
+      jobs: previous.jobs,
       mandala: previous.mandala,
       aura: previous.aura,
     }));
@@ -563,6 +565,15 @@ function App() {
     showToast("Ora è un promemoria", true);
   }
 
+  function thoughtToJob(thought) {
+    commit((current) => ({
+      ...current,
+      inbox: removeThought(current.inbox, thought.id),
+      jobs: addJob(current.jobs, { title: thoughtToActivityName(thought.text), notes: thought.text }),
+    }));
+    showToast("Ora è tra le cose da fare una volta", true);
+  }
+
   function thoughtToActivity(thought) {
     const name = thoughtToActivityName(thought.text);
     commit((current) => ({
@@ -693,6 +704,7 @@ function App() {
     openCapture: () => setIsCaptureOpen(true),
     thoughtToReminder,
     thoughtToActivity,
+    thoughtToJob,
     deleteThought: (thought) => updateField("inbox", (inbox) => removeThought(inbox, thought.id)),
     addActivity: (activity) => updateField("activities", (activities) => addActivity(activities, activity)),
     parkActivity: (id, note) => updateField("activities", (activities) => parkActivity(activities, id, note)),
@@ -754,6 +766,11 @@ function App() {
     addReminder: (text) => updateField("reminders", (reminders) => addReminder(reminders, text)),
     toggleReminder: (id) => updateField("reminders", (reminders) => toggleReminder(reminders, id)),
     deleteReminder: (id) => updateField("reminders", (reminders) => deleteReminder(reminders, id)),
+    addJob: (draft) => updateField("jobs", (jobs) => addJob(jobs, draft)),
+    toggleJob: (id) => updateField("jobs", (jobs) => toggleJob(jobs, id)),
+    deleteJob: (id) => updateField("jobs", (jobs) => deleteJob(jobs, id)),
+    postponeJob: (id, date) => updateField("jobs", (jobs) => postponeJob(jobs, id, date)),
+    clearDoneJobs: () => updateField("jobs", clearDoneJobs),
     setBrainstorm: (mode, messages) =>
       commit((current) => ({ ...current, brainstorm: { ...current.brainstorm, [mode]: messages } }), {
         record: false,

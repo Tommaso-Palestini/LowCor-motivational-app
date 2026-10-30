@@ -13,6 +13,8 @@ const defaultData = {
   blocks: sampleBlocks,
   cards: sampleCards,
   reminders: [],
+  // Cose da fare una volta sola: { id, title, notes, date, time, minutes, energy, done, doneAt, createdAt }
+  jobs: [],
   // Pensieri catturati al volo, da smistare: { id, text, createdAt }
   inbox: [],
   settings: defaultSettings,

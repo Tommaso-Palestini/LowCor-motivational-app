@@ -4,6 +4,7 @@ import Reminders from "./Reminders";
 import Feed from "./Feed";
 import FlexPlan from "./FlexPlan";
 import Inbox from "./inbox/Inbox";
+import Jobs from "./jobs/Jobs";
 import { shouldPromptReview } from "../logic/review";
 import { IconSparkle } from "./Icons";
 import { getBlocksForDate } from "../logic/blocks";
@@ -69,11 +70,24 @@ function TodayView({ data, now, today, actions, ai, isGeneratingCards }) {
               inbox={data.inbox}
               onToReminder={actions.thoughtToReminder}
               onToActivity={actions.thoughtToActivity}
+              onToJob={actions.thoughtToJob}
               onDelete={actions.deleteThought}
               onCapture={actions.openCapture}
             />
           </div>
         )}
+
+        <div className="slot slot--jobs">
+          <Jobs
+            jobs={data.jobs || []}
+            today={today}
+            onAdd={actions.addJob}
+            onToggle={actions.toggleJob}
+            onDelete={actions.deleteJob}
+            onPostpone={actions.postponeJob}
+            onClearDone={actions.clearDoneJobs}
+          />
+        </div>
 
         <div className="slot slot--flex">
           <FlexPlan data={data} now={now} actions={actions} />

@@ -215,6 +215,48 @@ test("pensieri al volo: li catturo e li smisto", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("cose da fare una volta: aggiungo, spunto e rimando", async ({ page }) => {
+  const errors = watchErrors(page);
+  await seed(page, {
+    jobs: [
+      {
+        id: "j1",
+        title: "Pagare il bollo",
+        notes: "",
+        date: "2020-01-01",
+        time: null,
+        minutes: null,
+        energy: "low",
+        done: false,
+        doneAt: null,
+        createdAt: "2020-01-01T09:00:00.000Z",
+      },
+    ],
+  });
+  await page.goto("/");
+  const jobs = page.getByRole("region", { name: "Da fare una volta" });
+  await expect(jobs.getByText("Rimaste indietro")).toBeVisible();
+  await jobs.getByRole("listitem").filter({ hasText: "Pagare il bollo" }).getByRole("button", { name: "A oggi" }).click();
+  await expect(jobs.getByText("Rimaste indietro")).toHaveCount(0);
+
+  await jobs.getByRole("textbox", { name: "Cosa c'è da fare" }).fill("Rinnovare la carta d'identità");
+  await jobs.getByRole("button", { name: "Giorno, ora e durata" }).click();
+  await jobs.getByLabel("Minuti").fill("45");
+  await jobs.getByRole("button", { name: "Aggiungi la cosa da fare" }).click();
+  const item = jobs.getByRole("listitem").filter({ hasText: "Rinnovare la carta d'identità" });
+  await expect(item.getByText("45 min")).toBeVisible();
+  await expect(jobs.getByText("2 aperte")).toBeVisible();
+
+  await item.getByRole("checkbox").check();
+  await expect(jobs.getByText("Fatte oggi")).toBeVisible();
+  await jobs.getByRole("button", { name: "Togli le fatte" }).click();
+  await expect(jobs.getByText("1 aperta")).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("region", { name: "Da fare una volta" }).getByText("Pagare il bollo")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  expect(errors).toEqual([]);
+});
+
 // Fluidità: misura i fotogrammi mentre la home scorre e l'anello ondeggia.
 // In un browser headless i numeri sono indicativi, ma un rallentamento serio si vede.
 test("fluidità della home", async ({ page }, testInfo) => {

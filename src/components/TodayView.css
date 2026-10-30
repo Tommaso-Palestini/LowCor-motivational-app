@@ -29,6 +29,10 @@
   order: 2;
 }
 
+.slot--jobs {
+  order: 2;
+}
+
 .slot--flex {
   order: 3;
 }

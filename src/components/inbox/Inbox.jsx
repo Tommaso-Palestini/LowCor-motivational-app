@@ -3,7 +3,7 @@ import { plural, t } from "../../i18n";
 import "./Inbox.css";
 
 // I pensieri catturati al volo, da smistare con un tocco
-function Inbox({ inbox, onToReminder, onToActivity, onDelete, onCapture }) {
+function Inbox({ inbox, onToReminder, onToActivity, onToJob, onDelete, onCapture }) {
   if (inbox.length === 0) {
     return null;
   }
@@ -24,6 +24,9 @@ function Inbox({ inbox, onToReminder, onToActivity, onDelete, onCapture }) {
             <div className="inbox-actions">
               <button type="button" className="button button--quiet" onClick={() => onToReminder(thought)}>
                 {t("Come promemoria")}
+              </button>
+              <button type="button" className="button button--quiet" onClick={() => onToJob(thought)}>
+                {t("Da fare una volta")}
               </button>
               <button type="button" className="button button--quiet" onClick={() => onToActivity(thought)}>
                 {t("Come attività")}

@@ -370,4 +370,26 @@ export default {
   "Elimina {name}": "Delete {name}",
   "Messo da parte in “Da smistare”": "Set aside in “To sort”",
   "Ora è un promemoria": "Now it's a reminder",
+
+  // Cose da fare una volta
+  "Da fare una volta": "One-off tasks",
+  "Rimaste indietro": "Left behind",
+  "Quando capita": "Whenever",
+  Prossimamente: "Coming up",
+  "Fatte oggi": "Done today",
+  aperta: "open",
+  aperte: "open",
+  "Le commissioni e le cose da fare una volta sola: si spuntano e spariscono.":
+    "Errands and things you only do once: tick them off and they're gone.",
+  "Per esempio: rinnovare la carta d'identità": "For example: renew your ID card",
+  "Cosa c'è da fare": "What needs doing",
+  "Aggiungi la cosa da fare": "Add the task",
+  "Giorno, ora e durata": "Day, time and length",
+  Giorno: "Day",
+  Ora: "Time",
+  Minuti: "Minutes",
+  Energia: "Energy",
+  "A oggi": "Move to today",
+  "Togli le fatte": "Clear done",
+  "Ora è tra le cose da fare una volta": "Now it's a one-off task",
 };
