@@ -1,6 +1,6 @@
 // Versione di informativa privacy e termini: se cambiano in modo sostanziale si alza la data
 // e l'app chiede di nuovo il consenso a tutti.
-export const LEGAL_VERSION = "2026-10-27";
+export const LEGAL_VERSION = "2026-10-30";
 
 export function hasConsent(data) {
   return data.consent?.version === LEGAL_VERSION;
