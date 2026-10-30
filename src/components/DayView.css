@@ -23,22 +23,38 @@
   margin: 0 auto;
 }
 
+/* Anello e onde galleggiano insieme. Solo uno spostamento, niente scala: così il browser
+   sposta lo strato già dipinto invece di ridisegnare l'SVG a ogni fotogramma. */
+.ring-art {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  animation: ring-float 9s ease-in-out infinite;
+}
+
 .ring svg {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-  animation: ring-float 9s ease-in-out infinite;
 }
 
-/* Galleggia appena: qualche pixel su e giù e un respiro di scala */
+/* Le onde in un SVG a parte, sotto all'anello: aggiornarle non ridipinge archi e testi */
+.ring .ring-waves {
+  position: absolute;
+  inset: 0;
+}
+
+/* Galleggia appena: qualche pixel su e giù */
 @keyframes ring-float {
   0%,
   100% {
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px) scale(1.008);
+    transform: translateY(-4px);
   }
 }
 
@@ -59,7 +75,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring svg {
+  .ring-art {
     animation: none;
   }
 }

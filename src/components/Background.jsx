@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "../logic/motion";
+import { isScrolling } from "../logic/scrolling";
 import "./Background.css";
 
 // La lava è disegnata su un solo canvas piccolo (1/8 dello schermo) e ingrandito dal CSS:
 // i gradienti morbidi non perdono niente, e il browser compone un solo strato opaco invece di sei
-// gradienti giganti semitrasparenti a ogni fotogramma di scroll. Si aggiorna 20 volte al secondo,
-// più che sufficiente per blob che si muovono in un minuto e mezzo.
+// gradienti giganti semitrasparenti a ogni fotogramma di scroll. I blob si muovono di mezzo pixel
+// del canvas al secondo: 4 aggiornamenti al secondo bastano (quanti ne fa l'onda di colori), e ogni
+// aggiornamento in meno è una pagina intera che il browser non deve ricomporre. Mentre si scorre è ferma.
 const SCALE = 8;
-const FRAME_MS = 50;
+const FRAME_MS = 250;
 
 // Posizione (in frazioni di vmax dal bordo), dimensione, tinta relativa, periodo e ampiezza del moto
 const BLOBS = [
@@ -58,9 +60,6 @@ function Lava({ animated }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d", { alpha: false });
-    let frameId = null;
-    let lastPaint = 0;
-
     function resize() {
       canvas.width = Math.max(1, Math.ceil(window.innerWidth / SCALE));
       canvas.height = Math.max(1, Math.ceil(window.innerHeight / SCALE));
@@ -70,31 +69,22 @@ function Lava({ animated }) {
       paint(context, canvas.width, canvas.height, time, readHue());
     }
 
-    function loop(time) {
-      frameId = requestAnimationFrame(loop);
-      if (document.hidden || time - lastPaint < FRAME_MS) {
-        return;
-      }
-      lastPaint = time;
-      draw(prefersReducedMotion() ? 0 : time);
-    }
-
     resize();
     draw(0);
-    if (animated) {
-      frameId = requestAnimationFrame(loop);
-    } else {
-      // Ferma, ma segue comunque l'onda di colori una volta al secondo
-      frameId = setInterval(() => draw(0), 1000);
-    }
+    // Ferma, la lava segue comunque l'onda di colori una volta al secondo
+    const timerId = setInterval(() => {
+      if (document.hidden || isScrolling()) {
+        return;
+      }
+      draw(animated && !prefersReducedMotion() ? performance.now() : 0);
+    }, animated ? FRAME_MS : 1000);
     const handleResize = () => {
       resize();
-      draw(performance.now());
+      draw(animated ? performance.now() : 0);
     };
     window.addEventListener("resize", handleResize);
     return () => {
-      cancelAnimationFrame(frameId);
-      clearInterval(frameId);
+      clearInterval(timerId);
       window.removeEventListener("resize", handleResize);
     };
   }, [animated]);

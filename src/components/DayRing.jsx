@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { formatDuration, timeToMinutes } from "../logic/time";
 import { prefersReducedMotion } from "../logic/motion";
+import { isScrolling } from "../logic/scrolling";
 import { t } from "../i18n";
 
 const RING_START = 6 * 60;
@@ -45,12 +46,15 @@ function blockArc(block) {
 }
 
 // Due contorni sottili che ondeggiano piano attorno all'anello, come la superficie dell'acqua.
-// Il path si aggiorna direttamente nel DOM a ogni frame, senza far ridisegnare React.
+// Il path si aggiorna direttamente nel DOM, senza far ridisegnare React, in un SVG tutto suo:
+// così a ogni fotogramma il browser ridipinge solo le onde e non archi, ore e testi.
+// 30 aggiornamenti al secondo, e nessuno quando l'anello è fuori schermo o mentre si scorre.
 const WAVES = [
   { radius: RADIUS + STROKE / 2 + 7, amplitude: 2.2, lobes: 5, speed: 0.00042, drift: 3, drift2: 0.00027 },
   { radius: RADIUS - STROKE / 2 - 3, amplitude: 1.4, lobes: 7, speed: -0.00031, drift: 4, drift2: -0.00019 },
 ];
 const WAVE_POINTS = 144;
+const WAVE_FRAME_MS = 33;
 
 function wavePath({ radius, amplitude, lobes, speed, drift, drift2 }, time) {
   let path = "";
@@ -68,6 +72,7 @@ function wavePath({ radius, amplitude, lobes, speed, drift, drift2 }, time) {
 }
 
 function RingWaves() {
+  const svgRef = useRef(null);
   const pathRefs = useRef([]);
 
   useEffect(() => {
@@ -76,18 +81,29 @@ function RingWaves() {
       paint(0);
       return undefined;
     }
-    let frame = requestAnimationFrame(function loop(time) {
-      // Se l'utente attiva "riduci i movimenti" mentre l'anello è a schermo, le onde si fermano
-      if (!prefersReducedMotion()) {
-        paint(time);
-      }
-      frame = requestAnimationFrame(loop);
+    let visible = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
     });
-    return () => cancelAnimationFrame(frame);
+    observer.observe(svgRef.current);
+    let lastPaint = -Infinity;
+    let frame = requestAnimationFrame(function loop(time) {
+      frame = requestAnimationFrame(loop);
+      // Se l'utente attiva "riduci i movimenti" mentre l'anello è a schermo, le onde si fermano
+      if (!visible || time - lastPaint < WAVE_FRAME_MS || isScrolling() || prefersReducedMotion()) {
+        return;
+      }
+      lastPaint = time;
+      paint(time);
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <g className="ring-waves" aria-hidden="true">
+    <svg ref={svgRef} className="ring-waves" viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
       {WAVES.map((wave, index) => (
         <path
           key={index}
@@ -98,7 +114,7 @@ function RingWaves() {
           d={wavePath(wave, 0)}
         />
       ))}
-    </g>
+    </svg>
   );
 }
 
@@ -149,40 +165,42 @@ function DayRing({ blocks, nowMinutes, current, next, onFocusBlock }) {
 
   return (
     <div className="ring">
-      <svg
-        viewBox={`0 0 ${SIZE} ${SIZE}`}
-        role="img"
-        aria-label={t("Giornata dalle 6 alle 24 con {n} blocchi", { n: blocks.length })}
-      >
+      <div className="ring-art">
         <RingWaves />
-        <circle className="ring-track" cx={CENTER} cy={CENTER} r={RADIUS} />
-        {showNow && nowAngle > 0 && (
-          <path className="ring-elapsed" d={arcPath(0, nowAngle)} />
-        )}
-        {HOUR_LABELS.map((hour) => {
-          const point = polar(toAngle(hour * 60), RADIUS - STROKE - 8);
-          return (
-            <text key={hour} className="ring-hour" x={point.x} y={point.y}>
-              {hour}
-            </text>
-          );
-        })}
-        {blocks.map((block, index) => (
-          <path
-            key={block.id}
-            className={`ring-arc ring-arc--${block.tone}`}
-            d={blockArc(block)}
-            pathLength="1"
-            style={{ "--i": index }}
-          />
-        ))}
-        {showNow && (
-          <g className="ring-now">
-            <circle className="ring-now-halo" cx={nowPoint.x} cy={nowPoint.y} r="15" />
-            <circle className="ring-now-dot" cx={nowPoint.x} cy={nowPoint.y} r="6" />
-          </g>
-        )}
-      </svg>
+        <svg
+          viewBox={`0 0 ${SIZE} ${SIZE}`}
+          role="img"
+          aria-label={t("Giornata dalle 6 alle 24 con {n} blocchi", { n: blocks.length })}
+        >
+          <circle className="ring-track" cx={CENTER} cy={CENTER} r={RADIUS} />
+          {showNow && nowAngle > 0 && (
+            <path className="ring-elapsed" d={arcPath(0, nowAngle)} />
+          )}
+          {HOUR_LABELS.map((hour) => {
+            const point = polar(toAngle(hour * 60), RADIUS - STROKE - 8);
+            return (
+              <text key={hour} className="ring-hour" x={point.x} y={point.y}>
+                {hour}
+              </text>
+            );
+          })}
+          {blocks.map((block, index) => (
+            <path
+              key={block.id}
+              className={`ring-arc ring-arc--${block.tone}`}
+              d={blockArc(block)}
+              pathLength="1"
+              style={{ "--i": index }}
+            />
+          ))}
+          {showNow && (
+            <g className="ring-now">
+              <circle className="ring-now-halo" cx={nowPoint.x} cy={nowPoint.y} r="15" />
+              <circle className="ring-now-dot" cx={nowPoint.x} cy={nowPoint.y} r="6" />
+            </g>
+          )}
+        </svg>
+      </div>
 
       <div className="ring-center">
         <p className="ring-label">{center.label}</p>
