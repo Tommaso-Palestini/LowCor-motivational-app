@@ -5,7 +5,7 @@ const RETRY_MS = 20000;
 
 // Controlla se Ollama è acceso e quali modelli hai. Se è spento riprova ogni 20 secondi,
 // così appena lo avvii l'app se ne accorge da sola.
-// enabled = false nell'app nativa: sul telefono non c'è Ollama e iOS blocca le richieste http in chiaro.
+// enabled = false spegne il controllo (per esempio nei test).
 export function useOllama(url, preferredModel, enabled = true) {
   const [state, setState] = useState({ status: "checking", models: [] });
   const [attempt, setAttempt] = useState(0);

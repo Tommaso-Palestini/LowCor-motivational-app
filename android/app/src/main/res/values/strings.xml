@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">LowCor</string>
-    <string name="title_activity_main">LowCor</string>
-    <string name="package_name">app.lowcor.routine</string>
-    <string name="custom_url_scheme">app.lowcor.routine</string>
-</resources>

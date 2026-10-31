@@ -8,9 +8,6 @@ import "@fontsource-variable/fraunces/soft.css";
 import "@fontsource-variable/lexend";
 import "./index.css";
 import App from "./App.jsx";
-import { initNative } from "./native";
-
-initNative();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

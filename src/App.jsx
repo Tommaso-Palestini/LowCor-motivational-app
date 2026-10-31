@@ -68,7 +68,6 @@ import FocusMode from "./components/FocusMode";
 import Nudges from "./components/Nudges";
 import { useBlockAlerts } from "./hooks/useBlockAlerts";
 import { useAppearance } from "./hooks/useAppearance";
-import { isNative, scheduleBlockNotifications } from "./native";
 
 // Calendario e Attività arrivano in pezzi separati: l'avvio scarica meno codice.
 // Appena il browser è libero li precarichiamo, così il primo cambio di sezione è istantaneo.
@@ -110,7 +109,7 @@ function App() {
   const historyRef = useRef([]);
   const now = useNow();
   const today = toDateString(now);
-  const ai = useOllama(data.settings.aiUrl, data.settings.aiModel, !isNative);
+  const ai = useOllama(data.settings.aiUrl, data.settings.aiModel);
 
   // La lingua va impostata prima che i figli disegnino i loro testi
   setLanguage(data.settings.language);
@@ -282,22 +281,6 @@ function App() {
   }
 
   // ---- Promemoria dei blocchi ----
-
-  // Nell'app nativa i promemoria vengono programmati in anticipo e arrivano anche ad app chiusa
-  useEffect(() => {
-    if (!isNative) {
-      return undefined;
-    }
-    const timerId = setTimeout(() => {
-      scheduleBlockNotifications({
-        blocks: data.blocks,
-        activities: data.activities,
-        enabled: data.settings.blockAlerts,
-        minutesBefore: data.settings.alertMinutes,
-      }).catch((error) => console.warn("Promemoria nativi non programmati:", error));
-    }, 1500);
-    return () => clearTimeout(timerId);
-  }, [data.blocks, data.activities, data.settings.blockAlerts, data.settings.alertMinutes, data.settings.language]);
 
   useBlockAlerts({
     blocks: data.blocks,
@@ -479,7 +462,6 @@ function App() {
   }
 
   async function deleteAllData() {
-    await scheduleBlockNotifications({ blocks: [], activities: [], enabled: false }).catch(() => {});
     clearAllData();
     window.location.reload();
   }

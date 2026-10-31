@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Test end-to-end sulla build di produzione, su desktop e sui principali dispositivi.
-// WebKit è il motore di Safari: i profili iPhone e iPad lo usano, come Safari su iOS.
+// Test end-to-end sulla build di produzione, con i due motori dell'app desktop:
+// WebKit (su Linux Tauri usa WebKitGTK) e Chromium (su Windows Tauri usa WebView2).
+// Una finestra stretta prova il layout quando la finestra viene rimpicciolita.
 export default defineConfig({
   testDir: "./e2e",
   timeout: 45000,
@@ -23,12 +24,8 @@ export default defineConfig({
     timeout: 120000,
   },
   projects: [
-    { name: "Chrome desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "Firefox desktop", use: { ...devices["Desktop Firefox"] } },
-    { name: "Safari desktop", use: { ...devices["Desktop Safari"] } },
-    { name: "iPhone 15", use: { ...devices["iPhone 15"] } },
-    { name: "iPad", use: { ...devices["iPad (gen 7)"] } },
-    { name: "Pixel 7", use: { ...devices["Pixel 7"] } },
-    { name: "Galaxy S9+", use: { ...devices["Galaxy S9+"] } },
+    { name: "Chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "WebKit", use: { ...devices["Desktop Safari"] } },
+    { name: "Finestra stretta", use: { ...devices["Desktop Chrome"], viewport: { width: 480, height: 800 } } },
   ],
 });
