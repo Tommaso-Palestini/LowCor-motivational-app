@@ -1,10 +1,10 @@
 # Task
 
 ## Fase 1 — `local-only`
-- [ ] 1. Togliere account e Supabase dall'app (codice, dipendenza, `supabase/`, test, script). `ConflictDialog` resta per il trasferimento
-- [ ] 2. Togliere PWA e Capacitor (plugin Vite, `android/`, `ios/`, dipendenze, icone PWA); `native.js` diventa `desktop.js` vuoto
-- [ ] 3. Privacy, termini e README per un'app senza server
-- [ ] Checkpoint: `npm run lint && npm test && npm run build` verdi, e2e principali verdi, nessun `supabase` in `src`
+- [x] 1. Togliere account e Supabase dall'app (codice, dipendenza, `supabase/`, test, script). `ConflictDialog` resta per il trasferimento
+- [x] 2. Togliere PWA e Capacitor (plugin Vite, `android/`, `ios/`, dipendenze, icone PWA); `native.js` diventa `desktop.js` vuoto
+- [x] 3. Privacy, termini e README per un'app senza server
+- [x] Checkpoint: `npm run lint && npm test && npm run build` verdi, e2e principali verdi, nessun `supabase` in `src`
 
 ## Fase 2 — `desktop-shell`
 - [ ] 4. Rust + librerie di sistema; `src-tauri/` creato; `npm run desktop:dev` apre la finestra

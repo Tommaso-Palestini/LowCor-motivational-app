@@ -1,6 +1,6 @@
 // Versione di informativa privacy e termini: se cambiano in modo sostanziale si alza la data
 // e l'app chiede di nuovo il consenso a tutti.
-export const LEGAL_VERSION = "2026-10-30";
+export const LEGAL_VERSION = "2026-10-31";
 
 export function hasConsent(data) {
   return data.consent?.version === LEGAL_VERSION;
@@ -15,8 +15,8 @@ export const LEGAL_PAGES = {
   terms: { file: "terms.html", title: "Termini d'uso" },
 };
 
-// Le pagine legali si aprono in una finestra dentro l'app (anche nell'app nativa, dove
-// un link esterno porterebbe fuori senza modo di tornare): i link mandano questo evento.
+// Le pagine legali si aprono in una finestra dentro l'app (nell'app desktop un link
+// porterebbe fuori, nel browser di sistema): i link mandano questo evento.
 const LEGAL_EVENT = "lowcor:legal";
 
 export function openLegal(page) {
