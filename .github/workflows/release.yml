@@ -1,5 +1,5 @@
 # A ogni push su main: controlli, poi una nuova versione 0.1.<numero della build> su GitHub Releases
-# con AppImage e .deb per Linux, installer per Windows e latest.json firmato.
+# con AppImage (GStreamer incluso, per i suoni del focus) e .deb per Linux, installer per Windows e latest.json firmato.
 # Le app installate (AppImage su Linux, installer su Windows) la trovano all'avvio e propongono di aggiornarsi.
 #
 # Segreti del repository richiesti:
@@ -24,7 +24,7 @@ permissions:
   contents: write
 
 env:
-  LINUX_DEPS: libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file
+  LINUX_DEPS: libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file gstreamer1.0-plugins-base gstreamer1.0-plugins-good patchelf
 
 jobs:
   check:

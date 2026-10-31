@@ -32,3 +32,9 @@
 ## Fase 6 — `release`
 - [x] 16. GitHub Actions: build Linux e Windows
 - [ ] 17. `install.sh`, README, CHANGELOG, versione 0.1.0
+
+## Da fare più avanti (rimandati il 31/10/2026)
+- [ ] Segreto `TAURI_SIGNING_PRIVATE_KEY` su GitHub (contenuto di `~/.tauri/lowcor.key`), più una copia di backup della chiave
+- [ ] Controllare la prima build in Actions e la versione nelle Releases
+- [ ] Rendere pubblico il repository (serve perché l'app trovi gli aggiornamenti)
+- [ ] Provare a mano: AI in "Idee" che scrive a pezzi nell'app desktop, suoni del focus nell'AppImage, logo nella barra

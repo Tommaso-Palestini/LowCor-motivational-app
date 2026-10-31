@@ -2,6 +2,7 @@
 # Installa LowCor per l'utente corrente, senza sudo, come Devtox.
 #
 #   sh install.sh                scarica l'ultima versione (AppImage) da GitHub: si aggiorna da sola
+#   sh install.sh --appimage F   installa l'AppImage F (scaricata o compilata): si aggiorna da sola
 #   sh install.sh --from-source  compila dai sorgenti di questa cartella (serve Rust; niente aggiornamenti automatici)
 #   sh install.sh --uninstall    rimuove programma, voce del menu e icone (i dati restano)
 #
@@ -42,6 +43,18 @@ case "${1:-}" in
         install -m 755 "$src/src-tauri/target/release/lowcor" "$bin/lowcor"
         exec_path="$bin/lowcor"
         ;;
+    --appimage)
+        # Un'AppImage già scaricata o compilata (npm run desktop:build)
+        file="${2:-}"
+        if [ ! -f "$file" ]; then
+            echo "Uso: sh install.sh --appimage percorso/LowCor_x.y.z_amd64.AppImage"
+            exit 1
+        fi
+        mkdir -p "$appdir" "$bin"
+        install -m 755 "$file" "$appdir/LowCor.AppImage"
+        ln -sf "$appdir/LowCor.AppImage" "$bin/lowcor"
+        exec_path="$appdir/LowCor.AppImage"
+        ;;
     "")
         command -v curl >/dev/null 2>&1 || { echo "Serve curl."; exit 1; }
         echo "Cerco l'ultima versione su GitHub..."
@@ -63,7 +76,7 @@ case "${1:-}" in
         fi
         ;;
     *)
-        echo "Uso: sh install.sh [--from-source | --uninstall]"
+        echo "Uso: sh install.sh [--appimage FILE | --from-source | --uninstall]"
         exit 1
         ;;
 esac
