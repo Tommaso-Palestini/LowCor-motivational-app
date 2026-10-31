@@ -7,3 +7,13 @@ export async function invoke(command, args) {
   const { invoke: tauriInvoke } = await import("@tauri-apps/api/core");
   return tauriInvoke(command, args);
 }
+
+// fetch per indirizzi esterni (Ollama, calendari .ics). Nell'app desktop passa dal lato Rust:
+// niente blocchi CORS, così funzionano anche i calendari di Google e iCloud e Ollama su Windows.
+export async function appFetch(url, options) {
+  if (!isDesktop) {
+    return fetch(url, options);
+  }
+  const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
+  return tauriFetch(url, options);
+}

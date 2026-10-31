@@ -39,6 +39,9 @@ fn clear_state(app: AppHandle) -> Result<(), String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Richieste HTTP dal lato Rust: Ollama e i calendari .ics non rispondono all'origine dell'app
+        // (CORS), il plugin sì. Gli indirizzi permessi sono in capabilities/default.json.
+        .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![
             load_state,
             save_state,

@@ -7,13 +7,13 @@
 - [x] Checkpoint: `npm run lint && npm test && npm run build` verdi, e2e principali verdi, nessun `supabase` in `src`
 
 ## Fase 2 — `desktop-shell`
-- [ ] 4. Rust + librerie di sistema; `src-tauri/` creato; `npm run desktop:dev` apre la finestra
+- [x] 4. Rust + librerie di sistema; `src-tauri/` creato; `npm run desktop:dev` apre la finestra
 - [ ] 5. CSP per Tauri; Ollama e calendari .ics funzionano dall'app
-- [ ] 6. `npm run desktop:build` produce .deb e AppImage che si installano e aprono
+- [x] 6. `npm run desktop:build` produce .deb e AppImage che si installano e aprono
 - [ ] Checkpoint: app installata su Linux, funziona come nel browser
 
 ## Fase 3 — `disk-storage`
-- [ ] 7. Comandi Rust `load_state`/`save_state` con scrittura atomica (+ test); `storage.js` li usa in Tauri e migra da `localStorage`
+- [x] 7. Comandi Rust `load_state`/`save_state` con scrittura atomica (+ test); `storage.js` li usa in Tauri e migra da `localStorage`
 - [ ] 8. Backup, PDF e .ics con "Salva con nome" del sistema (plugin dialog + fs)
 - [ ] 9. Esporta i miei impegni in `.ics` "solo occupato" / "anche i titoli"
 - [ ] Checkpoint: dati sopravvivono a chiusura e reinstallazione

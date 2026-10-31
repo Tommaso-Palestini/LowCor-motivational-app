@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { clearAllData, loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
+import { appFetch } from "./desktop";
 import { consentRecord, hasConsent } from "./logic/consent";
 import { ConsentDialog, LegalLink, LegalViewer } from "./components/legal/Legal";
 import { backupFilename, createBackup } from "./logic/backup";
@@ -352,7 +353,7 @@ function App() {
   async function fetchCalendar(url) {
     let response;
     try {
-      response = await fetch(normalizeCalendarUrl(url));
+      response = await appFetch(normalizeCalendarUrl(url));
     } catch {
       throw new Error(
         "Il calendario non si lascia leggere dal browser (succede con Google e iCloud): scarica il file .ics e importalo"

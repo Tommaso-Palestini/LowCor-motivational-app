@@ -1,13 +1,15 @@
 // Client per Ollama, l'AI che gira in locale sul tuo computer.
 // Niente cloud: le richieste vanno solo a http://localhost:11434.
 
+import { appFetch } from "../desktop";
+
 export class AiError extends Error {}
 
 // Modelli che sanno chattare, in ordine di preferenza se non ne hai scelto uno.
 const PREFERRED_MODELS = [/llama3\.2/, /qwen3/, /qwen2\.5/, /gemma3/, /llama3/, /mistral/, /phi/];
 
 export async function listModels(url, signal) {
-  const response = await fetch(`${url}/api/tags`, { signal });
+  const response = await appFetch(`${url}/api/tags`, { signal });
   if (!response.ok) {
     throw new AiError(`Ollama ha risposto con errore ${response.status}`);
   }
@@ -35,7 +37,7 @@ export function pickModel(models, preferred) {
 export async function chatJson({ ai, messages, schema, signal, temperature = 0.7, onText }) {
   let response;
   try {
-    response = await fetch(`${ai.url}/api/chat`, {
+    response = await appFetch(`${ai.url}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
