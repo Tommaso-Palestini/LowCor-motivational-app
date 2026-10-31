@@ -13,11 +13,31 @@ stesso codice di 6 cifre compaia su entrambi e i dati passano cifrati, direttame
 > Il piano è in [`SPEC.md`](SPEC.md) e [`tasks/todo.md`](tasks/todo.md). Fino al primo rilascio l'app si prova
 > nel browser con `npm run dev`, e lì salva i dati nella memoria del browser.
 
+## Installare su Linux
+
+Servono Rust (`curl https://sh.rustup.rs -sSf | sh`), Node.js e le librerie di sistema:
+
+```bash
+sudo apt install libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev \
+    libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file
+```
+
+Poi, senza sudo:
+
+```bash
+sh install.sh                # compila e installa in ~/.local, con voce nel menu e logo
+sh install.sh --rebuild      # ricompila e aggiorna dopo un git pull
+sh install.sh --uninstall    # rimuove il programma; i dati restano in ~/.local/share/lowcor
+```
+
+In alternativa `npm run desktop:build` prepara un `.deb` e un'AppImage in `src-tauri/target/release/bundle/`.
+
 ## Sviluppo
 
 ```bash
 npm install
 npm run dev            # interfaccia nel browser, con ricarica automatica
+npm run desktop:dev    # la stessa cosa nella finestra dell'app desktop
 npm run lint           # oxlint
 npm test               # test della logica (vitest)
 npm run test:e2e       # end-to-end su Chromium, WebKit e una finestra stretta
