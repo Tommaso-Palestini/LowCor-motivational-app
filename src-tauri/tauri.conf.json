@@ -40,7 +40,12 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb", "appimage", "nsis", "msi"],
+    "targets": [
+      "deb",
+      "appimage",
+      "nsis",
+      "msi"
+    ],
     "category": "Productivity",
     "shortDescription": "Routine, focus e obiettivi, tutto in locale",
     "longDescription": "Calendario a blocchi con energia, modalità focus, piano flessibile, cose da fare una volta, rito della settimana e obiettivi. I dati restano sul computer.",
@@ -52,5 +57,16 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdCQ0E5NUM3QUY2RUZFRTcKUldUbi9tNnZ4NVhLZTRDb04zUThsMXR2OFNGN2c1YkRFbDRHaER4R2grcmJOL0NTbjBqMVd1dUYK",
+      "endpoints": [
+        "https://github.com/Tommaso-Palestini/LowCor-motivational-app/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

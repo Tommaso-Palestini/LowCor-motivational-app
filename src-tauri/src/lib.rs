@@ -36,17 +36,31 @@ fn clear_state(app: AppHandle) -> Result<(), String> {
     storage::clear(&data_dir(&app)?).map_err(|e| format!("Non riesco a cancellare i dati: {e}"))
 }
 
+// Può aggiornarsi da sola? Su Windows sì (installer NSIS); su Linux solo se gira come AppImage,
+// perché il binario installato da .deb o compilato a mano non si può sostituire da dentro l'app.
+#[tauri::command]
+fn update_supported() -> bool {
+    cfg!(windows) || std::env::var_os("APPIMAGE").is_some()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         // Richieste HTTP dal lato Rust: Ollama e i calendari .ics non rispondono all'origine dell'app
         // (CORS), il plugin sì. Gli indirizzi permessi sono in capabilities/default.json.
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_process::init())
+        .setup(|app| {
+            // Aggiornamenti firmati, pubblicati su GitHub Releases dalla CI a ogni push su main
+            app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             load_state,
             save_state,
             save_background,
-            clear_state
+            clear_state,
+            update_supported
         ])
         .run(tauri::generate_context!())
         .expect("LowCor non è riuscito ad avviarsi");

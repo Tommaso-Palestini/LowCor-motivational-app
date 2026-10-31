@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { DEFAULT_AI_URL } from "../logic/settings";
 import { backupSummary, parseBackup } from "../logic/backup";
 import { LegalLink } from "./legal/Legal";
+import { isDesktop } from "../desktop";
 import { LANGUAGES, locale, t } from "../i18n";
 
 function Switch({ checked, onChange, label }) {
@@ -588,6 +589,15 @@ function SettingsPanel({
       <p className="settings-group">{t("I tuoi dati")}</p>
       <BackupSection onExport={onExportBackup} onRestore={onRestoreBackup} />
       <PrivacySection consent={consent} onDeleteAll={onDeleteAll} />
+      {isDesktop && (
+        <div className="settings-row">
+          <div>
+            <p className="settings-name">{t("Cerca aggiornamenti")}</p>
+            <p className="settings-hint">{t("All'avvio LowCor chiede a GitHub se c'è una versione nuova. Non manda nessun tuo dato.")}</p>
+          </div>
+          <Switch checked={settings.checkUpdates} onChange={(value) => set("checkUpdates", value)} label={t("Cerca aggiornamenti")} />
+        </div>
+      )}
 
       <p className="settings-group">{t("AI e scorciatoie")}</p>
       <AiSection ai={ai} settings={settings} set={set} />

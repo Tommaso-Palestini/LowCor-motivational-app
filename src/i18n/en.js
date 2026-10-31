@@ -396,5 +396,13 @@ export default {
   // Altro
   "Salva": "Save",
   "Scollega": "Disconnect",
+  "Cerca aggiornamenti": "Check for updates",
+  "All'avvio LowCor chiede a GitHub se c'è una versione nuova. Non manda nessun tuo dato.": "When it starts, LowCor asks GitHub whether there is a new version. None of your data is sent.",
+  "È pronta LowCor {version}": "LowCor {version} is ready",
+  "Aggiorna e riavvia": "Update and restart",
+  "Più tardi": "Later",
+  "Scarico la nuova versione…": "Downloading the new version…",
+  "Scarico la nuova versione… {n}%": "Downloading the new version… {n}%",
+  "Aggiornamento non riuscito: riprova più tardi": "Update failed: try again later",
   "Ho già LowCor su un altro PC": "I already use LowCor on another PC",
 };

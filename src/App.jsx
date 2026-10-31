@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { clearAllData, loadBackgroundImage, loadData, normalizeData, saveBackgroundImage, saveData } from "./storage/storage";
 import { appFetch } from "./desktop";
+import UpdateNotice from "./components/UpdateNotice";
 import { consentRecord, hasConsent } from "./logic/consent";
 import { ConsentDialog, LegalLink, LegalViewer } from "./components/legal/Legal";
 import { backupFilename, createBackup } from "./logic/backup";
@@ -874,6 +875,7 @@ function App() {
         <ConsentDialog onAccept={() => commit((current) => ({ ...current, consent: consentRecord() }), { record: false })} />
       )}
       <LegalViewer />
+      <UpdateNotice enabled={data.settings.checkUpdates} />
       {isCaptureOpen && <QuickCapture onSave={captureThought} onClose={() => setIsCaptureOpen(false)} />}
 
       {reviewWeek && (

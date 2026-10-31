@@ -35,7 +35,8 @@ suoi e non vuole che i suoi dati, compresi energia e giornate no, finiscano su u
 4. I PC abbinati restano ricordati (si salva la loro chiave pubblica): il codice serve solo la prima volta.
 5. L'AI resta Ollama su `localhost:11434`. Se WebKitGTK blocca le richieste dall'app verso `http://localhost`,
    passano dal lato Rust.
-6. Niente aggiornamenti automatici: una versione nuova si installa come la prima volta.
+6. Aggiornamenti (deciso il 31/10/2026): a ogni push su `main` la CI pubblica una versione su GitHub Releases;
+   l'app (AppImage su Linux, installer su Windows) la propone all'avvio. Si spegne dalle impostazioni.
 7. La build Windows si fa con GitHub Actions sul repository esistente. Il programma non è firmato, quindi
    Windows SmartScreen mostrerà un avviso al primo avvio.
 

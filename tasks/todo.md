@@ -30,5 +30,5 @@
 - [ ] Checkpoint: due istanze si passano i dati
 
 ## Fase 6 — `release`
-- [ ] 16. GitHub Actions: build Linux e Windows
+- [x] 16. GitHub Actions: build Linux e Windows
 - [ ] 17. `install.sh`, README, CHANGELOG, versione 0.1.0

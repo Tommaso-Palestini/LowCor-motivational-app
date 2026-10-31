@@ -27,6 +27,8 @@ export const defaultSettings = {
   focusVolume: 40,
   focusChime: true,
   aiUrl: DEFAULT_AI_URL,
+  // App desktop: all'avvio cerca una versione nuova su GitHub
+  checkUpdates: true,
   aiModel: "",
   aiAutoCards: true,
   // Oltre queste soglie un giorno è in "Rischio overload"
