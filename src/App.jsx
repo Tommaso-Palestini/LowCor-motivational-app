@@ -462,7 +462,7 @@ function App() {
   }
 
   async function deleteAllData() {
-    clearAllData();
+    await clearAllData();
     window.location.reload();
   }
 
