@@ -480,7 +480,3 @@ kbd {
   }
 }
 
-/* Account: il pallino verde quando si è dentro */
-.topbar-account--in {
-  color: var(--done);
-}
