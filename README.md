@@ -5,65 +5,120 @@ piene. Calendario a blocchi con energia, modalità focus con time timer, piano f
 cose da fare una volta sola, rito della settimana, schema 9×9 degli obiettivi e AI locale (Ollama) per scomporre i
 compiti.
 
-**Tutto in locale.** LowCor è un programma per PC: niente account, niente server. I dati stanno in file sul tuo
-computer. Per passarli a un altro PC basta la stessa rete: i due computer si trovano da soli, controlli che lo
-stesso codice di 6 cifre compaia su entrambi e i dati passano cifrati, direttamente.
+**Tutto in locale.** LowCor è un programma per PC (Linux e Windows): niente account, niente server, niente
+statistiche. I dati stanno in file sul tuo computer, in una cartella che puoi vedere e copiare.
 
-> **Lavori in corso.** LowCor sta diventando un'app desktop installabile (Tauri, Linux e Windows).
-> Il piano è in [`SPEC.md`](SPEC.md) e [`tasks/todo.md`](tasks/todo.md). Fino al primo rilascio l'app si prova
-> nel browser con `npm run dev`, e lì salva i dati nella memoria del browser.
+## Provalo
 
-## Installare su Linux
+### Linux
 
-Servono Rust (`curl https://sh.rustup.rs -sSf | sh`), Node.js e le librerie di sistema:
+Dalla pagina [Releases](../../releases/latest) scarica il file `.AppImage`, poi:
 
 ```bash
-sudo apt install libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev \
-    libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file
+chmod +x LowCor_*_amd64.AppImage
+./LowCor_*_amd64.AppImage
 ```
 
-Poi, senza sudo:
+Oppure, per averlo nel menu delle applicazioni con il logo (senza sudo):
 
 ```bash
-sh install.sh                # compila e installa in ~/.local, con voce nel menu e logo
-sh install.sh --rebuild      # ricompila e aggiorna dopo un git pull
-sh install.sh --uninstall    # rimuove il programma; i dati restano in ~/.local/share/lowcor
+git clone https://github.com/Tommaso-Palestini/LowCor-motivational-app.git
+cd LowCor-motivational-app
+sh install.sh                # scarica l'ultima AppImage in ~/.local
+sh install.sh --uninstall    # la toglie; i dati restano
 ```
 
-In alternativa `npm run desktop:build` prepara un `.deb` e un'AppImage in `src-tauri/target/release/bundle/`.
+Le AppImage hanno bisogno di FUSE 2: su Ubuntu 24.04 `sudo apt install libfuse2t64`, su Ubuntu 22.04
+`sudo apt install libfuse2`. Nelle Releases c'è anche un `.deb`, che però non si aggiorna da solo.
 
-## Sviluppo
+### Windows
 
-```bash
-npm install
-npm run dev            # interfaccia nel browser, con ricarica automatica
-npm run desktop:dev    # la stessa cosa nella finestra dell'app desktop
-npm run lint           # oxlint
-npm test               # test della logica (vitest)
-npm run test:e2e       # end-to-end su Chromium, WebKit e una finestra stretta
-```
+Dalla pagina [Releases](../../releases/latest) scarica `LowCor_*_x64-setup.exe` e installalo. Il programma non è
+firmato: se Windows SmartScreen avvisa, scegli *Ulteriori informazioni → Esegui comunque*.
 
-Su Linux WebKit ha bisogno di alcune librerie di sistema: `sudo npx playwright install-deps webkit`.
+### Aggiornamenti
 
-### AI locale
+A ogni modifica pubblicata su `main` GitHub Actions compila una nuova versione e la mette nelle Releases.
+All'avvio LowCor se ne accorge e propone **Aggiorna e riavvia**. Vale per l'AppImage e per l'installer di
+Windows; si spegne dalle impostazioni ("Cerca aggiornamenti").
 
-Le funzioni AI usano [Ollama](https://ollama.com) sul computer, all'indirizzo `http://localhost:11434`:
+### Dove stanno i dati
+
+| Sistema | Cartella |
+|---|---|
+| Linux | `~/.local/share/lowcor/` |
+| Windows | `%APPDATA%\lowcor\` |
+
+Dentro c'è `data.json` con tutto. Disinstallare il programma non lo cancella. Dalle impostazioni puoi salvare e
+ripristinare un backup.
+
+### AI locale (facoltativa)
+
+Brainstorming, carte generate e schema 9×9 usano [Ollama](https://ollama.com) sul tuo computer:
 
 ```bash
 ollama serve
 ollama pull llama3.2
 ```
 
+Senza Ollama tutto il resto funziona lo stesso.
+
+## Stato del progetto
+
+LowCor è appena passata da sito web ad app desktop. Il piano è in [`SPEC.md`](SPEC.md), i passi in
+[`tasks/todo.md`](tasks/todo.md).
+
+- [x] App desktop per Linux e Windows, dati su file, aggiornamenti automatici
+- [ ] "Salva con nome" del sistema per backup, PDF e calendari
+- [ ] Promemoria come notifiche di sistema, icona nell'area di notifica
+- [ ] Passaggio dei dati tra due PC sulla stessa rete, con codice di conferma di 6 cifre
+
+## Sviluppo
+
+Servono [Node.js](https://nodejs.org) 22, [Rust](https://rustup.rs) e, su Linux, le librerie di sistema:
+
+```bash
+sudo apt install libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev \
+    libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file
+```
+
+```bash
+npm install
+npm run desktop:dev        # l'app in una finestra, con ricarica automatica
+npm run dev                # solo l'interfaccia, nel browser (i dati vanno in localStorage)
+npm run desktop:build      # .deb e AppImage in src-tauri/target/release/bundle/
+sh install.sh --from-source   # compila e installa in ~/.local (senza aggiornamenti automatici)
+```
+
+### Test
+
+```bash
+npm run lint                                        # oxlint
+npm test                                            # logica JS (vitest)
+cargo test --manifest-path src-tauri/Cargo.toml     # lato Rust (salvataggio su file, …)
+npm run test:e2e                                    # Playwright su Chromium, WebKit e una finestra stretta
+```
+
+Su Linux WebKit per Playwright ha bisogno di: `sudo npx playwright install-deps webkit`.
+
+La CI (`.github/workflows/release.yml`) fa lint, test JS, `cargo fmt`, `clippy` e test Rust prima di ogni rilascio.
+Per firmare gli aggiornamenti servono nei segreti del repository `TAURI_SIGNING_PRIVATE_KEY` (la chiave creata con
+`npx tauri signer generate`) e `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+
 ## Struttura
 
-- `src/logic/` logica pura (calendario, energia, focus, backup, cose da fare, …) con i test in `__tests__/`
-- `src/components/` interfaccia per sezione
-- `src/storage/` salvataggio dei dati
-- `src/i18n/` traduzioni (l'italiano è la chiave, inglese in beta)
+- `src/` interfaccia React (Vite)
+  - `logic/` logica pura (calendario, energia, focus, backup, …) con i test in `__tests__/`
+  - `components/` interfaccia per sezione
+  - `storage/` salvataggio: `localStorage` nel browser, file su disco nell'app desktop
+  - `desktop.js` ponte verso Tauri (comandi Rust, HTTP, aggiornamenti)
+  - `i18n/` traduzioni (l'italiano è la chiave, inglese in beta)
+- `src-tauri/` app desktop Tauri 2: configurazione, permessi, icone e codice Rust in `src/`
 - `public/privacy.html`, `public/terms.html` informativa privacy e termini d'uso
 - `e2e/` test Playwright
+- `install.sh` installazione per l'utente su Linux
 
-Le versioni web/PWA, Android e iOS (Capacitor) e il backend Supabase sono stati tolti il 31/10/2026: si ritrovano
+Le versioni web/PWA, Android e iOS (Capacitor) e il backend Supabase sono state tolte il 31/10/2026: si ritrovano
 nella cronologia git fino al commit `e9b674a`.
 
 © 2026 LowCor. Tutti i diritti riservati.
