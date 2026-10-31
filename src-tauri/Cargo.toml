@@ -3,6 +3,8 @@ name = "lowcor"
 version = "0.1.0"
 description = "LowCor: routine, focus e obiettivi, tutto in locale"
 authors = ["XENON1354"]
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Tommaso-Palestini/LowCor-motivational-app"
 edition = "2024"
 rust-version = "1.90"
 

@@ -832,7 +832,7 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>{t("© {year} LowCor. Tutti i diritti riservati.", { year: now.getFullYear() })}</p>
+          <p>{t("© {year} LowCor · software libero, GPL 3", { year: now.getFullYear() })}</p>
           <p className="app-footer-note">
             {t("I tuoi dati restano su questo dispositivo.")}{" "}
             <LegalLink page="privacy" /> · <LegalLink page="terms" />

@@ -79,7 +79,8 @@ Servono [Node.js](https://nodejs.org) 22, [Rust](https://rustup.rs) e, su Linux,
 
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libssl-dev \
-    libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file
+    libayatana-appindicator3-dev librsvg2-dev libxdo-dev build-essential file \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good patchelf
 ```
 
 ```bash
@@ -122,4 +123,10 @@ Senza chiave le versioni escono lo stesso, ma senza aggiornamento automatico.
 Le versioni web/PWA, Android e iOS (Capacitor) e il backend Supabase sono state tolte il 31/10/2026: si ritrovano
 nella cronologia git fino al commit `e9b674a`.
 
-© 2026 LowCor. Tutti i diritti riservati.
+## Licenza
+
+Copyright © 2026 XENON1354.
+
+LowCor è software libero, distribuito con la [GNU General Public License v3.0 o successiva](LICENSE).
+Non ha alcuna garanzia. Usa Tauri, React e le altre librerie elencate in `package.json` e `src-tauri/Cargo.toml`,
+ognuna con la sua licenza.
