@@ -102,8 +102,9 @@ npm run test:e2e                                    # Playwright su Chromium, We
 Su Linux WebKit per Playwright ha bisogno di: `sudo npx playwright install-deps webkit`.
 
 La CI (`.github/workflows/release.yml`) fa lint, test JS, `cargo fmt`, `clippy` e test Rust prima di ogni rilascio.
-Per firmare gli aggiornamenti servono nei segreti del repository `TAURI_SIGNING_PRIVATE_KEY` (la chiave creata con
-`npx tauri signer generate`) e `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+Per firmare gli aggiornamenti serve nei segreti del repository `TAURI_SIGNING_PRIVATE_KEY` (il contenuto della
+chiave creata con `npx tauri signer generate`) e, se la chiave ha una password, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+Senza chiave le versioni escono lo stesso, ma senza aggiornamento automatico.
 
 ## Struttura
 
