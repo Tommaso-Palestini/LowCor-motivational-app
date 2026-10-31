@@ -1,0 +1,56 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "LowCor",
+  "mainBinaryName": "lowcor",
+  "version": "0.1.0",
+  "identifier": "io.github.tommaso-palestini.lowcor",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "LowCor",
+        "width": 1280,
+        "height": 840,
+        "minWidth": 420,
+        "minHeight": 560,
+        "center": true,
+        "backgroundColor": "#01190a"
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob:",
+        "font-src": "'self' data:",
+        "connect-src": "'self' ipc: http://ipc.localhost https: http:",
+        "worker-src": "'self' blob:",
+        "frame-src": "'self'",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'self'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage", "nsis", "msi"],
+    "category": "Productivity",
+    "shortDescription": "Routine, focus e obiettivi, tutto in locale",
+    "longDescription": "Calendario a blocchi con energia, modalità focus, piano flessibile, cose da fare una volta, rito della settimana e obiettivi. I dati restano sul computer.",
+    "copyright": "© 2026 LowCor",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

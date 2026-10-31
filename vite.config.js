@@ -30,6 +30,13 @@ function contentSecurityPolicy() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Con `tauri dev` la finestra si collega a questa porta: deve essere sempre la stessa
+  clearScreen: false,
+  server: {
+    port: 5173,
+    strictPort: true,
+    watch: { ignored: ['**/src-tauri/**'] },
+  },
   plugins: [
     react(),
     contentSecurityPolicy(),

@@ -12,7 +12,10 @@
     "native:sync": "vite build && cap sync",
     "android": "vite build && cap sync android && cap open android",
     "ios": "vite build && cap sync ios && cap open ios",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
@@ -20,6 +23,7 @@
     "@fontsource-variable/lexend": "^5.3.0",
     "@fontsource-variable/onest": "^5.3.1",
     "@fontsource-variable/unbounded": "^5.3.0",
+    "@tauri-apps/api": "^2.12.4",
     "html-to-image": "^1.11.13",
     "jspdf": "^4.2.1",
     "react": "^19.2.8",
@@ -27,6 +31,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
+    "@tauri-apps/cli": "^2.12.4",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
