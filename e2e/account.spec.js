@@ -162,6 +162,35 @@ test("accedo, i dati vanno online e su un altro dispositivo tornano giù", async
   await other.close();
 });
 
+test("su un dispositivo nuovo accedo dall'onboarding e ritrovo i miei dati", async ({ browser, page }, testInfo) => {
+  const email = uniqueEmail("ritorno", testInfo);
+  const userId = await makeUser("Ritorno", email);
+  await seed(page, {
+    jobs: [{ id: "j1", title: "Prenotare il dentista", notes: "", date: null, time: null, minutes: null, energy: "low", done: false, doneAt: null, createdAt: "2026-10-30T09:00:00.000Z" }],
+  });
+  await page.goto("/");
+  await signIn(page, email);
+  await expect(async () => {
+    const { data } = await admin.from("user_state").select("data").eq("user_id", userId).single();
+    expect(data.data.jobs[0].title).toBe("Prenotare il dentista");
+  }).toPass({ timeout: 10000 });
+
+  // Dispositivo vuoto: niente onboarding da rifare, niente scelta tra dati diversi
+  const fresh = await browser.newContext();
+  const second = await fresh.newPage();
+  await second.goto("/");
+  await second.getByRole("button", { name: "Ho già un account" }).click();
+  const dialog = second.getByRole("dialog", { name: "Accedi" });
+  await dialog.getByLabel("Email").fill(email);
+  await dialog.getByLabel("Password").fill(PASSWORD);
+  await dialog.getByRole("button", { name: "Accedi", exact: true }).click();
+  await expect(second.getByText("Eccoci di nuovo: i tuoi dati sono qui")).toBeVisible({ timeout: 15000 });
+  await expect(second.getByRole("dialog")).toHaveCount(0);
+  await expect(second.getByRole("dialog", { name: "Quali dati tengo?" })).toHaveCount(0);
+  await expect(second.getByRole("region", { name: "Da fare una volta" }).getByText("Prenotare il dentista")).toBeVisible();
+  await fresh.close();
+});
+
 test("collego due persone con un invito e vedo gli impegni che mi mostrano", async ({ browser, page }, testInfo) => {
   // Due browser, due accessi e l'attesa della pubblicazione: sui profili mobili serve più tempo
   test.setTimeout(120000);

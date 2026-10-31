@@ -28,7 +28,8 @@ function ToggleRow({ title, text, checked, onChange }) {
 }
 
 // Primo avvio: quattro schermate, una domanda per volta. Si può sempre cambiare tutto dopo.
-function Onboarding({ settings, onLanguage, onFinish }) {
+// Chi ha già un account (onSignIn, solo se il backend c'è) può saltare tutto e riprendere i suoi dati.
+function Onboarding({ settings, onLanguage, onFinish, onSignIn }) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState(settings.userName || "");
   const [picked, setPicked] = useState(["morning", "move"]);
@@ -111,6 +112,13 @@ function Onboarding({ settings, onLanguage, onFinish }) {
               />
             </label>
             <ConsentCheck checked={accepted} onChange={setAccepted} />
+            {onSignIn && (
+              <div className="onb-alt">
+                <button type="button" className="button button--quiet" onClick={onSignIn}>
+                  {t("Ho già un account")}
+                </button>
+              </div>
+            )}
           </section>
         )}
 

@@ -409,6 +409,7 @@ export default {
   "Ho almeno 14 anni": "I am at least 14 years old",
   "Crea l'account": "Create account",
   "Ho già un account": "I already have an account",
+  "Eccoci di nuovo: i tuoi dati sono qui": "Welcome back: your data is here",
   "Scrivi il nome che vedranno le persone collegate.": "Enter the name your connections will see.",
   "Controlla l'indirizzo email.": "Check the email address.",
   "La password deve avere {list}.": "The password needs {list}.",

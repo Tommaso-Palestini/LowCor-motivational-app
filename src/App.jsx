@@ -136,6 +136,17 @@ function App() {
   }, []);
   const cloud = useCloud({ data, today, replaceData });
 
+  // Accesso dall'onboarding: appena arrivano i dati dell'account l'onboarding sparisce,
+  // e con lui la finestra dell'account, che a quel punto non serve più
+  const signInFromOnboardingRef = useRef(false);
+  useEffect(() => {
+    if (data.onboarded && signInFromOnboardingRef.current && cloud.user) {
+      signInFromOnboardingRef.current = false;
+      setIsAccountOpen(false);
+      showToast(t("Eccoci di nuovo: i tuoi dati sono qui"));
+    }
+  }, [data.onboarded, cloud.user]);
+
   // Un link d'invito apre direttamente l'account, dove il codice è già pronto
   useEffect(() => {
     if (capturePendingInvite() && cloud.available) {
@@ -910,6 +921,14 @@ function App() {
             settings={data.settings}
             onLanguage={(language) => setSetting("language", language)}
             onFinish={finishOnboarding}
+            onSignIn={
+              cloud.available
+                ? () => {
+                    signInFromOnboardingRef.current = true;
+                    setIsAccountOpen(true);
+                  }
+                : undefined
+            }
           />
         </Suspense>
       )}
@@ -922,7 +941,10 @@ function App() {
           <AccountDialog
             cloud={cloud}
             today={today}
-            onClose={() => setIsAccountOpen(false)}
+            onClose={() => {
+              signInFromOnboardingRef.current = false;
+              setIsAccountOpen(false);
+            }}
             onClearDevice={deleteAllData}
             notify={(message) => showToast(message)}
           />
