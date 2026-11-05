@@ -301,3 +301,17 @@ test("fluidità della home", async ({ page }, testInfo) => {
   expect(metrics.p95).toBeLessThan(150);
   expect(navigation).toBeLessThan(4000);
 });
+
+test("impostazioni: il pannello entra tutto in larghezza, senza scroll orizzontale", async ({ page }) => {
+  await seed(page, { settings: { fullGas: false, blockAlerts: true } });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Impostazioni" }).click();
+  const panel = page.getByRole("dialog", { name: "Impostazioni" });
+  await expect(panel).toBeVisible();
+  const { overflow, right } = await panel.evaluate((element) => ({
+    overflow: element.scrollWidth - element.clientWidth,
+    right: element.getBoundingClientRect().right - window.innerWidth,
+  }));
+  expect(overflow).toBeLessThanOrEqual(0);
+  expect(right).toBeLessThanOrEqual(0);
+});

@@ -23,6 +23,19 @@ function ViewTabs({ className, view, onViewChange }) {
   );
 }
 
+// Le anteprime "Aa" delle impostazioni usano tre font che altrimenti nessuno scarica:
+// li prepariamo quando il puntatore si avvicina all'ingranaggio, così il pannello si apre già pronto.
+let fontsWarmed = false;
+function warmSettingsFonts() {
+  if (fontsWarmed || typeof document === "undefined" || !document.fonts) {
+    return;
+  }
+  fontsWarmed = true;
+  ["Unbounded Variable", "Fraunces Variable", "Lexend Variable"].forEach((family) => {
+    document.fonts.load(`600 24px "${family}"`, "Aa").catch(() => {});
+  });
+}
+
 function TopBar({
   view,
   onViewChange,
@@ -106,6 +119,8 @@ function TopBar({
               className={`icon-button ${ai.isReady ? "topbar-settings-button--ai" : ""}`}
               aria-label={t("Impostazioni")}
               aria-expanded={isSettingsOpen}
+              onPointerEnter={warmSettingsFonts}
+              onFocus={warmSettingsFonts}
               onClick={() => setIsSettingsOpen((open) => !open)}
             >
               <IconSettings />
